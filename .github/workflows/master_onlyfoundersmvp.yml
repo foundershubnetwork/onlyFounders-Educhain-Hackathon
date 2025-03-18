@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy Next.js app to Azure Web App - OnlyFoundersMvp
 
 on:
@@ -22,16 +19,22 @@ jobs:
           node-version: '20.x'
           cache: 'npm'
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-        
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Next.js app
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+
+      - name: Zip build folder
+        run: zip -r nextjs-app.zip .next public package.json node_modules
+
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'onlyFoundersMvp'
           slot-name: 'Production'
-          package: '.'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4DDC18D9BD26413DB34BC81617E088DD }}
-          
+          package: nextjs-app.zip

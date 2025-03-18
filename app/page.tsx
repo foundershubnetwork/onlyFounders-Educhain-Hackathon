@@ -47,115 +47,41 @@ export default function HomePage() {
   }, []);
 
 
-  // Featured projects data
-  // const featuredProjects = [
-  //   {
-  //     id: "decentravault",
-  //     title: "DecentraVault",
-  //     category: "DeFi",
-  //     description:
-  //       "Secure multi-chain asset management platform with AI-driven risk assessment and automated portfolio rebalancing.",
-  //     image: "/placeholder.svg?height=200&width=400&text=DecentraVault",
-  //     logo: "/placeholder.svg?height=40&width=40&text=DV",
-  //     raised: 425000,
-  //     goal: 500000,
-  //     progress: 85,
-  //     daysLeft: 7,
-  //     categoryColor: "bg-blue-600",
-  //     founders: ["Elena Rodriguez", "Michael Chen"],
-  //     investors: 47,
-  //     location: "Singapore",
-  //     founded: "January 2025",
-  //     tags: ["Multi-chain", "Asset Management", "AI-Powered"],
-  //     milestones: [
-  //       { title: "Smart Contract Audit", completed: true, date: "March 2025" },
-  //       { title: "Beta Launch", completed: true, date: "April 2025" },
-  //       { title: "Mainnet Release", completed: false, date: "June 2025" },
-  //     ],
-  //   },
-  //   {
-  //     id: "metacanvas",
-  //     title: "MetaCanvas",
-  //     category: "NFT",
-  //     description:
-  //       "Revolutionary NFT creation platform enabling artists to co-create and monetize digital art across the metaverse.",
-  //     image: "/placeholder.svg?height=200&width=400&text=MetaCanvas",
-  //     logo: "/placeholder.svg?height=40&width=40&text=MC",
-  //     raised: 380000,
-  //     goal: 450000,
-  //     progress: 84,
-  //     daysLeft: 12,
-  //     categoryColor: "bg-purple-600",
-  //     founders: ["James Wilson", "Sarah Kim"],
-  //     investors: 63,
-  //     location: "Paris, France",
-  //     founded: "February 2025",
-  //     tags: ["NFT", "Creator Economy", "Metaverse"],
-  //     milestones: [
-  //       { title: "Artist Onboarding", completed: true, date: "March 2025" },
-  //       { title: "Marketplace Launch", completed: true, date: "April 2025" },
-  //       { title: "Metaverse Integration", completed: false, date: "July 2025" },
-  //     ],
-  //   },
-  //   {
-  //     id: "chaingovernance",
-  //     title: "ChainGovernance",
-  //     category: "DAO",
-  //     description:
-  //       "Next-generation DAO governance platform with AI-enhanced voting mechanisms and transparent on-chain decision tracking.",
-  //     image: "/placeholder.svg?height=200&width=400&text=ChainGovernance",
-  //     logo: "/placeholder.svg?height=40&width=40&text=CG",
-  //     raised: 520000,
-  //     goal: 600000,
-  //     progress: 87,
-  //     daysLeft: 5,
-  //     categoryColor: "bg-amber-600",
-  //     founders: ["David Nakamoto", "Priya Sharma"],
-  //     investors: 82,
-  //     location: "Berlin, Germany",
-  //     founded: "December 2024",
-  //     tags: ["Governance", "DAO", "Voting Systems"],
-  //     milestones: [
-  //       { title: "Governance Framework", completed: true, date: "February 2025" },
-  //       { title: "Voting System", completed: true, date: "April 2025" },
-  //       { title: "Cross-Chain Support", completed: false, date: "June 2025" },
-  //     ],
-  //   },
-  // ]
-
-
   return (
     <AppLayout showHero={true}>
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-32 overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 z-0"></div>
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full filter blur-3xl animate-blob"></div>
-        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+       <section className="relative py-12 md:py-20 overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 z-0"></div>
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full filter blur-3xl animate-blob"></div>
+      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
 
-        <div className="container relative z-10 mx-auto px-4 max-w-6xl">
-          <div className="flex flex-col items-center text-center space-y-8">
+      <div className="container relative z-10 mx-auto px-4 md:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+          {/* Left side - Text content */}
+          <div className="flex flex-col items-start text-left space-y-6">
             <Badge className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 px-4 py-1.5 text-sm font-medium text-blue-400 border-blue-500/20">
               The Future of Web3 Fundraising
             </Badge>
 
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white max-w-4xl">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
               AI-Powered Investment Platform for{" "}
               <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                 Web3 Startups
               </span>
             </h1>
-            <p className="text-lg text-purple-200/70 max-w-2xl">
-              Optimus AI combines AI-driven investment intelligence with decentralized crowdfunding to democratize
+
+            <p className="text-lg text-purple-200/70 max-w-xl">
+              OnlyFounders combines AI-driven investment intelligence with decentralized crowdfunding to democratize
               early-stage startup funding.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+
+            <div className="flex items-center sm:flex-row gap-4 pt-4">
               <Link href="/marketplace">
                 <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-6 text-lg">
-                  Explore Projects <ArrowRight className="ml-2 h-5 w-5" />
+                  Explore Startups <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/founder-dashboard">
+              <Link href="api/auth/login">
                 <Button
                   variant="outline"
                   className="border-purple-800/20 text-white hover:bg-purple-900/30 px-8 py-6 text-lg"
@@ -166,20 +92,23 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="mt-20 relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-950 z-10"></div>
-            <div className="relative z-0 rounded-xl overflow-hidden border border-purple-800/20">
+          {/* Right side - Image */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-950/50 z-10 rounded-xl"></div>
+            <div className="relative z-0 rounded-xl overflow-hidden border border-purple-800/20 shadow-xl">
               <Image
-                src="/placeholder.svg?height=600&width=1200&text=Optimus+AI+Platform+Preview"
-                alt="Optimus AI Platform"
-                width={1200}
+                src="/placeholder.svg?height=600&width=800&text=Optimus+AI+Platform+Preview"
+                alt="OnlyFounders Platform"
+                width={800}
                 height={600}
-                className="w-full"
+                className="w-full h-auto"
+                priority
               />
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* Features Section */}
       <section className="py-20 bg-gray-900">
@@ -190,7 +119,7 @@ export default function HomePage() {
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Revolutionizing Web3 Fundraising</h2>
             <p className="text-purple-200/70 max-w-2xl mx-auto">
-              Optimus AI leverages cutting-edge technology to create a seamless investment experience for both founders
+              OnlyFounders leverages cutting-edge technology to create a seamless investment experience for both founders
               and investors.
             </p>
           </div>
@@ -201,10 +130,9 @@ export default function HomePage() {
                 <div className="h-12 w-12 rounded-lg bg-blue-600/20 flex items-center justify-center">
                   <Shield className="h-6 w-6 text-blue-400" />
                 </div>
-                <h3 className="text-xl font-bold text-white">AI-Powered Investment Evaluation</h3>
+                <h3 className="text-xl font-bold text-white">AI Investment Insights</h3>
                 <p className="text-purple-200/70">
-                  Our AI agents assess startups based on financials, team strength, market potential, and blockchain
-                  analytics, improving investment success rates by up to 40%.
+                Our AI agents evaluate startups on financials, team, market potential, and blockchain data, boosting investment success by up to 40%.
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-start">
@@ -287,7 +215,7 @@ export default function HomePage() {
             <Badge className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 px-4 py-1.5 text-sm font-medium text-blue-400 border-blue-500/20 mb-4">
               Process
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How Optimus AI Works</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How OnlyFounders Works</h2>
             <p className="text-purple-200/70 max-w-2xl mx-auto">
               Our platform streamlines the fundraising process for founders and provides investors with AI-powered
               insights.
@@ -302,9 +230,9 @@ export default function HomePage() {
                     1
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white mb-2">Project Submission</h3>
+                    <h3 className="text-xl font-bold text-white mb-2">Startup Submission</h3>
                     <p className="text-purple-200/70">
-                      Founders submit their projects with detailed information about their team, technology, and funding
+                      Founders submit their Startups with detailed information about their team, technology, and funding
                       goals.
                     </p>
                   </div>
@@ -317,7 +245,7 @@ export default function HomePage() {
                   <div>
                     <h3 className="text-xl font-bold text-white mb-2">AI Evaluation</h3>
                     <p className="text-purple-200/70">
-                      Our AI system analyzes the project, verifies claims, and generates a comprehensive risk
+                      Our AI system analyzes the startup, verifies claims, and generates a comprehensive risk
                       assessment.
                     </p>
                   </div>
@@ -330,7 +258,7 @@ export default function HomePage() {
                   <div>
                     <h3 className="text-xl font-bold text-white mb-2">Investor Matching</h3>
                     <p className="text-purple-200/70">
-                      Projects are matched with investors based on their investment preferences and risk tolerance.
+                      Startups are matched with investors based on their investment preferences and risk tolerance.
                     </p>
                   </div>
                 </div>
@@ -342,7 +270,7 @@ export default function HomePage() {
                   <div>
                     <h3 className="text-xl font-bold text-white mb-2">DCA Investment</h3>
                     <p className="text-purple-200/70">
-                      Investors deploy capital gradually based on project milestones and performance metrics.
+                      Investors deploy capital gradually based on startup milestones and performance metrics.
                     </p>
                   </div>
                 </div>
@@ -353,7 +281,7 @@ export default function HomePage() {
               <div className="relative rounded-xl overflow-hidden border border-purple-800/20">
                 <Image
                   src="/placeholder.svg?height=500&width=600&text=How+It+Works"
-                  alt="How Optimus AI Works"
+                  alt="How OnlyFounders Works"
                   width={600}
                   height={500}
                   className="w-full"
@@ -372,14 +300,14 @@ export default function HomePage() {
               <Badge className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 px-4 py-1.5 text-sm font-medium text-blue-400 border-blue-500/20 mb-4">
                 Opportunities
               </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Featured Projects</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Featured Startups</h2>
               <p className="text-purple-200/70 max-w-2xl">
-                Discover innovative blockchain projects seeking funding on our platform.
+                Discover innovative blockchain startups seeking funding on our platform.
               </p>
             </div>
             <Link href="/marketplace" className="mt-4 md:mt-0">
               <Button variant="outline" className="border-purple-800/20 text-white hover:bg-purple-900/30">
-                View All Projects <ArrowRight className="ml-2 h-4 w-4" />
+                View All Startups <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </div>
@@ -463,7 +391,7 @@ export default function HomePage() {
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                   >
                     <Link href={`/marketplace/project/${item.startupName.toLowerCase().replace(/\s+/g, "-")}`}>
-                      View Project Details
+                      View Startup Details
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -482,14 +410,14 @@ export default function HomePage() {
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Transform Web3 Fundraising?</h2>
                 <p className="text-purple-200/70 mb-6">
-                  Join Optimus AI today and be part of the future of decentralized investment. Whether you're a founder
+                  Join OnlyFounders today and be part of the future of decentralized investment. Whether you're a founder
                   looking to raise funds or an investor seeking opportunities, our platform provides the tools you need
                   to succeed.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link href="/marketplace">
                     <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                      Explore Projects <ArrowRight className="ml-2 h-4 w-4" />
+                      Explore Startups <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
                   <Link href="/founder-dashboard">
@@ -502,7 +430,7 @@ export default function HomePage() {
               <div className="relative h-64 md:h-auto">
                 <Image
                   src="/placeholder.svg?height=300&width=500&text=Join+Optimus+AI"
-                  alt="Join Optimus AI"
+                  alt="Join OnlyFounders"
                   fill
                   className="object-cover rounded-xl"
                 />

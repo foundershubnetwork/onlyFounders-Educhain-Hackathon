@@ -4,9 +4,10 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { UserProvider } from "@auth0/nextjs-auth0/client";
 import Providers from "./web3/Providers";
 import "@rainbow-me/rainbowkit/styles.css";
+import AuthTracking from "./MIXPanel/AuthTracking";
+import AuthProvider from "../components/AuthProvider"; // Use AuthProvider instead of UserProvider
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,14 +26,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
-        {/* Providers should wrap only the children, not the entire body */}
-        <UserProvider>
+        <AuthProvider>
+          <AuthTracking /> {/* Tracking user login */}
           <Providers>
             {children}
             <Analytics />
             <SpeedInsights />
           </Providers>
-        </UserProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -173,15 +173,14 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
       >
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-6 md:gap-10">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2 pr-5">
               <Image
-                src="/placeholder.svg?height=32&width=32"
+                src="/onlyFounder_logo.svg"
                 alt="Optimus AI Logo"
-                width={32}
-                height={32}
+                width={128}
+                height={48}
                 className="rounded-md"
               />
-              <span className="hidden font-bold text-xl text-white md:inline-block">Optimus AI</span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-6">
@@ -197,6 +196,7 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
                   {item.label}
                 </Link>
               ))}
+              {user? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="text-muted-foreground hover:text-primary">
@@ -214,15 +214,13 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
+              ) : ''}
             </nav>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-2">
-              <Button variant="outline" size="icon" className="border-gray-700 text-gray-400 hover:text-white">
-                <Search className="h-5 w-5" />
-              </Button>
-
+              {user? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -264,9 +262,10 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              ) : ''}
 
               {user? (
-              <DropdownMenu>
+              <DropdownMenu >
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="border-gray-700 text-white gap-2">
                     <Avatar className="h-6 w-6">
@@ -314,7 +313,7 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
               </DropdownMenu>
               ) : (
                 <a href="api/auth/login">
-                  <Button variant="outline">Login</Button>
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white" variant="outline">Login</Button>
                 </a>
               )}
             </div>
@@ -322,7 +321,10 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
             {/* <Button className="hidden md:flex bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
               <Wallet className="mr-2 h-4 w-4" />
             </Button> */}
+
+            {user? (
               <ConnectButton/>
+            ): ( '')}
 
             {/* <ConnectButton.Custom>
                 {({ account, openConnectModal, mounted }) => {

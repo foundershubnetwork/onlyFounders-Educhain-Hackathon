@@ -17,6 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Camera, Check, Linkedin, Twitter, User, Wallet } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const investorProfileSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -27,6 +29,7 @@ const investorProfileSchema = z.object({
     .max(500, { message: "Bio must be less than 500 characters" }),
   investorType: z.string().min(1, { message: "Please select your investor type" }),
   experience: z.string().min(1, { message: "Please select your experience level" }),
+  location: z.string().min(1, { message: "Please select your country" }),
   minInvestment: z.number().min(100, { message: "Minimum investment must be at least 100 USDC" }),
   maxInvestment: z.number().min(100, { message: "Maximum investment must be at least 100 USDC" }),
   interests: z.array(z.string()).min(1, { message: "Please select at least one interest" }),
@@ -40,6 +43,9 @@ type InvestorProfileValues = z.infer<typeof investorProfileSchema>
 export default function InvestorProfileSetupPage() {
   const router = useRouter()
   const [avatarSrc, setAvatarSrc] = useState<string>("/placeholder.svg?height=100&width=100")
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { user, isLoading } = useUser();
 
   const interestOptions = [
     { id: "defi", label: "DeFi" },
@@ -52,6 +58,204 @@ export default function InvestorProfileSetupPage() {
     { id: "social", label: "Social" },
   ]
 
+  const countries = [
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Antigua and Barbuda",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Barbados",
+    "Belarus",
+    "Belgium",
+    "Belize",
+    "Benin",
+    "Bhutan",
+    "Bolivia",
+    "Bosnia and Herzegovina",
+    "Botswana",
+    "Brazil",
+    "Brunei",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Cabo Verde",
+    "Cambodia",
+    "Cameroon",
+    "Canada",
+    "Central African Republic",
+    "Chad",
+    "Chile",
+    "China",
+    "Colombia",
+    "Comoros",
+    "Congo",
+    "Costa Rica",
+    "Croatia",
+    "Cuba",
+    "Cyprus",
+    "Czech Republic",
+    "Denmark",
+    "Djibouti",
+    "Dominica",
+    "Dominican Republic",
+    "Ecuador",
+    "Egypt",
+    "El Salvador",
+    "Equatorial Guinea",
+    "Eritrea",
+    "Estonia",
+    "Eswatini",
+    "Ethiopia",
+    "Fiji",
+    "Finland",
+    "France",
+    "Gabon",
+    "Gambia",
+    "Georgia",
+    "Germany",
+    "Ghana",
+    "Greece",
+    "Grenada",
+    "Guatemala",
+    "Guinea",
+    "Guinea-Bissau",
+    "Guyana",
+    "Haiti",
+    "Honduras",
+    "Hungary",
+    "Iceland",
+    "India",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Ireland",
+    "Israel",
+    "Italy",
+    "Jamaica",
+    "Japan",
+    "Jordan",
+    "Kazakhstan",
+    "Kenya",
+    "Kiribati",
+    "Korea, North",
+    "Korea, South",
+    "Kosovo",
+    "Kuwait",
+    "Kyrgyzstan",
+    "Laos",
+    "Latvia",
+    "Lebanon",
+    "Lesotho",
+    "Liberia",
+    "Libya",
+    "Liechtenstein",
+    "Lithuania",
+    "Luxembourg",
+    "Madagascar",
+    "Malawi",
+    "Malaysia",
+    "Maldives",
+    "Mali",
+    "Malta",
+    "Marshall Islands",
+    "Mauritania",
+    "Mauritius",
+    "Mexico",
+    "Micronesia",
+    "Moldova",
+    "Monaco",
+    "Mongolia",
+    "Montenegro",
+    "Morocco",
+    "Mozambique",
+    "Myanmar",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Netherlands",
+    "New Zealand",
+    "Nicaragua",
+    "Niger",
+    "Nigeria",
+    "North Macedonia",
+    "Norway",
+    "Oman",
+    "Pakistan",
+    "Palau",
+    "Palestine",
+    "Panama",
+    "Papua New Guinea",
+    "Paraguay",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Portugal",
+    "Qatar",
+    "Romania",
+    "Russia",
+    "Rwanda",
+    "Saint Kitts and Nevis",
+    "Saint Lucia",
+    "Saint Vincent and the Grenadines",
+    "Samoa",
+    "San Marino",
+    "Sao Tome and Principe",
+    "Saudi Arabia",
+    "Senegal",
+    "Serbia",
+    "Seychelles",
+    "Sierra Leone",
+    "Singapore",
+    "Slovakia",
+    "Slovenia",
+    "Solomon Islands",
+    "Somalia",
+    "South Africa",
+    "South Sudan",
+    "Spain",
+    "Sri Lanka",
+    "Sudan",
+    "Suriname",
+    "Sweden",
+    "Switzerland",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Tanzania",
+    "Thailand",
+    "Timor-Leste",
+    "Togo",
+    "Tonga",
+    "Trinidad and Tobago",
+    "Tunisia",
+    "Turkey",
+    "Turkmenistan",
+    "Tuvalu",
+    "Uganda",
+    "Ukraine",
+    "United Arab Emirates",
+    "United Kingdom",
+    "United States",
+    "Uruguay",
+    "Uzbekistan",
+    "Vanuatu",
+    "Vatican City",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Zambia",
+    "Zimbabwe",
+  ]
+
   const form = useForm<InvestorProfileValues>({
     resolver: zodResolver(investorProfileSchema),
     defaultValues: {
@@ -60,6 +264,7 @@ export default function InvestorProfileSetupPage() {
       bio: "",
       investorType: "",
       experience: "",
+      location: "",
       minInvestment: 1000,
       maxInvestment: 10000,
       interests: [],
@@ -69,14 +274,104 @@ export default function InvestorProfileSetupPage() {
     },
   })
 
-  function onSubmit(data: InvestorProfileValues) {
-    console.log(data)
-    router.push("/investor-dashboard")
+ 
+
+  async function onSubmit(data: InvestorProfileValues) {
+    setIsSubmitting(true)
+
+    try {
+      // Get user_id from wherever it's stored in your application
+      const userId = user.sub?.substring(14);
+
+      if (!userId) {
+        toast({
+          title: "Authentication error",
+          description: "Please sign in again to continue.",
+          variant: "destructive",
+        })
+        router.push("/login")
+        return
+      }
+
+      // Create FormData object
+      const formData = new FormData()
+
+      // Add profile data
+      formData.append("professionalTitle", data.title)
+      formData.append("location", data.location)
+      formData.append("bio", data.bio)
+      formData.append("username", data.fullName)
+
+      // Add profile picture if available
+      if (avatarFile) {
+        formData.append("profile_pic_file", avatarFile)
+      }
+
+      // Create investorData object
+      const investorData = {
+        investorType: data.investorType,
+        investmentExperience: data.experience,
+        minInvestment: data.minInvestment,
+        maxInvestment: data.maxInvestment,
+        investmentInterest: data.interests,
+        socialLinks : {
+          Linkedin: data.linkedin,
+          Twitter: data.twitter,
+        },
+      }
+
+      // Append investorData as JSON string
+      formData.append("investorData", JSON.stringify(investorData))
+
+      // Create socialLinks object
+      const socialLinks = {
+        Linkedin: data.linkedin,
+        Twitter: data.twitter,
+      }
+
+      // Append socialLinks as JSON string
+      formData.append("socialLinks", JSON.stringify(socialLinks))
+
+      // Make API call
+      const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/submit-personal-details", {
+        method: "POST",
+        headers: {
+          user_id: userId,
+        },
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+        throw new Error(errorData?.message || "Failed to submit profile")
+      }
+
+      toast({
+        title: "Profile submitted successfully",
+        description: "Your investor profile has been saved.",
+      })
+
+      // Navigate to dashboard
+      router.push("/profile")
+    } catch (error) {
+      console.error("Error submitting profile:", error)
+      toast({
+        title: "Submission failed",
+        description: error instanceof Error ? error.message : "Failed to save your profile. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      // Save file for upload
+      setAvatarFile(file)
+
+      // Preview image
       const reader = new FileReader()
       reader.onload = (e) => {
         if (e.target?.result) {
@@ -252,6 +547,31 @@ export default function InvestorProfileSetupPage() {
                     />
                   </div>
 
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white">Location</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                              <SelectValue placeholder="Select your country" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-gray-900 border-gray-800 text-white max-h-[200px]">
+                            {countries.map((country) => (
+                              <SelectItem key={country} value={country}>
+                                {country}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <div className="space-y-6">
                     <h3 className="text-lg font-medium text-white">Investment Preferences</h3>
 
@@ -316,41 +636,47 @@ export default function InvestorProfileSetupPage() {
                         </div>
                       </div>
 
-                      <div>
-                        <FormLabel className="text-white block mb-3">Investment Interests</FormLabel>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {interestOptions.map((option) => (
-                            <FormField
-                              key={option.id}
-                              control={form.control}
-                              name="interests"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={option.id}
-                                    className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-3 bg-gray-800/50"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(option.id)}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([...field.value, option.id])
-                                            : field.onChange(field.value?.filter((value) => value !== option.id))
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-white font-normal cursor-pointer">
-                                      {option.label}
-                                    </FormLabel>
-                                  </FormItem>
-                                )
-                              }}
-                            />
-                          ))}
-                        </div>
-                        <FormMessage className="mt-2">{form.formState.errors.interests?.message}</FormMessage>
-                      </div>
+                      <FormField
+                        control={form.control}
+                        name="interests"
+                        render={() => (
+                          <FormItem>
+                            <FormLabel className="text-white block mb-3">Investment Interests</FormLabel>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                              {interestOptions.map((option) => (
+                                <FormField
+                                  key={option.id}
+                                  control={form.control}
+                                  name="interests"
+                                  render={({ field }) => {
+                                    return (
+                                      <FormItem
+                                        key={option.id}
+                                        className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-3 bg-gray-800/50"
+                                      >
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value?.includes(option.id)}
+                                            onCheckedChange={(checked) => {
+                                              return checked
+                                                ? field.onChange([...field.value, option.id])
+                                                : field.onChange(field.value?.filter((value) => value !== option.id))
+                                            }}
+                                          />
+                                        </FormControl>
+                                        <FormLabel className="text-white font-normal cursor-pointer">
+                                          {option.label}
+                                        </FormLabel>
+                                      </FormItem>
+                                    )
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            <FormMessage className="mt-2" />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </div>
 
@@ -426,13 +752,18 @@ export default function InvestorProfileSetupPage() {
                       variant="outline"
                       onClick={() => router.push("/profile/setup")}
                       className="border-gray-700 text-white"
+                      disabled={isSubmitting}
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       Back
                     </Button>
-                    <Button type="submit" className="bg-black hover:bg-gray-900 text-white border border-gray-800">
-                      Complete Setup
-                      <Check className="ml-2 h-4 w-4" />
+                    <Button
+                      type="submit"
+                      className="bg-black hover:bg-gray-900 text-white border border-gray-800"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Submitting..." : "Complete Setup"}
+                      {!isSubmitting && <Check className="ml-2 h-4 w-4" />}
                     </Button>
                   </div>
                 </form>

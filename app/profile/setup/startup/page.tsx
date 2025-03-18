@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState } from "react"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -15,92 +14,410 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ArrowLeft, Building, Camera, Check, FileText, Github, Globe, Twitter } from "lucide-react"
+import { ArrowLeft, ArrowRight, Building, Camera, Facebook, Globe, Instagram, Linkedin, Twitter } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
+import { useUser } from "@auth0/nextjs-auth0/client"
 
-const startupSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  tagline: z
+const serviceProviderProfileSchema = z.object({
+  fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  title: z.string().min(2, { message: "Title is required" }),
+  bio: z
     .string()
-    .min(5, { message: "Tagline must be at least 5 characters" })
-    .max(100, { message: "Tagline must be less than 100 characters" }),
-  description: z
-    .string()
-    .min(50, { message: "Description must be at least 50 characters" })
-    .max(1000, { message: "Description must be less than 1000 characters" }),
+    .min(10, { message: "Bio must be at least 10 characters" })
+    .max(500, { message: "Bio must be less than 500 characters" }),
+  experience: z.string().min(1, { message: "Please select your experience level" }),
+  skills: z.string().min(2, { message: "Skills are required" }),
+  location: z.string().min(1, { message: "Please select your country" }),
+  businessName: z.string().min(2, { message: "Business name is required" }),
+  nameOfServiceProvider: z.string().min(2, { message: "Service provider name is required" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
   category: z.string().min(1, { message: "Please select a category" }),
-  stage: z.string().min(1, { message: "Please select your startup stage" }),
-  foundedYear: z.string().min(4, { message: "Please enter a valid year" }).max(4),
-  teamSize: z.string().min(1, { message: "Please select your team size" }),
-  website: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
-  twitter: z.string().optional().or(z.literal("")),
-  github: z.string().optional().or(z.literal("")),
-  whitepaper: z.string().optional().or(z.literal("")),
-  blockchain: z.array(z.string()).min(1, { message: "Please select at least one blockchain" }),
+  serviceDescription: z.string().min(10, { message: "Service description must be at least 10 characters" }),
+  pricingModel: z.string().min(1, { message: "Please select a pricing model" }),
+  websiteUrl: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  companyTwitter: z.string().optional().or(z.literal("")),
+  companyLinkedin: z.string().optional().or(z.literal("")),
+  companyInstagram: z.string().optional().or(z.literal("")),
+  companyFacebook: z.string().optional().or(z.literal("")),
+  personalTwitter: z.string().optional().or(z.literal("")),
+  personalLinkedin: z.string().optional().or(z.literal("")),
+  personalInstagram: z.string().optional().or(z.literal("")),
+  personalFacebook: z.string().optional().or(z.literal("")),
 })
 
-type StartupValues = z.infer<typeof startupSchema>
+type ServiceProviderProfileValues = z.infer<typeof serviceProviderProfileSchema>
 
-export default function StartupSetupPage() {
+export default function ServiceProviderProfileSetupPage() {
   const router = useRouter()
-  const [logoSrc, setLogoSrc] = useState<string>("/placeholder.svg?height=100&width=100")
-  const [coverSrc, setCoverSrc] = useState<string>("/placeholder.svg?height=300&width=800")
+  const [avatarSrc, setAvatarSrc] = useState<string>("/placeholder.svg?height=100&width=100")
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { user, isLoading } = useUser()
 
-  const blockchainOptions = [
-    { id: "ethereum", label: "Ethereum" },
-    { id: "polygon", label: "Polygon" },
-    { id: "solana", label: "Solana" },
-    { id: "binance", label: "BNB Chain" },
-    { id: "avalanche", label: "Avalanche" },
-    { id: "arbitrum", label: "Arbitrum" },
-    { id: "optimism", label: "Optimism" },
-    { id: "near", label: "NEAR" },
-  ]
-
-  const form = useForm<StartupValues>({
-    resolver: zodResolver(startupSchema),
+  const form = useForm<ServiceProviderProfileValues>({
+    resolver: zodResolver(serviceProviderProfileSchema),
     defaultValues: {
-      name: "",
-      tagline: "",
-      description: "",
+      fullName: "",
+      title: "",
+      bio: "",
+      experience: "",
+      skills: "",
+      location: "",
+      businessName: "",
+      nameOfServiceProvider: "",
+      email: "",
       category: "",
-      stage: "",
-      foundedYear: new Date().getFullYear().toString(),
-      teamSize: "",
-      website: "",
-      twitter: "",
-      github: "",
-      whitepaper: "",
-      blockchain: [],
+      serviceDescription: "",
+      pricingModel: "",
+      websiteUrl: "",
+      companyTwitter: "",
+      companyLinkedin: "",
+      companyInstagram: "",
+      companyFacebook: "",
+      personalTwitter: "",
+      personalLinkedin: "",
+      personalInstagram: "",
+      personalFacebook: "",
     },
   })
 
-  function onSubmit(data: StartupValues) {
-    console.log(data)
-    router.push("/founder-dashboard")
-  }
+  const countries = [
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Antigua and Barbuda",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Barbados",
+    "Belarus",
+    "Belgium",
+    "Belize",
+    "Benin",
+    "Bhutan",
+    "Bolivia",
+    "Bosnia and Herzegovina",
+    "Botswana",
+    "Brazil",
+    "Brunei",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Cabo Verde",
+    "Cambodia",
+    "Cameroon",
+    "Canada",
+    "Central African Republic",
+    "Chad",
+    "Chile",
+    "China",
+    "Colombia",
+    "Comoros",
+    "Congo",
+    "Costa Rica",
+    "Croatia",
+    "Cuba",
+    "Cyprus",
+    "Czech Republic",
+    "Denmark",
+    "Djibouti",
+    "Dominica",
+    "Dominican Republic",
+    "Ecuador",
+    "Egypt",
+    "El Salvador",
+    "Equatorial Guinea",
+    "Eritrea",
+    "Estonia",
+    "Eswatini",
+    "Ethiopia",
+    "Fiji",
+    "Finland",
+    "France",
+    "Gabon",
+    "Gambia",
+    "Georgia",
+    "Germany",
+    "Ghana",
+    "Greece",
+    "Grenada",
+    "Guatemala",
+    "Guinea",
+    "Guinea-Bissau",
+    "Guyana",
+    "Haiti",
+    "Honduras",
+    "Hungary",
+    "Iceland",
+    "India",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Ireland",
+    "Israel",
+    "Italy",
+    "Jamaica",
+    "Japan",
+    "Jordan",
+    "Kazakhstan",
+    "Kenya",
+    "Kiribati",
+    "Korea, North",
+    "Korea, South",
+    "Kosovo",
+    "Kuwait",
+    "Kyrgyzstan",
+    "Laos",
+    "Latvia",
+    "Lebanon",
+    "Lesotho",
+    "Liberia",
+    "Libya",
+    "Liechtenstein",
+    "Lithuania",
+    "Luxembourg",
+    "Madagascar",
+    "Malawi",
+    "Malaysia",
+    "Maldives",
+    "Mali",
+    "Malta",
+    "Marshall Islands",
+    "Mauritania",
+    "Mauritius",
+    "Mexico",
+    "Micronesia",
+    "Moldova",
+    "Monaco",
+    "Mongolia",
+    "Montenegro",
+    "Morocco",
+    "Mozambique",
+    "Myanmar",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Netherlands",
+    "New Zealand",
+    "Nicaragua",
+    "Niger",
+    "Nigeria",
+    "North Macedonia",
+    "Norway",
+    "Oman",
+    "Pakistan",
+    "Palau",
+    "Palestine",
+    "Panama",
+    "Papua New Guinea",
+    "Paraguay",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Portugal",
+    "Qatar",
+    "Romania",
+    "Russia",
+    "Rwanda",
+    "Saint Kitts and Nevis",
+    "Saint Lucia",
+    "Saint Vincent and the Grenadines",
+    "Samoa",
+    "San Marino",
+    "Sao Tome and Principe",
+    "Saudi Arabia",
+    "Senegal",
+    "Serbia",
+    "Seychelles",
+    "Sierra Leone",
+    "Singapore",
+    "Slovakia",
+    "Slovenia",
+    "Solomon Islands",
+    "Somalia",
+    "South Africa",
+    "South Sudan",
+    "Spain",
+    "Sri Lanka",
+    "Sudan",
+    "Suriname",
+    "Sweden",
+    "Switzerland",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Tanzania",
+    "Thailand",
+    "Timor-Leste",
+    "Togo",
+    "Tonga",
+    "Trinidad and Tobago",
+    "Tunisia",
+    "Turkey",
+    "Turkmenistan",
+    "Tuvalu",
+    "Uganda",
+    "Ukraine",
+    "United Arab Emirates",
+    "United Kingdom",
+    "United States",
+    "Uruguay",
+    "Uzbekistan",
+    "Vanuatu",
+    "Vatican City",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Zambia",
+    "Zimbabwe",
+  ]
 
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setLogoSrc(e.target.result as string)
-        }
+  const categories = [
+    "Development",
+    "Design",
+    "Marketing",
+    "Legal",
+    "Finance",
+    "Consulting",
+    "Security",
+    "Community Management",
+    "Content Creation",
+    "Smart Contract Audit",
+    "Tokenomics",
+    "Other",
+  ]
+
+  const pricingModels = [
+    "Hourly",
+    "Fixed Price",
+    "Project-based",
+    "Retainer",
+    "Subscription",
+    "Success Fee",
+    "Hybrid",
+    "Custom",
+  ]
+
+  async function onSubmit(data: ServiceProviderProfileValues) {
+    setIsSubmitting(true)
+
+    try {
+      // Get user_id from wherever it's stored in your application
+      const userId = user?.sub?.substring(14)
+
+      if (!userId) {
+        toast({
+          title: "Authentication error",
+          description: "Please sign in again to continue.",
+          variant: "destructive",
+        })
+        router.push("/login")
+        return
       }
-      reader.readAsDataURL(file)
+
+      // Create FormData object
+      const formData = new FormData()
+
+      // Add profile data
+      formData.append("professionalTitle", data.title)
+      formData.append("location", data.location)
+      formData.append("bio", data.bio)
+      formData.append("username", data.fullName)
+      formData.append("email", data.email)
+
+      // Add profile picture if available
+      if (avatarFile) {
+        formData.append("profile_pic_file", avatarFile)
+      }
+
+      // Parse skills into array
+      const skillsArray = data.skills.split(",").map((skill) => skill.trim())
+
+      // Create company social links object
+      const companySocialLinks = {
+        Twitter: data.companyTwitter,
+        LinkedIn: data.companyLinkedin,
+        Instagram: data.companyInstagram,
+        Facebook: data.companyFacebook,
+       
+      }
+
+      // Create personal social links object
+      const personalSocialLinks = {
+        Twitter: data.personalTwitter,
+        LinkedIn: data.personalLinkedin,
+        Instagram: data.personalInstagram,
+        Facebook: data.personalFacebook,
+      }
+
+      // Create service provider data object
+      const serviceProviderData = {
+        businessName: data.businessName,
+        email: data.email,
+        nameOfServiceProvider: data.nameOfServiceProvider,
+        category: data.category,
+        serviceDescription: data.serviceDescription,
+        pricingModel: data.pricingModel,
+        Website: data.websiteUrl,
+        companySocialLinks: companySocialLinks,
+        personalSocialLinks: personalSocialLinks,
+      }
+
+      // Append serviceProviderData as JSON string
+      formData.append("serviceProviderData", JSON.stringify(serviceProviderData))
+
+      // Make API call
+      const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/submit-personal-details", {
+        method: "POST",
+        headers: {
+          user_id: userId,
+        },
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+        throw new Error(errorData?.message || "Failed to submit profile")
+      }
+
+      toast({
+        title: "Profile submitted successfully",
+        description: "Your service provider profile has been saved.",
+      })
+
+      // Navigate to next step
+      router.push("/profile")
+    } catch (error) {
+      console.error("Error submitting profile:", error)
+      toast({
+        title: "Submission failed",
+        description: error instanceof Error ? error.message : "Failed to save your profile. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      // Save file for upload
+      setAvatarFile(file)
+
+      // Preview image
       const reader = new FileReader()
       reader.onload = (e) => {
         if (e.target?.result) {
-          setCoverSrc(e.target.result as string)
+          setAvatarSrc(e.target.result as string)
         }
       }
       reader.readAsDataURL(file)
@@ -111,15 +428,15 @@ export default function StartupSetupPage() {
     <div className="max-w-4xl mx-auto py-12">
       <div className="space-y-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-white">Startup Information</h1>
-          <p className="text-gray-400">Tell us about your Web3 project or startup</p>
+          <h1 className="text-3xl font-bold text-white">Service Provider Profile</h1>
+          <p className="text-gray-400">Tell us about your services and expertise in the Web3 space</p>
         </div>
 
         <div className="w-full">
           <div className="space-y-2 mb-6">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-400">Profile Setup</span>
-              <span className="text-white font-medium">Step 3 of 3</span>
+              <span className="text-white font-medium">Step 2 of 2</span>
             </div>
             <Progress
               value={100}
@@ -130,77 +447,53 @@ export default function StartupSetupPage() {
 
           <Card className="bg-gray-900 border-gray-800">
             <CardHeader>
-              <CardTitle className="text-xl text-white">Startup Details</CardTitle>
+              <CardTitle className="text-xl text-white">Service Provider Information</CardTitle>
               <CardDescription className="text-gray-400">
-                This information will be displayed on your project page
+                This information will be visible to potential clients in the community
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-lg font-medium text-white mb-4">Logo & Cover Image</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="flex flex-col items-center">
-                          <div className="relative mb-4">
-                            <Avatar className="h-24 w-24 border-2 border-gray-800">
-                              <AvatarImage src={logoSrc} alt="Logo" />
-                              <AvatarFallback className="bg-gray-800 text-gray-400">
-                                <Building className="h-12 w-12" />
-                              </AvatarFallback>
-                            </Avatar>
-                            <label
-                              htmlFor="logo-upload"
-                              className="absolute bottom-0 right-0 p-1 rounded-full bg-gray-800 border border-gray-700 cursor-pointer"
-                            >
-                              <Camera className="h-4 w-4 text-gray-400" />
-                              <span className="sr-only">Upload logo</span>
-                            </label>
-                            <input
-                              id="logo-upload"
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={handleLogoChange}
-                            />
-                          </div>
-                          <p className="text-sm text-gray-400">Upload project logo</p>
-                        </div>
-
-                        <div className="md:col-span-2">
-                          <div className="relative h-40 w-full rounded-lg overflow-hidden border-2 border-gray-800">
-                            <Image src={coverSrc || "/placeholder.svg"} alt="Cover" fill className="object-cover" />
-                            <label
-                              htmlFor="cover-upload"
-                              className="absolute bottom-2 right-2 p-1.5 rounded-md bg-gray-800/80 border border-gray-700 cursor-pointer"
-                            >
-                              <Camera className="h-4 w-4 text-gray-400" />
-                              <span className="sr-only">Upload cover</span>
-                            </label>
-                            <input
-                              id="cover-upload"
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={handleCoverChange}
-                            />
-                          </div>
-                          <p className="text-sm text-gray-400 mt-2">Upload a cover image (recommended: 1200×400px)</p>
-                        </div>
-                      </div>
+                  <div className="flex flex-col items-center mb-6">
+                    <div className="relative mb-4">
+                      <Avatar className="h-24 w-24 border-2 border-gray-800">
+                        <AvatarImage src={avatarSrc} alt="Profile" />
+                        <AvatarFallback className="bg-gray-800 text-gray-400">
+                          <Building className="h-12 w-12" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <label
+                        htmlFor="avatar-upload"
+                        className="absolute bottom-0 right-0 p-1 rounded-full bg-gray-800 border border-gray-700 cursor-pointer"
+                      >
+                        <Camera className="h-4 w-4 text-gray-400" />
+                        <span className="sr-only">Upload avatar</span>
+                      </label>
+                      <input
+                        id="avatar-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAvatarChange}
+                      />
                     </div>
+                    <p className="text-sm text-gray-400">Upload a professional profile picture</p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-medium text-white">Personal Information</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
-                        name="name"
+                        name="fullName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Project Name</FormLabel>
+                            <FormLabel className="text-white">Full Name</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="DecentraVault"
+                                placeholder="John Doe"
                                 className="bg-gray-800 border-gray-700 text-white"
                                 {...field}
                               />
@@ -212,20 +505,17 @@ export default function StartupSetupPage() {
 
                       <FormField
                         control={form.control}
-                        name="tagline"
+                        name="title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Tagline</FormLabel>
+                            <FormLabel className="text-white">Professional Title</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="Decentralized vault for secure asset management"
+                                placeholder="CEO & Founder"
                                 className="bg-gray-800 border-gray-700 text-white"
                                 {...field}
                               />
                             </FormControl>
-                            <FormDescription className="text-gray-500">
-                              {field.value.length}/100 characters
-                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -234,90 +524,65 @@ export default function StartupSetupPage() {
 
                     <FormField
                       control={form.control}
-                      name="description"
+                      name="bio"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white">Project Description</FormLabel>
+                          <FormLabel className="text-white">Bio</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="Describe your project, its mission, and the problem it solves..."
-                              className="bg-gray-800 border-gray-700 text-white min-h-[150px]"
+                              placeholder="Tell us about your background, experience, and vision..."
+                              className="bg-gray-800 border-gray-700 text-white min-h-[120px]"
                               {...field}
                             />
                           </FormControl>
                           <FormDescription className="text-gray-500">
-                            {field.value.length}/1000 characters
+                            {field.value.length}/500 characters
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
 
+
+                    <FormField
+                      control={form.control}
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white">Location</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                                <SelectValue placeholder="Select your country" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-gray-900 border-gray-800 text-white max-h-[200px]">
+                              {countries.map((country) => (
+                                <SelectItem key={country} value={country}>
+                                  {country}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-medium text-white">Business Information</h3>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
-                        name="category"
+                        name="businessName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Category</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                                  <SelectValue placeholder="Select a category" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                                <SelectItem value="defi">DeFi</SelectItem>
-                                <SelectItem value="nft">NFT</SelectItem>
-                                <SelectItem value="dao">DAO</SelectItem>
-                                <SelectItem value="gaming">Gaming</SelectItem>
-                                <SelectItem value="infrastructure">Infrastructure</SelectItem>
-                                <SelectItem value="metaverse">Metaverse</SelectItem>
-                                <SelectItem value="privacy">Privacy</SelectItem>
-                                <SelectItem value="social">Social</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="stage"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-white">Project Stage</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                                  <SelectValue placeholder="Select your project stage" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                                <SelectItem value="concept">Concept/Idea</SelectItem>
-                                <SelectItem value="prototype">Prototype/MVP</SelectItem>
-                                <SelectItem value="beta">Beta</SelectItem>
-                                <SelectItem value="launched">Launched</SelectItem>
-                                <SelectItem value="scaling">Scaling</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="foundedYear"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-white">Founded Year</FormLabel>
+                            <FormLabel className="text-white">Business Name</FormLabel>
                             <FormControl>
                               <Input
-                                type="number"
-                                placeholder="2023"
+                                placeholder="Your Company LLC"
                                 className="bg-gray-800 border-gray-700 text-white"
                                 {...field}
                               />
@@ -329,22 +594,59 @@ export default function StartupSetupPage() {
 
                       <FormField
                         control={form.control}
-                        name="teamSize"
+                        name="nameOfServiceProvider"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Team Size</FormLabel>
+                            <FormLabel className="text-white">Service Provider Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Name of your service"
+                                className="bg-gray-800 border-gray-700 text-white"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Business Email</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder="contact@yourcompany.com"
+                                className="bg-gray-800 border-gray-700 text-white"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Service Category</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                                  <SelectValue placeholder="Select team size" />
+                                  <SelectValue placeholder="Select service category" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                                <SelectItem value="solo">Solo Founder</SelectItem>
-                                <SelectItem value="2-5">2-5 People</SelectItem>
-                                <SelectItem value="6-10">6-10 People</SelectItem>
-                                <SelectItem value="11-20">11-20 People</SelectItem>
-                                <SelectItem value="20+">20+ People</SelectItem>
+                                {categories.map((category) => (
+                                  <SelectItem key={category} value={category.toLowerCase()}>
+                                    {category}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -353,130 +655,248 @@ export default function StartupSetupPage() {
                       />
                     </div>
 
-                    <div>
-                      <FormLabel className="text-white block mb-3">Blockchain Platforms</FormLabel>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {blockchainOptions.map((option) => (
-                          <FormField
-                            key={option.id}
-                            control={form.control}
-                            name="blockchain"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={option.id}
-                                  className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-3 bg-gray-800/50"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(option.id)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...field.value, option.id])
-                                          : field.onChange(field.value?.filter((value) => value !== option.id))
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="text-white font-normal cursor-pointer">
-                                    {option.label}
-                                  </FormLabel>
-                                </FormItem>
-                              )
-                            }}
-                          />
-                        ))}
-                      </div>
-                      <FormMessage className="mt-2">{form.formState.errors.blockchain?.message}</FormMessage>
+                    <FormField
+                      control={form.control}
+                      name="serviceDescription"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white">Service Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Describe the services you offer in detail..."
+                              className="bg-gray-800 border-gray-700 text-white min-h-[120px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="pricingModel"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Pricing Model</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                                  <SelectValue placeholder="Select pricing model" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="bg-gray-900 border-gray-800 text-white">
+                                {pricingModels.map((model) => (
+                                  <SelectItem key={model} value={model.toLowerCase()}>
+                                    {model}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="websiteUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Website URL</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Input
+                                  placeholder="https://yourcompany.com"
+                                  className="bg-gray-800 border-gray-700 text-white pl-10"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
+                  </div>
 
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-white">Web Presence</h3>
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-medium text-white">Company Social Media</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="companyTwitter"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Company Twitter</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Input
+                                  placeholder="@companyname"
+                                  className="bg-gray-800 border-gray-700 text-white pl-10"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormField
-                          control={form.control}
-                          name="website"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-white">Website</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                  <Input
-                                    placeholder="https://yourproject.com"
-                                    className="bg-gray-800 border-gray-700 text-white pl-10"
-                                    {...field}
-                                  />
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      <FormField
+                        control={form.control}
+                        name="companyLinkedin"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Company LinkedIn</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Input
+                                  placeholder="linkedin.com/company/name"
+                                  className="bg-gray-800 border-gray-700 text-white pl-10"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                        <FormField
-                          control={form.control}
-                          name="twitter"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-white">Twitter</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                  <Input
-                                    placeholder="@projectname"
-                                    className="bg-gray-800 border-gray-700 text-white pl-10"
-                                    {...field}
-                                  />
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      <FormField
+                        control={form.control}
+                        name="companyInstagram"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Company Instagram</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Input
+                                  placeholder="instagram.com/companyname"
+                                  className="bg-gray-800 border-gray-700 text-white pl-10"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                        <FormField
-                          control={form.control}
-                          name="github"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-white">GitHub</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Github className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                  <Input
-                                    placeholder="github.com/projectname"
-                                    className="bg-gray-800 border-gray-700 text-white pl-10"
-                                    {...field}
-                                  />
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      <FormField
+                        control={form.control}
+                        name="companyFacebook"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Company Facebook</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Input
+                                  placeholder="facebook.com/companyname"
+                                  className="bg-gray-800 border-gray-700 text-white pl-10"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
 
-                        <FormField
-                          control={form.control}
-                          name="whitepaper"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-white">Whitepaper</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                  <Input
-                                    placeholder="Link to your whitepaper"
-                                    className="bg-gray-800 border-gray-700 text-white pl-10"
-                                    {...field}
-                                  />
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-medium text-white">Personal Social Media</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="personalTwitter"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Personal Twitter</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Input
+                                  placeholder="@username"
+                                  className="bg-gray-800 border-gray-700 text-white pl-10"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="personalLinkedin"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Personal LinkedIn</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Input
+                                  placeholder="linkedin.com/in/username"
+                                  className="bg-gray-800 border-gray-700 text-white pl-10"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="personalInstagram"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Personal Instagram</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Input
+                                  placeholder="instagram.com/username"
+                                  className="bg-gray-800 border-gray-700 text-white pl-10"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="personalFacebook"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Personal Facebook</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Input
+                                  placeholder="facebook.com/username"
+                                  className="bg-gray-800 border-gray-700 text-white pl-10"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </div>
 
@@ -484,15 +904,20 @@ export default function StartupSetupPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => router.push("/profile/setup/founder")}
+                      onClick={() => router.push("/profile")}
                       className="border-gray-700 text-white"
+                      disabled={isSubmitting}
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       Back
                     </Button>
-                    <Button type="submit" className="bg-black hover:bg-gray-900 text-white border border-gray-800">
-                      Complete Setup
-                      <Check className="ml-2 h-4 w-4" />
+                    <Button
+                      type="submit"
+                      className="bg-black hover:bg-gray-900 text-white border border-gray-800"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Submitting..." : "Submit"}
+                      {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
                     </Button>
                   </div>
                 </form>

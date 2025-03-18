@@ -7,16 +7,66 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { ArrowRight, Building, User, Wallet } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 export default function ProfileSetupPage() {
   const router = useRouter()
   const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  const { user, isLoading } = useUser();
 
-  const handleContinue = () => {
-    if (selectedType === "founder") {
-      router.push("/profile/setup/founder")
-    } else if (selectedType === "investor") {
-      router.push("/profile/setup/investor")
+  const handleContinue = async () => {
+    if (!selectedType) return
+
+    setIsSubmitting(true)
+
+    try {
+      const userId = user.sub?.substring(14);
+
+      if (!userId) {
+        toast({
+          title: "Authentication error",
+          description: "Please sign in again to continue.",
+          variant: "destructive",
+        })
+        router.push("/login")
+        return
+      }
+
+      const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/submit-role", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          user_id: userId,
+        },
+        body: JSON.stringify({
+          role: selectedType,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to submit role")
+      }
+
+      // Navigate to the next page based on the selected role
+      if (selectedType === "Founder") {
+        router.push("/profile/setup/founder")
+      } else if (selectedType === "Investor") {
+        router.push("/profile/setup/investor")
+      } else if (selectedType === "ServiceProvider") {
+        router.push("/profile/setup/startup")
+      }
+    } catch (error) {
+      console.error("Error submitting role:", error)
+      toast({
+        title: "Something went wrong",
+        description: "Failed to save your role. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -35,10 +85,10 @@ export default function ProfileSetupPage() {
             <div className="space-y-2 mb-6">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-400">Profile Setup</span>
-                <span className="text-white font-medium">Step 1 of 3</span>
+                <span className="text-white font-medium">Step 1 of 2</span>
               </div>
               <Progress
-                value={33}
+                value={50}
                 className="h-2 bg-gray-700"
                 indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
               />
@@ -52,11 +102,11 @@ export default function ProfileSetupPage() {
               <CardContent className="space-y-4">
                 <div
                   className={`flex items-start p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedType === "founder"
+                    selectedType === "Founder"
                       ? "border-blue-600 bg-blue-950/20"
                       : "border-gray-800 bg-gray-800/50 hover:border-gray-700"
                   }`}
-                  onClick={() => setSelectedType("founder")}
+                  onClick={() => setSelectedType("Founder")}
                 >
                   <div className="mr-4 p-2 rounded-full bg-blue-900/30">
                     <Building className="h-6 w-6 text-blue-400" />
@@ -71,11 +121,11 @@ export default function ProfileSetupPage() {
 
                 <div
                   className={`flex items-start p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedType === "investor"
+                    selectedType === "Investor"
                       ? "border-purple-600 bg-purple-950/20"
                       : "border-gray-800 bg-gray-800/50 hover:border-gray-700"
                   }`}
-                  onClick={() => setSelectedType("investor")}
+                  onClick={() => setSelectedType("Investor")}
                 >
                   <div className="mr-4 p-2 rounded-full bg-purple-900/30">
                     <Wallet className="h-6 w-6 text-purple-400" />
@@ -90,17 +140,17 @@ export default function ProfileSetupPage() {
 
                 <div
                   className={`flex items-start p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedType === "both"
+                    selectedType === "ServiceProvider"
                       ? "border-amber-600 bg-amber-950/20"
                       : "border-gray-800 bg-gray-800/50 hover:border-gray-700"
                   }`}
-                  onClick={() => setSelectedType("both")}
+                  onClick={() => setSelectedType("ServiceProvider")}
                 >
                   <div className="mr-4 p-2 rounded-full bg-amber-900/30">
                     <User className="h-6 w-6 text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-white">I'm Both</h3>
+                    <h3 className="text-lg font-medium text-white">Service Provider</h3>
                     <p className="text-gray-400 text-sm mt-1">
                       Access both founder and investor features to raise funds and invest in projects
                     </p>
@@ -110,11 +160,11 @@ export default function ProfileSetupPage() {
               <CardFooter>
                 <Button
                   onClick={handleContinue}
-                  disabled={!selectedType}
+                  disabled={!selectedType || isSubmitting}
                   className="w-full bg-black hover:bg-gray-900 text-white border border-gray-800"
                 >
-                  Continue
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  {isSubmitting ? "Submitting..." : "Continue"}
+                  {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
                 </Button>
               </CardFooter>
             </Card>

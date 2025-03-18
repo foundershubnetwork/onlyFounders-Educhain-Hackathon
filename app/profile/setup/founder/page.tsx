@@ -16,6 +16,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, ArrowRight, Building, Camera, Github, Globe, Linkedin, Twitter } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
+import { useUser } from "@auth0/nextjs-auth0/client"
 
 const founderProfileSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -26,6 +28,7 @@ const founderProfileSchema = z.object({
     .max(500, { message: "Bio must be less than 500 characters" }),
   experience: z.string().min(1, { message: "Please select your experience level" }),
   skills: z.string().min(2, { message: "Skills are required" }),
+  location: z.string().min(1, { message: "Please select your country" }),
   website: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
   twitter: z.string().optional().or(z.literal("")),
   linkedin: z.string().optional().or(z.literal("")),
@@ -37,6 +40,9 @@ type FounderProfileValues = z.infer<typeof founderProfileSchema>
 export default function FounderProfileSetupPage() {
   const router = useRouter()
   const [avatarSrc, setAvatarSrc] = useState<string>("/placeholder.svg?height=100&width=100")
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+    const { user, isLoading } = useUser();
 
   const form = useForm<FounderProfileValues>({
     resolver: zodResolver(founderProfileSchema),
@@ -46,6 +52,7 @@ export default function FounderProfileSetupPage() {
       bio: "",
       experience: "",
       skills: "",
+      location: "",
       website: "",
       twitter: "",
       linkedin: "",
@@ -53,14 +60,293 @@ export default function FounderProfileSetupPage() {
     },
   })
 
-  function onSubmit(data: FounderProfileValues) {
-    console.log(data)
-    router.push("/profile/setup/startup")
+  const countries = [
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Antigua and Barbuda",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Barbados",
+    "Belarus",
+    "Belgium",
+    "Belize",
+    "Benin",
+    "Bhutan",
+    "Bolivia",
+    "Bosnia and Herzegovina",
+    "Botswana",
+    "Brazil",
+    "Brunei",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Cabo Verde",
+    "Cambodia",
+    "Cameroon",
+    "Canada",
+    "Central African Republic",
+    "Chad",
+    "Chile",
+    "China",
+    "Colombia",
+    "Comoros",
+    "Congo",
+    "Costa Rica",
+    "Croatia",
+    "Cuba",
+    "Cyprus",
+    "Czech Republic",
+    "Denmark",
+    "Djibouti",
+    "Dominica",
+    "Dominican Republic",
+    "Ecuador",
+    "Egypt",
+    "El Salvador",
+    "Equatorial Guinea",
+    "Eritrea",
+    "Estonia",
+    "Eswatini",
+    "Ethiopia",
+    "Fiji",
+    "Finland",
+    "France",
+    "Gabon",
+    "Gambia",
+    "Georgia",
+    "Germany",
+    "Ghana",
+    "Greece",
+    "Grenada",
+    "Guatemala",
+    "Guinea",
+    "Guinea-Bissau",
+    "Guyana",
+    "Haiti",
+    "Honduras",
+    "Hungary",
+    "Iceland",
+    "India",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Ireland",
+    "Israel",
+    "Italy",
+    "Jamaica",
+    "Japan",
+    "Jordan",
+    "Kazakhstan",
+    "Kenya",
+    "Kiribati",
+    "Korea, North",
+    "Korea, South",
+    "Kosovo",
+    "Kuwait",
+    "Kyrgyzstan",
+    "Laos",
+    "Latvia",
+    "Lebanon",
+    "Lesotho",
+    "Liberia",
+    "Libya",
+    "Liechtenstein",
+    "Lithuania",
+    "Luxembourg",
+    "Madagascar",
+    "Malawi",
+    "Malaysia",
+    "Maldives",
+    "Mali",
+    "Malta",
+    "Marshall Islands",
+    "Mauritania",
+    "Mauritius",
+    "Mexico",
+    "Micronesia",
+    "Moldova",
+    "Monaco",
+    "Mongolia",
+    "Montenegro",
+    "Morocco",
+    "Mozambique",
+    "Myanmar",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Netherlands",
+    "New Zealand",
+    "Nicaragua",
+    "Niger",
+    "Nigeria",
+    "North Macedonia",
+    "Norway",
+    "Oman",
+    "Pakistan",
+    "Palau",
+    "Palestine",
+    "Panama",
+    "Papua New Guinea",
+    "Paraguay",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Portugal",
+    "Qatar",
+    "Romania",
+    "Russia",
+    "Rwanda",
+    "Saint Kitts and Nevis",
+    "Saint Lucia",
+    "Saint Vincent and the Grenadines",
+    "Samoa",
+    "San Marino",
+    "Sao Tome and Principe",
+    "Saudi Arabia",
+    "Senegal",
+    "Serbia",
+    "Seychelles",
+    "Sierra Leone",
+    "Singapore",
+    "Slovakia",
+    "Slovenia",
+    "Solomon Islands",
+    "Somalia",
+    "South Africa",
+    "South Sudan",
+    "Spain",
+    "Sri Lanka",
+    "Sudan",
+    "Suriname",
+    "Sweden",
+    "Switzerland",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Tanzania",
+    "Thailand",
+    "Timor-Leste",
+    "Togo",
+    "Tonga",
+    "Trinidad and Tobago",
+    "Tunisia",
+    "Turkey",
+    "Turkmenistan",
+    "Tuvalu",
+    "Uganda",
+    "Ukraine",
+    "United Arab Emirates",
+    "United Kingdom",
+    "United States",
+    "Uruguay",
+    "Uzbekistan",
+    "Vanuatu",
+    "Vatican City",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Zambia",
+    "Zimbabwe",
+  ]
+
+  async function onSubmit(data: FounderProfileValues) {
+    setIsSubmitting(true)
+
+    try {
+      // Get user_id from wherever it's stored in your application
+      const userId = user.sub?.substring(14);
+
+      if (!userId) {
+        toast({
+          title: "Authentication error",
+          description: "Please sign in again to continue.",
+          variant: "destructive",
+        })
+        router.push("/login")
+        return
+      }
+
+      // Create FormData object
+      const formData = new FormData()
+
+      // Add profile data
+      formData.append("professionalTitle", data.title)
+      formData.append("location", data.location)
+      formData.append("bio", data.bio)
+      formData.append("username", data.fullName)
+
+      // Add profile picture if available
+      if (avatarFile) {
+        formData.append("profile_pic_file", avatarFile)
+      }
+
+      // Parse skills into array
+      const skillsArray = data.skills.split(",").map((skill) => skill.trim())
+
+   
+      const founderData = {
+        experienceLevel: data.experience,
+        skills: skillsArray,
+        socialLinks: {
+          Twitter: data.twitter,
+          github: data.github,
+          LinkedIn: data.linkedin,
+          website: data.website,
+        },
+      }
+
+      // Append founderData as JSON string
+      formData.append("founderData", JSON.stringify(founderData))
+
+      // Make API call
+      const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/submit-personal-details", {
+        method: "POST",
+        headers: {
+          user_id: userId,
+        },
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+        throw new Error(errorData?.message || "Failed to submit profile")
+      }
+
+      toast({
+        title: "Profile submitted successfully",
+        description: "Your founder profile has been saved.",
+      })
+
+      // Navigate to next step
+      router.push("/profile")
+    } catch (error) {
+      console.error("Error submitting profile:", error)
+      toast({
+        title: "Submission failed",
+        description: error instanceof Error ? error.message : "Failed to save your profile. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      // Save file for upload
+      setAvatarFile(file)
+
+      // Preview image
       const reader = new FileReader()
       reader.onload = (e) => {
         if (e.target?.result) {
@@ -83,10 +369,10 @@ export default function FounderProfileSetupPage() {
           <div className="space-y-2 mb-6">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-400">Profile Setup</span>
-              <span className="text-white font-medium">Step 2 of 3</span>
+              <span className="text-white font-medium">Step 2 of 2</span>
             </div>
             <Progress
-              value={66}
+              value={100}
               className="h-2 bg-gray-700"
               indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
             />
@@ -230,6 +516,31 @@ export default function FounderProfileSetupPage() {
                     />
                   </div>
 
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white">Location</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                              <SelectValue placeholder="Select your country" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-gray-900 border-gray-800 text-white max-h-[200px]">
+                            {countries.map((country) => (
+                              <SelectItem key={country} value={country}>
+                                {country}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium text-white">Social & Web Presence</h3>
 
@@ -324,15 +635,20 @@ export default function FounderProfileSetupPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => router.push("/profile/setup")}
+                      onClick={() => router.push("/profile")}
                       className="border-gray-700 text-white"
+                      disabled={isSubmitting}
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       Back
                     </Button>
-                    <Button type="submit" className="bg-black hover:bg-gray-900 text-white border border-gray-800">
-                      Continue to Startup
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                    <Button
+                      type="submit"
+                      className="bg-black hover:bg-gray-900 text-white border border-gray-800"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Submitting..." : "Submit"}
+                      {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
                     </Button>
                   </div>
                 </form>

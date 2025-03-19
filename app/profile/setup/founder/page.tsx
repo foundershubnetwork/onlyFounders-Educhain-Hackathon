@@ -42,7 +42,7 @@ export default function FounderProfileSetupPage() {
   const [avatarSrc, setAvatarSrc] = useState<string>("/placeholder.svg?height=100&width=100")
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-    const { user, isLoading } = useUser();
+  const { user, isLoading } = useUser();
 
   const form = useForm<FounderProfileValues>({
     resolver: zodResolver(founderProfileSchema),

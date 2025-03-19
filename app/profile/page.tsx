@@ -9,6 +9,7 @@ import { Header } from "@/components/header"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { useEffect } from "react"
 import Loading from "../loading"
+import { AppLayout } from "@/components/layout/app-layout"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -26,7 +27,8 @@ export default function ProfilePage() {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
+      <AppLayout>
       <div className="container mx-auto py-8">
         {/* Breadcrumb navigation */}
         <div className="flex items-center text-sm text-gray-400 mb-6">
@@ -242,6 +244,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      </AppLayout>
     </>
   )
 }

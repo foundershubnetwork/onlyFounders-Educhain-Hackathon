@@ -56,7 +56,7 @@ export default function ProfileSetupPage() {
       } else if (selectedType === "Investor") {
         router.push("/profile/setup/investor")
       } else if (selectedType === "ServiceProvider") {
-        router.push("/profile/setup/startup")
+        router.push("/profile/setup/serviceProvider")
       }
     } catch (error) {
       console.error("Error submitting role:", error)

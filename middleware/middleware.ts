@@ -8,7 +8,7 @@ export async function middleware(req: Request) {
   const session = await getSession();
   
   // Define protected routes
-  const protectedRoutes = ["/founder-dashboard","investor-dashboard", "/profile"];
+  const protectedRoutes = ["/founder-dashboard","investor-dashboard", "/profile", "/profile/setup", "/profile/setup/founder", "/profile/setup/investor", "/profile/setup/serviceProvider"];
 
   // If user is not logged in and tries to access protected routes, redirect to login
   if (!session?.user && protectedRoutes.includes(new URL(req.url).pathname)) {
@@ -20,5 +20,5 @@ export async function middleware(req: Request) {
 
 // Apply middleware only to specific routes
 export const config = {
-  matcher: ["/dashboard", "/profile"],
+  matcher: ["/founder-dashboard","investor-dashboard", "/profile", "/profile/setup", "/profile/setup/founder", "/profile/setup/investor", "/profile/setup/serviceProvider"],
 };

@@ -8,6 +8,7 @@ import Providers from "./web3/Providers";
 import "@rainbow-me/rainbowkit/styles.css";
 import AuthTracking from "./MIXPanel/AuthTracking";
 import AuthProvider from "../components/AuthProvider"; // Use AuthProvider instead of UserProvider
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function RootLayout({
           <AuthTracking /> {/* Tracking user login */}
           <Providers>
             {children}
+            <Toaster/>
             <Analytics />
             <SpeedInsights />
           </Providers>

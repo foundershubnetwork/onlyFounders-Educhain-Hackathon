@@ -42,6 +42,7 @@ import { useUser } from "@auth0/nextjs-auth0/client"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { useAccount } from "wagmi"
 import axios from "axios"
+import { useToast } from "../ui/use-toast"
 
 interface AppLayoutProps {
   children: ReactNode
@@ -58,8 +59,10 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
   const requestSent = useRef(false)
   const { user, isLoading } = useUser()
   const { address, isConnected } = useAccount()
+  const toast = useToast()
+  
 
-  // Add the profile navigation handler
+  // Add the profile navigation handler 
   const handleProfileNavigation = async () => {
     if (!user) return
 
@@ -109,6 +112,7 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
     }
   }, [isLoading])
 
+  //sending wallet address to the backend after user connected wallet.
   useEffect(() => {
     const sendWalletAddress = async () => {
       if (user && isConnected && address) {
@@ -136,6 +140,8 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
     sendWalletAddress()
   }, [user, isConnected, address])
 
+
+  //sending user data to the backend after user registered.
   useEffect(() => {
     if (!isLoading && user && !isSent && !requestSent.current) {
       requestSent.current = true

@@ -11,7 +11,20 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Briefcase, Calendar, Clock, Filter, Globe, MapPin, MessageSquare, Search, Star, Users } from "lucide-react"
+import {
+  Briefcase,
+  Calendar,
+  Clock,
+  Filter,
+  Globe,
+  MapPin,
+  MessageSquare,
+  Search,
+  Star,
+  Users,
+  Bell,
+  Rocket,
+} from "lucide-react"
 
 export default function NetworkPage() {
   const [activeTab, setActiveTab] = useState("members")
@@ -252,6 +265,34 @@ export default function NetworkPage() {
 
   return (
     <AppLayout>
+      {/* Coming Soon Overlay */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-md">
+        <Card className="w-full max-w-md mx-4 bg-gradient-to-br from-indigo-950/90 to-purple-900/90 border-purple-800/30 shadow-xl">
+          <CardHeader className="pb-2 text-center">
+            <div className="mx-auto w-16 h-16 rounded-full bg-blue-600/20 flex items-center justify-center mb-4">
+              <Rocket className="h-8 w-8 text-blue-400" />
+            </div>
+            <CardTitle className="text-2xl md:text-3xl font-bold text-white">Coming Soon!</CardTitle>
+            <CardDescription className="text-purple-200/80 text-lg">We're building something amazing</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 text-center">
+            <p className="text-gray-300">
+              Our network feature is currently under development. We're working hard to create the ultimate Web3
+              networking experience for founders, investors, and professionals.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button className="border-purple-800/30 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <Link href="/">Return to Home</Link>
+              </Button>
+              <Button variant="outline" className="border-purple-800/30 text-white">
+                <Link href="/marketplace">Explore Marketplace</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="container mx-auto py-8 space-y-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>

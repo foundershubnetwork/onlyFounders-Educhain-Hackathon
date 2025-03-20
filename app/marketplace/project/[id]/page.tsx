@@ -1,15 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -18,8 +24,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { InvestmentTier } from "@/components/investment-tier"
+} from "@/components/ui/dialog";
+import { InvestmentTier } from "@/components/investment-tier";
 import {
   ArrowLeft,
   Bookmark,
@@ -37,258 +43,460 @@ import {
   Twitter,
   Users,
   Linkedin,
-} from "lucide-react"
+  Send,
+  MessageCircle,
+  Book,
+  VideoIcon
+} from "lucide-react";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
-  const [activeTab, setActiveTab] = useState("overview")
-  const [isBookmarked, setIsBookmarked] = useState(false)
-  const [showInvestDialog, setShowInvestDialog] = useState(false)
+interface TeamMember {
+  name: string;
+  role: string;
+  bio: string;
+  avatar: string;
+  linkedin?: string;
+  twitter?: string;
+}
 
-  // Mock project data
-  const project = {
-    id: params.id,
-    title: "DecentraVault",
-    tagline: "Decentralized vault for secure asset management with multi-chain support",
-    description:
-      "DecentraVault is a next-generation decentralized vault protocol that enables secure management of digital assets across multiple blockchains. Our innovative cross-chain technology allows users to store, transfer, and manage their crypto assets with enhanced security and flexibility.",
-    image: "/placeholder.svg?height=400&width=800",
-    logo: "/placeholder.svg?height=100&width=100",
-    category: "DeFi",
-    tags: ["Cross-chain", "Security", "Asset Management"],
-    raised: 325000,
-    goal: 500000,
-    progress: 65,
-    investors: 128,
-    daysLeft: 14,
-    minInvestment: 100,
-    website: "https://decentravault.io",
-    github: "https://github.com/decentravault",
-    twitter: "https://twitter.com/decentravault",
-    whitepaper: "https://decentravault.io/whitepaper.pdf",
-    team: [
-      {
-        name: "Sarah Johnson",
-        role: "Founder & CEO",
-        bio: "Former security engineer at Coinbase with 8+ years of experience in blockchain security",
-        avatar: "/placeholder.svg?height=100&width=100",
-      },
-      {
-        name: "Michael Chen",
-        role: "CTO",
-        bio: "Blockchain architect with experience at Ethereum Foundation and Chainlink",
-        avatar: "/placeholder.svg?height=100&width=100",
-      },
-      {
-        name: "David Kim",
-        role: "Lead Developer",
-        bio: "Full-stack developer with expertise in Solidity and cross-chain protocols",
-        avatar: "/placeholder.svg?height=100&width=100",
-      },
-      {
-        name: "Emily Watson",
-        role: "Head of Operations",
-        bio: "Operations specialist with background in fintech and DeFi projects",
-        avatar: "/placeholder.svg?height=100&width=100",
-      },
-    ],
-    roadmap: [
-      {
-        title: "Q1 2025",
-        description: "Protocol design and whitepaper release",
-        completed: true,
-      },
-      {
-        title: "Q2 2025",
-        description: "MVP development and security audits",
-        completed: true,
-      },
-      {
-        title: "Q3 2025",
-        description: "Testnet launch and community building",
-        completed: false,
-        current: true,
-      },
-      {
-        title: "Q4 2025",
-        description: "Mainnet launch and initial partnerships",
-        completed: false,
-      },
-      {
-        title: "Q1 2026",
-        description: "Cross-chain expansion and advanced features",
-        completed: false,
-      },
-      {
-        title: "Q2 2026",
-        description: "Mobile app release and enterprise solutions",
-        completed: false,
-      },
-    ],
-    tokenomics: {
-      symbol: "DVT",
-      totalSupply: "100,000,000",
-      distribution: [
-        { category: "Public Sale", percentage: 20 },
-        { category: "Team & Advisors", percentage: 15 },
-        { category: "Treasury", percentage: 25 },
-        { category: "Ecosystem Growth", percentage: 30 },
-        { category: "Liquidity", percentage: 10 },
-      ],
-    },
-    updates: [
-      {
-        title: "Security Audit Completed",
-        date: "Oct 15, 2023",
-        content:
-          "We're pleased to announce that our smart contracts have successfully passed a comprehensive security audit by CertiK. The audit found no critical vulnerabilities, and all minor issues have been addressed.",
-        image: "/placeholder.svg?height=200&width=400",
-      },
-      {
-        title: "Partnership with ChainBridge",
-        date: "Oct 5, 2023",
-        content:
-          "DecentraVault has partnered with ChainBridge to enhance our cross-chain capabilities. This collaboration will enable seamless asset transfers between Ethereum, Binance Smart Chain, and Polygon networks.",
-        image: "/placeholder.svg?height=200&width=400",
-      },
-      {
-        title: "Testnet Launch Successful",
-        date: "Sep 20, 2023",
-        content:
-          "We're excited to announce the successful launch of our testnet. Over 500 users participated in the testing phase, providing valuable feedback that has helped us improve the protocol.",
-        image: "/placeholder.svg?height=200&width=400",
-      },
-    ],
-    faqs: [
-      {
-        question: "How does DecentraVault ensure asset security?",
-        answer:
-          "DecentraVault employs a multi-layered security approach, including multi-signature wallets, time-locked transactions, and regular security audits. Our smart contracts have been audited by leading security firms to ensure the highest level of protection for user assets.",
-      },
-      {
-        question: "Which blockchains are supported?",
-        answer:
-          "At launch, DecentraVault will support Ethereum, Binance Smart Chain, Polygon, and Avalanche. We plan to add support for additional blockchains in the future based on community demand and technical feasibility.",
-      },
-      {
-        question: "How does the token (DVT) function within the ecosystem?",
-        answer:
-          "The DVT token serves multiple purposes within the DecentraVault ecosystem: governance rights for protocol decisions, fee discounts for transactions, staking rewards, and access to premium features. Token holders can also participate in the protocol's revenue sharing program.",
-      },
-      {
-        question: "What are the fees for using DecentraVault?",
-        answer:
-          "DecentraVault charges a 0.1% fee on asset transfers and a 0.5% annual management fee. These fees are significantly lower than traditional financial services and are used to sustain the protocol's development and security measures.",
-      },
-    ],
-    reviews: [
-      {
-        user: {
-          name: "Alex Rodriguez",
-          avatar: "/placeholder.svg?height=50&width=50",
-          role: "Angel Investor",
+interface RoadmapItem {
+  title: string;
+  description: string;
+  completed: boolean;
+  current: boolean;
+  completedStatus: string;
+}
+
+interface TokenDistribution {
+  category: string;
+  percentage: number;
+}
+
+interface Tokenomics {
+  symbol: string;
+  totalSupply: string;
+  distribution: TokenDistribution[];
+}
+
+interface Milestone {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  completionDate: string | null;
+  fundingAmount: number;
+  percentCompleted: number;
+  status: string;
+  fundingReleased: boolean;
+  verificationProof: string | null;
+}
+
+interface Startup {
+  id: string;
+  title: string;
+  stage: string;
+  tagline: string;
+  description: string;
+  image: string;
+  logo: string;
+  category: string;
+  tags: string[];
+  raised: number;
+  goal: number;
+  progress: number;
+  investors: number;
+  daysLeft: number;
+  minInvestment: number;
+  website: string;
+  github: string;
+  twitter: string;
+  whitepaper: string;
+  team: TeamMember[];
+  roadmap: RoadmapItem[];
+  tokenomics: Tokenomics;
+  updates: any[]; // Define properly if updates have a structure
+  faqs: any[]; // Define properly if FAQs have a structure
+  reviews: any[]; // Define properly if reviews have a structure
+  milestones: Milestone[];
+  telegram?: string;
+  verifiedStatus: string;
+  waitlistSignups: string;
+  strategicPartners: string;
+  githubStars: string;
+  nodeOperators: number;
+  _id: string;
+  developerInterest: string;
+  growthMetrics: string;
+  storageCapacity: string;
+  tokenPrice: string;
+}
+
+// API response types
+interface FileInfo {
+  file_name: string;
+  file_url: string | null;
+  _id: string;
+}
+
+interface SocialLinks {
+  website?: string;
+  twitter?: string;
+  github?: string;
+  discord?: string;
+  medium?: string;
+  linkedin?: string;
+}
+
+interface Traction {
+  waitlistSignups: number;
+  strategicPartners: number;
+  githubStars: number;
+  nodeOperators: number;
+  _id: string;
+  developerInterest: string;
+  growthMetrics: string;
+  storageCapacity: string;
+}
+
+interface TokenDistributionAPI {
+  publicSale: number;
+  teamAdvisors: number;
+  foundation: number;
+  ecosystemGrowth: number;
+  strategicPartners: number;
+  _id: string;
+  others: number;
+}
+
+interface TokenomicsAPI {
+  tokenName: string;
+  symbol: string;
+  totalSupply: number;
+  tokenType: string;
+  initialPrice: number;
+  useCases: string[];
+  tokenDistribution: TokenDistributionAPI;
+  _id: string;
+}
+
+interface TeamMemberAPI {
+  fullName: string;
+  title: string;
+  profilePicture: FileInfo;
+  shortBio: string;
+  socialLinks: SocialLinks;
+  _id: string;
+}
+
+interface Milestone {
+  content: string;
+  status: string;
+  _id: string;
+}
+
+interface RoadmapItemAPI {
+  quarterYear: string;
+  milestones: Milestone[];
+  status: string;
+  _id: string;
+}
+
+interface FAQAPI {
+  question: string;
+  answer: string;
+  _id?: string;
+}
+
+interface StartupAPI {
+  _id: string;
+  user_id: string;
+  startupName: string;
+  startupLogo: FileInfo;
+  bannerImage: FileInfo;
+  tagline: string;
+  description: string;
+  stage: string;
+  category: string;
+  blockchainPlatforms: string[];
+  socialLinks: SocialLinks;
+  whitepaper: FileInfo;
+  pitchDeck: FileInfo;
+  demoVideo: string;
+  traction: Traction;
+  verifiedStatus: string;
+  featuredStatus: string;
+  completedStatus: boolean;
+  totalRaised: number;
+  faq: FAQAPI[];
+  coreTeam: TeamMemberAPI[];
+  roadmap: RoadmapItemAPI[];
+  investers: any[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  tokenomics?: TokenomicsAPI;
+  pitchDeckText?: string;
+  pitchDeck_Url?: string;
+  pitchDemoVideo_Url?: string;
+  whitepaper_Url?: string;
+  tokenName?: string;
+  strategicPartners: string;
+  githubStars: string;
+  nodeOperators: string;
+  growthMetrics: string;
+  storageCapacity: string;
+}
+
+interface APIResponse {
+  message: string;
+  startup: StartupAPI;
+}
+
+export default function ProjectDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showInvestDialog, setShowInvestDialog] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [startupData, setStartupData] = useState<StartupAPI | null>(null);
+  const { user } = useUser();
+  const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchStartupData = async () => {
+      try {
+        setLoading(true);
+        const userId = user?.sub?.substring(14);
+
+        const response = await fetch(
+          "https://onlyfounders.azurewebsites.net/api/startup/view-startup",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              user_id: userId, // This should be dynamically set in a production app
+            },
+            body: JSON.stringify({
+              projectId: params.id, // In a real app, this would come from params.id
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch startup data");
+        }
+
+        const data: APIResponse = await response.json();
+        setStartupData(data.startup);
+      } catch (error) {
+        console.error("Error fetching startup data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStartupData();
+  }, [params.id, router, toast, user]);
+
+  // Use API data when available, otherwise fallback to mock data
+  const project: Startup = startupData
+    ? {
+        id: startupData._id,
+        stage: startupData.stage,
+        title: startupData.startupName,
+        verifiedStatus: startupData.verifiedStatus,
+        tagline: startupData.tagline,
+        description: startupData.description,
+        image:
+          startupData.bannerImage?.file_url ||
+          "/placeholder.svg?height=400&width=800",
+        logo:
+          startupData.startupLogo?.file_url ||
+          "/placeholder.svg?height=100&width=100",
+        category: startupData.category,
+        tags: startupData.blockchainPlatforms || [],
+        raised: startupData.totalRaised || 0,
+        goal: 500000, // This might need to come from the API in the future
+        progress: Math.min(
+          ((startupData.totalRaised || 0) / 500000) * 100,
+          100
+        ), // Calculate progress percentage
+        investors: startupData.investers?.length || 0,
+        daysLeft: 14, // This might need to come from the API in the future
+        minInvestment: 100, // This might need to come from the API in the future
+        website: startupData.socialLinks?.website || "#",
+        github: startupData.socialLinks?.github || "#",
+        twitter: startupData.socialLinks?.twitter || "#",
+        telegram: startupData.socialLinks?.telegram || "#",
+        discord: startupData.socialLinks?.discord || "#",
+        medium: startupData.socialLinks?.medium || "#",
+        whitepaper: startupData.whitepaper.file_url || "#",
+        demoVideo: startupData.pitchDemoVideo?.file_url,
+
+        //traction
+        waitlistSignups: startupData.traction.waitlistSignups,
+        strategicPartners: startupData.traction.strategicPartners,
+        githubStars: startupData.traction.githubStars,
+        nodeOperators: startupData.traction.nodeOperators,
+        growthMetrics: startupData.traction.growthMetrics,
+        storageCapacity: startupData.traction.storageCapacity,
+
+        team:
+          startupData.coreTeam?.map((member) => ({
+            name: member.fullName,
+            role: member.title,
+            bio: member.shortBio,
+            avatar:
+              member.profilePicture?.file_url ||
+              "/placeholder.svg?height=100&width=100",
+            linkedin: member.socialLinks?.linkedin,
+            twitter: member.socialLinks?.twitter,
+          })) || [],
+        roadmap:
+          startupData.roadmap?.map((item) => ({
+            title: item.quarterYear,
+            description: item.milestones?.map((m) => m.content),
+            completedStatus: item.status,
+            current: item.status === "In Progress",
+          })) || [],
+        tokenomics: startupData.tokenomics
+          ? {
+              tokenName: startupData.tokenomics.tokenName,
+              symbol: startupData.tokenomics.symbol,
+              totalSupply:
+          startupData.tokenomics.totalSupply?.toLocaleString() || "0",
+              distribution: [
+          {
+            category: "Public Sale",
+            percentage:
+              startupData.tokenomics.tokenDistribution?.publicSale || 0,
+          },
+          {
+            category: "Team & Advisors",
+            percentage:
+              startupData.tokenomics.tokenDistribution?.teamAdvisors || 0,
+          },
+          {
+            category: "Foundation",
+            percentage:
+              startupData.tokenomics.tokenDistribution?.foundation || 0,
+          },
+          {
+            category: "Ecosystem Growth",
+            percentage:
+              startupData.tokenomics.tokenDistribution?.ecosystemGrowth ||
+              0,
+          },
+          {
+            category: "Strategic Partners",
+            percentage:
+              startupData.tokenomics.tokenDistribution
+                ?.strategicPartners || 0,
+          },
+          {
+            category: "Others",
+            percentage:
+              startupData.tokenomics.tokenDistribution?.others || 0,
+          },
+              ].filter((item) => item.percentage > 0),
+            }
+          : {
+              symbol: "",
+              totalSupply: "0",
+              distribution: [],
+            },
+        tokenPrice: startupData.tokenomics?.initialPrice,
+        updates: [], // This might need to come from the API in the future
+        faqs: startupData.faq || [],
+        milestones:
+          startupData.roadmap?.flatMap(
+            (roadmapItem) =>
+              roadmapItem.milestones?.map((milestone, index) => ({
+                id: `m${index}`,
+                title: milestone.content,
+                description: `Milestone for ${roadmapItem.quarterYear}`,
+                dueDate: roadmapItem.quarterYear,
+                completionDate:
+                  milestone.status === "completed"
+                    ? roadmapItem.quarterYear
+                    : null,
+                fundingAmount: 50000, // Placeholder value
+                percentCompleted:
+                  milestone.status === "completed"
+                    ? 100
+                    : milestone.status === "pending"
+                    ? 0
+                    : 50,
+                status: milestone.status,
+                fundingReleased: milestone.status === "completed",
+                verificationProof: null,
+              })) || []
+          ) || [],
+      }
+    : {
+        id: "1",
+        title: "",
+        tagline: "",
+        description: "",
+        image: "/placeholder.svg?height=400&width=800",
+        logo: "/placeholder.svg?height=100&width=100",
+        category: "",
+        tags: [],
+        raised: 0,
+        goal: 500000,
+        progress: 0,
+        investors: 0,
+        daysLeft: 14,
+        minInvestment: 100,
+        website: "#",
+        github: "#",
+        twitter: "#",
+        whitepaper: "#",
+        team: [],
+        roadmap: [],
+        tokenomics: {
+          symbol: "",
+          totalSupply: "0",
+          distribution: [],
         },
-        rating: 5,
-        date: "Oct 10, 2023",
-        content:
-          "DecentraVault addresses a critical need in the DeFi space with its cross-chain asset management solution. The team is highly experienced and has a clear roadmap for execution. I'm particularly impressed with their security-first approach.",
-      },
-      {
-        user: {
-          name: "Sophia Martinez",
-          avatar: "/placeholder.svg?height=50&width=50",
-          role: "Crypto Analyst",
-        },
-        rating: 4,
-        date: "Oct 8, 2023",
-        content:
-          "Solid project with strong technical foundations. The cross-chain functionality sets it apart from competitors. My only concern is the ambitious timeline, but the team has demonstrated good progress so far.",
-      },
-      {
-        user: {
-          name: "James Wilson",
-          avatar: "/placeholder.svg?height=50&width=50",
-          role: "DeFi Investor",
-        },
-        rating: 5,
-        date: "Oct 5, 2023",
-        content:
-          "I've been following DecentraVault since their whitepaper release, and I'm impressed with their execution. The recent security audit results are reassuring, and the partnership with ChainBridge adds significant value to the project.",
-      },
-    ],
-    milestones: [
-      {
-        id: "m1",
-        title: "Smart Contract Development",
-        description: "Complete core smart contract development and internal testing",
-        dueDate: "March 30, 2025",
-        completionDate: "March 28, 2025",
-        fundingAmount: 75000,
-        percentCompleted: 100,
-        status: "completed",
-        fundingReleased: true,
-        verificationProof: "https://github.com/decentravault/contracts",
-      },
-      {
-        id: "m2",
-        title: "Security Audit",
-        description: "Complete comprehensive security audit by CertiK",
-        dueDate: "April 15, 2025",
-        completionDate: "April 10, 2025",
-        fundingAmount: 50000,
-        percentCompleted: 100,
-        status: "completed",
-        fundingReleased: true,
-        verificationProof: "https://certik.com/projects/decentravault",
-      },
-      {
-        id: "m3",
-        title: "Testnet Launch",
-        description: "Deploy protocol on testnet and complete initial user testing",
-        dueDate: "May 20, 2025",
-        completionDate: null,
-        fundingAmount: 100000,
-        percentCompleted: 65,
-        status: "in_progress",
-        fundingReleased: false,
-        verificationProof: null,
-      },
-      {
-        id: "m4",
-        title: "Cross-Chain Integration",
-        description: "Complete integration with Ethereum, BSC, and Polygon networks",
-        dueDate: "June 30, 2025",
-        completionDate: null,
-        fundingAmount: 125000,
-        percentCompleted: 30,
-        status: "in_progress",
-        fundingReleased: false,
-        verificationProof: null,
-      },
-      {
-        id: "m5",
-        title: "Mainnet Launch",
-        description: "Full production deployment on mainnet with all core features",
-        dueDate: "August 15, 2025",
-        completionDate: null,
-        fundingAmount: 150000,
-        percentCompleted: 0,
-        status: "not_started",
-        fundingReleased: false,
-        verificationProof: null,
-      },
-    ],
-  }
+        updates: [],
+        faqs: [],
+        reviews: [],
+        milestones: [],
+      };
 
   const handleInvest = (amount: number) => {
-    console.log(`Investing ${amount} USDC in ${project.title}`)
-    setShowInvestDialog(false)
+    console.log(`Investing ${amount} USDC in ${project.title}`);
+    setShowInvestDialog(false);
     // Here you would typically handle the investment process
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading project details...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+        <Button
+          asChild
+          variant="ghost"
+          size="icon"
+          className="text-gray-400 hover:text-white"
+        >
           <Link href="/marketplace">
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -297,17 +505,31 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
       </div>
 
       <div className="relative rounded-xl overflow-hidden h-[200px] md:h-[300px]">
-        <Image src={project.image || "/placeholder.svg"} alt={project.title} fill className="object-cover" />
+        <Image
+          src={project.image || "/placeholder.svg"}
+          alt={project.title}
+          fill
+          className="object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
         <div className="absolute bottom-0 left-0 p-6 flex items-end gap-4">
           <div className="h-20 w-20 rounded-xl overflow-hidden relative bg-gray-800 border-4 border-gray-800">
-            <Image src={project.logo || "/placeholder.svg"} alt={project.title} fill className="object-cover" />
+            <Image
+              src={project.logo || "/placeholder.svg"}
+              alt={project.title}
+              fill
+              className="object-cover"
+            />
           </div>
           <div>
             <div className="flex flex-wrap gap-2 mb-2">
               <Badge className="bg-blue-600">{project.category}</Badge>
-              {project.tags.map((tag) => (
-                <Badge key={tag} variant="outline" className="bg-gray-800/50 text-gray-300 border-gray-700">
+              {project.tags.map((tag, index) => (
+                <Badge
+                  key={index}
+                  variant="outline"
+                  className="bg-gray-800/50 text-gray-300 border-gray-700"
+                >
                   {tag}
                 </Badge>
               ))}
@@ -320,7 +542,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <Tabs
+            defaultValue="overview"
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-6"
+          >
             <TabsList className="bg-gray-900 border border-gray-800 p-1">
               <TabsTrigger
                 value="overview"
@@ -341,12 +568,6 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                 Roadmap
               </TabsTrigger>
               <TabsTrigger
-                value="milestones"
-                className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
-              >
-                Milestones
-              </TabsTrigger>
-              <TabsTrigger
                 value="tokenomics"
                 className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
               >
@@ -358,97 +579,146 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               >
                 Updates
               </TabsTrigger>
-              <TabsTrigger
-                value="reviews"
-                className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
-              >
-                Reviews
-              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
               <Card className="bg-gray-900 border-gray-800">
                 <CardHeader>
-                  <CardTitle className="text-xl text-white">Project Overview</CardTitle>
+                  <CardTitle className="text-xl text-white">
+                    Project Overview
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-300 mb-6">{project.description}</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-white">Key Features</h3>
-                      <ul className="space-y-2">
-                        <li className="flex items-start text-gray-300">
-                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                          <span>Multi-chain asset management across major blockchains</span>
-                        </li>
-                        <li className="flex items-start text-gray-300">
-                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                          <span>Enhanced security with multi-signature and time-locked transactions</span>
-                        </li>
-                        <li className="flex items-start text-gray-300">
-                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                          <span>Automated portfolio rebalancing and yield optimization</span>
-                        </li>
-                        <li className="flex items-start text-gray-300">
-                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                          <span>Decentralized governance through the DVT token</span>
-                        </li>
-                        <li className="flex items-start text-gray-300">
-                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                          <span>Low fees compared to traditional financial services</span>
-                        </li>
-                      </ul>
+                    {/* First Column */}
+                    <div className="space-y-3">
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full justify-start text-gray-300 border-gray-700"
+                      >
+                        <a
+                          href={project.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Globe className="mr-2 h-4 w-4 text-blue-400" />
+                          Website
+                          <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
+                        </a>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full justify-start text-gray-300 border-gray-700"
+                      >
+                        <a
+                          href={project.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Github className="mr-2 h-4 w-4 text-purple-400" />
+                          GitHub Repository
+                          <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
+                        </a>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full justify-start text-gray-300 border-gray-700"
+                      >
+                        <a
+                          href={project.twitter}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Twitter className="mr-2 h-4 w-4 text-blue-400" />
+                          Twitter
+                          <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
+                        </a>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full justify-start text-gray-300 border-gray-700"
+                      >
+                        <a
+                          href={project.telegram}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Send className="mr-2 h-4 w-4 text-blue-400" />
+                          Telegram
+                          <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
+                        </a>
+                      </Button>
                     </div>
 
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-white">Project Links</h3>
-                      <div className="space-y-3">
-                        <Button
-                          asChild
-                          variant="outline"
-                          className="w-full justify-start text-gray-300 border-gray-700"
+                    {/* Second Column */}
+                    <div className="space-y-3">
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full justify-start text-gray-300 border-gray-700"
+                      >
+                        <a
+                          href={project.whitepaper}
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
-                          <a href={project.website} target="_blank" rel="noopener noreferrer">
-                            <Globe className="mr-2 h-4 w-4 text-blue-400" />
-                            Website
-                            <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
-                          </a>
-                        </Button>
-                        <Button
-                          asChild
-                          variant="outline"
-                          className="w-full justify-start text-gray-300 border-gray-700"
+                          <FileText className="mr-2 h-4 w-4 text-amber-400" />
+                          Whitepaper
+                          <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
+                        </a>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full justify-start text-gray-300 border-gray-700"
+                      >
+                        <a
+                          href={project.discord}
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
-                          <a href={project.github} target="_blank" rel="noopener noreferrer">
-                            <Github className="mr-2 h-4 w-4 text-purple-400" />
-                            GitHub Repository
-                            <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
-                          </a>
-                        </Button>
-                        <Button
-                          asChild
-                          variant="outline"
-                          className="w-full justify-start text-gray-300 border-gray-700"
+                          <MessageCircle className="mr-2 h-4 w-4 text-indigo-400" />
+                          Discord
+                          <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
+                        </a>
+                      </Button>
+                     
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full justify-start text-gray-300 border-gray-700"
+                      >
+                        <a
+                          href={project.medium}
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
-                          <a href={project.twitter} target="_blank" rel="noopener noreferrer">
-                            <Twitter className="mr-2 h-4 w-4 text-blue-400" />
-                            Twitter
-                            <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
-                          </a>
-                        </Button>
-                        <Button
-                          asChild
-                          variant="outline"
-                          className="w-full justify-start text-gray-300 border-gray-700"
+                          <Book className="mr-2 h-4 w-4 text-gray-400" />
+                          Medium Blog
+                          <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
+                        </a>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full justify-start text-gray-300 border-gray-700"
+                      >
+                        <a
+                          href={project.demoVideo}
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
-                          <a href={project.whitepaper} target="_blank" rel="noopener noreferrer">
-                            <FileText className="mr-2 h-4 w-4 text-amber-400" />
-                            Whitepaper
-                            <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
-                          </a>
-                        </Button>
-                      </div>
+                          <VideoIcon className="mr-2 h-4 w-4 text-blue-500" />
+                          Demo Video 
+                          <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
+                        </a>
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -456,17 +726,46 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
               <Card className="bg-gray-900 border-gray-800">
                 <CardHeader>
-                  <CardTitle className="text-xl text-white">Frequently Asked Questions</CardTitle>
+                  <CardTitle className="text-xl text-white">
+                    Traction and Metrics
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {project.faqs.map((faq, index) => (
-                      <div key={index} className="space-y-2">
-                        <h3 className="text-lg font-medium text-white">{faq.question}</h3>
-                        <p className="text-gray-300">{faq.answer}</p>
-                        {index < project.faqs.length - 1 && <Separator className="bg-gray-800 my-4" />}
+                  <div className="space-y-4 ">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
+                        <Users className="text-blue-400" size={28}/>
+                        <p className="text-gray-400 text-lg">Waitlist Signups</p>
+                        <span className="text-3xl font-bold">{project.waitlistSignups}</span>
                       </div>
-                    ))}
+                      <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
+                      <Globe className="text-violet-500" size={28}/>
+                      <p className="text-gray-400 text-lg">Strategic Partners</p>
+                      <span className="text-3xl font-bold">{project.strategicPartners}</span>
+                      </div>
+                      <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
+                      <Github className="text-green-400" size={28}/>
+                      <p className="text-gray-400 text-lg">Github Stars</p>
+                      <span className="text-3xl font-bold">{project.githubStars}</span>
+                      </div>
+                    </div>
+
+                    <CardTitle className="text-xl">Additional Metrics</CardTitle>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <p className="text-gray-400">Storage Capacity</p>
+                        <span>{project.storageCapacity}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-gray-400">Node Operators</p>
+                        <span>{project.nodeOperators}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-gray-400">Growth Metrics</p>
+                        <span>{project.growthMetrics}</span>
+                      </div>
+                    </div>
+
                   </div>
                 </CardContent>
               </Card>
@@ -475,8 +774,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             <TabsContent value="team" className="space-y-6">
               <Card className="bg-gray-900 border-gray-800">
                 <CardHeader>
-                  <CardTitle className="text-xl text-white">Team Members</CardTitle>
-                  <CardDescription className="text-gray-400">Meet the team behind {project.title}</CardDescription>
+                  <CardTitle className="text-xl text-white">
+                    Team Members
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Meet the team behind {project.title}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -495,17 +798,33 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <h3 className="text-lg font-medium text-white">{member.name}</h3>
-                          <div className="text-sm text-blue-400 mb-2">{member.role}</div>
+                          <h3 className="text-lg font-medium text-white">
+                            {member.name}
+                          </h3>
+                          <div className="text-sm text-blue-400 mb-2">
+                            {member.role}
+                          </div>
                           <p className="text-gray-300 text-sm">{member.bio}</p>
                           <div className="flex mt-3 space-x-2">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-gray-400 hover:text-white"
+                            >
                               <Twitter className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-gray-400 hover:text-white"
+                            >
                               <Github className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-gray-400 hover:text-white"
+                            >
                               <Linkedin className="h-4 w-4" />
                             </Button>
                           </div>
@@ -520,8 +839,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             <TabsContent value="roadmap" className="space-y-6">
               <Card className="bg-gray-900 border-gray-800">
                 <CardHeader>
-                  <CardTitle className="text-xl text-white">Project Roadmap</CardTitle>
-                  <CardDescription className="text-gray-400">Development timeline and milestones</CardDescription>
+                  <CardTitle className="text-xl text-white">
+                    Project Roadmap
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Development timeline and milestones
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
@@ -536,8 +859,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                             milestone.current
                               ? "border-blue-600 bg-blue-900/10"
                               : milestone.completed
-                                ? "border-green-600 bg-green-900/10"
-                                : "border-gray-800 bg-gray-800/50"
+                              ? "border-green-600 bg-green-900/10"
+                              : "border-gray-800 bg-gray-800/50"
                           }`}
                         >
                           <div
@@ -545,95 +868,37 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                               milestone.current
                                 ? "bg-blue-900/50 text-blue-400"
                                 : milestone.completed
-                                  ? "bg-green-900/50 text-green-400"
-                                  : "bg-gray-800 text-gray-400"
-                            }`}
-                          >
-                            {milestone.completed ? <Check className="h-5 w-5" /> : <Calendar className="h-5 w-5" />}
-                          </div>
-
-                          <div className="flex-1">
-                            <h3 className="text-lg font-medium text-white">{milestone.title}</h3>
-                            <p className="text-gray-300 mt-1">{milestone.description}</p>
-
-                            {milestone.current && <Badge className="mt-3 bg-blue-600 text-white">Current Phase</Badge>}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="milestones" className="space-y-6">
-              <Card className="bg-gray-900 border-gray-800">
-                <CardHeader>
-                  <CardTitle className="text-xl text-white">Project Milestones & Funding</CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Track the project's progress and funding releases based on milestone completion
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {project.milestones.map((milestone, index) => (
-                      <div key={milestone.id} className="relative">
-                        {index < project.milestones.length - 1 && (
-                          <div className="absolute left-6 top-12 bottom-0 w-px bg-gray-800 z-0"></div>
-                        )}
-
-                        <div
-                          className={`relative z-10 flex items-start gap-4 p-4 rounded-lg border ${
-                            milestone.status === "completed"
-                              ? "border-green-600 bg-green-900/10"
-                              : milestone.status === "in_progress"
-                                ? "border-blue-600 bg-blue-900/10"
-                                : "border-gray-800 bg-gray-800/50"
-                          }`}
-                        >
-                          <div
-                            className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
-                              milestone.status === "completed"
                                 ? "bg-green-900/50 text-green-400"
-                                : milestone.status === "in_progress"
-                                  ? "bg-blue-900/50 text-blue-400"
-                                  : "bg-gray-800 text-gray-400"
+                                : "bg-gray-800 text-gray-400"
                             }`}
                           >
-                            {milestone.status === "completed" ? (
+                            {milestone.completed ? (
                               <Check className="h-5 w-5" />
-                            ) : milestone.status === "in_progress" ? (
-                              <Progress value={milestone.percentCompleted} className="h-5 w-5 rounded-full" />
                             ) : (
                               <Calendar className="h-5 w-5" />
                             )}
                           </div>
 
                           <div className="flex-1">
-                            <h3 className="text-lg font-medium text-white">{milestone.title}</h3>
-                            <p className="text-gray-300 mt-1">{milestone.description}</p>
-                            <div className="flex items-center justify-between mt-2">
-                              <div className="text-sm text-gray-400">Due: {milestone.dueDate}</div>
-                              {milestone.completionDate && (
-                                <div className="text-sm text-green-500">Completed: {milestone.completionDate}</div>
-                              )}
-                            </div>
-                            <div className="flex items-center justify-between mt-2">
-                              <div className="text-sm text-gray-400">Funding: {milestone.fundingAmount} USDC</div>
-                              <div className="text-sm text-gray-400">
-                                Released: {milestone.fundingReleased ? "Yes" : "No"}
+                            <h3 className="text-lg font-medium text-white">
+                              {milestone.title}
+                            </h3>
+                            {milestone.description.map((item, index) => (
+                              <div className="flex items-center gap-1">
+                                <Check className="mt-1 text-green-500"/>
+                                <p key={index} className="text-gray-300 mt-1">
+                                {item}
+                                </p>
                               </div>
+                            ))}
+                            
+                            <div className="">
+                            {milestone.completedStatus === 'Incomplete' ? (
+                              <Badge className="bg-red-500">
+                                Incomplete
+                              </Badge>
+                            ):(<Badge className="bg-green-500">Complete</Badge>)}
                             </div>
-                            {milestone.verificationProof && (
-                              <a
-                                href={milestone.verificationProof}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-400 underline text-sm"
-                              >
-                                Verification Proof
-                              </a>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -646,40 +911,99 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             <TabsContent value="tokenomics" className="space-y-6">
               <Card className="bg-gray-900 border-gray-800">
                 <CardHeader>
-                  <CardTitle className="text-xl text-white">Tokenomics</CardTitle>
-                  <CardDescription className="text-gray-400">Token distribution and utility</CardDescription>
+                  <CardTitle className="text-xl text-white">
+                    Tokenomics
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Token distribution and utility
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div>
-                        <h3 className="text-lg font-medium text-white mb-2">Token Details</h3>
+                        <h3 className="text-lg font-medium text-white mb-2">
+                          Token Details
+                        </h3>
                         <div className="space-y-2">
                           <div className="flex justify-between">
                             <span className="text-gray-400">Token Name:</span>
-                            <span className="text-white font-medium">DecentraVault Token</span>
+                            <span className="text-white font-medium">
+                              {project.tokenomics.tokenName}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-400">Symbol:</span>
-                            <span className="text-white font-medium">{project.tokenomics.symbol}</span>
+                            <span className="text-white font-medium">
+                              {project.tokenomics.symbol}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-400">Total Supply:</span>
-                            <span className="text-white font-medium">{project.tokenomics.totalSupply}</span>
+                            <span className="text-white font-medium">
+                              {project.tokenomics.totalSupply}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-400">Token Type:</span>
-                            <span className="text-white font-medium">ERC-20</span>
+                            <span className="text-white font-medium">
+                              ERC-20
+                            </span>
                           </div>
                         </div>
                       </div>
-
+                      
                       <div>
-                        <h3 className="text-lg font-medium text-white mb-2">Token Utility</h3>
+                      <h3 className="text-lg font-medium text-white mb-4">
+                        Token Distribution
+                      </h3>
+                      <div className="space-y-4">
+                        {project.tokenomics.distribution.map((item) => (
+                          <div key={item.category} className="space-y-2">
+                            <div className="flex justify-between">
+                              <span className="text-gray-300">
+                                {item.category}
+                              </span>
+                              <span className="text-white font-medium">
+                                {item.percentage}%
+                              </span>
+                            </div>
+                            <Progress
+                              value={item.percentage}
+                              className="h-2 bg-gray-800"
+                              indicatorClassName={`
+                                ${
+                                  item.category === "Public Sale"
+                                    ? "bg-blue-600"
+                                    : item.category === "Team & Advisors"
+                                    ? "bg-purple-600"
+                                    : item.category === "Treasury"
+                                    ? "bg-amber-600"
+                                    : item.category === "Treasury"
+                                    ? "bg-amber-600"
+                                    : item.category === "Ecosystem Growth"
+                                    ? "bg-green-600"
+                                    : "bg-cyan-600"
+                                }
+                              `}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    </div>
+                     {/* token utility */}
+                     <div>
+                        <h3 className="text-lg font-medium text-white mb-2">
+                          Token Usecases
+                        </h3>
                         <ul className="space-y-2">
                           <li className="flex items-start text-gray-300">
                             <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                            <span>Governance rights for protocol decisions</span>
+                            <span>
+                              Governance rights for protocol decisions
+                            </span>
                           </li>
                           <li className="flex items-start text-gray-300">
                             <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
@@ -699,54 +1023,6 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                           </li>
                         </ul>
                       </div>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-medium text-white mb-4">Token Distribution</h3>
-                      <div className="space-y-4">
-                        {project.tokenomics.distribution.map((item) => (
-                          <div key={item.category} className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-gray-300">{item.category}</span>
-                              <span className="text-white font-medium">{item.percentage}%</span>
-                            </div>
-                            <Progress
-                              value={item.percentage}
-                              className="h-2 bg-gray-800"
-                              indicatorClassName={`
-                                ${
-                                  item.category === "Public Sale"
-                                    ? "bg-blue-600"
-                                    : item.category === "Team & Advisors"
-                                      ? "bg-purple-600"
-                                      : item.category === "Treasury"
-                                        ? "bg-amber-600"
-                                        : item.category === "Treasury"
-                                          ? "bg-amber-600"
-                                          : item.category === "Ecosystem Growth"
-                                            ? "bg-green-600"
-                                            : "bg-cyan-600"
-                                }
-                              `}
-                            />
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="mt-6 p-4 rounded-lg bg-gray-800/50 border border-gray-800">
-                        <div className="flex items-start">
-                          <Info className="h-5 w-5 text-blue-400 mr-2 shrink-0 mt-0.5" />
-                          <div>
-                            <h4 className="text-white font-medium">Vesting Schedule</h4>
-                            <p className="text-gray-300 text-sm mt-1">
-                              Team tokens are subject to a 2-year vesting period with a 6-month cliff. Advisor tokens
-                              vest over 18 months. Ecosystem and treasury tokens are released according to protocol
-                              needs and governance decisions.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
 
                   <div className="relative h-64 w-full rounded-lg overflow-hidden">
@@ -764,16 +1040,25 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             <TabsContent value="updates" className="space-y-6">
               <Card className="bg-gray-900 border-gray-800">
                 <CardHeader>
-                  <CardTitle className="text-xl text-white">Project Updates</CardTitle>
-                  <CardDescription className="text-gray-400">Latest news and announcements</CardDescription>
+                  <CardTitle className="text-xl text-white">
+                    Project Updates
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Latest news and announcements
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
                     {project.updates.map((update, index) => (
                       <div key={index} className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-lg font-medium text-white">{update.title}</h3>
-                          <Badge variant="outline" className="bg-gray-800/50 text-gray-300 border-gray-700">
+                          <h3 className="text-lg font-medium text-white">
+                            {update.title}
+                          </h3>
+                          <Badge
+                            variant="outline"
+                            className="bg-gray-800/50 text-gray-300 border-gray-700"
+                          >
                             <Calendar className="mr-1 h-3 w-3" />
                             {update.date}
                           </Badge>
@@ -793,53 +1078,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                           </div>
                         </div>
 
-                        {index < project.updates.length - 1 && <Separator className="bg-gray-800" />}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="reviews" className="space-y-6">
-              <Card className="bg-gray-900 border-gray-800">
-                <CardHeader>
-                  <CardTitle className="text-xl text-white">Investor Reviews</CardTitle>
-                  <CardDescription className="text-gray-400">Feedback from the community</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {project.reviews.map((review, index) => (
-                      <div key={index} className="p-4 rounded-lg border border-gray-800 bg-gray-800/50">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center">
-                            <Avatar className="h-10 w-10 mr-3">
-                              <AvatarImage src={review.user.avatar} />
-                              <AvatarFallback>
-                                {review.user.name
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium text-white">{review.user.name}</div>
-                              <div className="text-xs text-gray-400">{review.user.role}</div>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <div className="flex mr-2">
-                              {Array.from({ length: 5 }).map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${i < review.rating ? "text-amber-400 fill-amber-400" : "text-gray-600"}`}
-                                />
-                              ))}
-                            </div>
-                            <div className="text-xs text-gray-400">{review.date}</div>
-                          </div>
-                        </div>
-                        <p className="text-gray-300">{review.content}</p>
+                        {index < project.updates.length - 1 && (
+                          <Separator className="bg-gray-800" />
+                        )}
                       </div>
                     ))}
                   </div>
@@ -852,7 +1093,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         <div className="space-y-6">
           <Card className="bg-gray-900 border-gray-800 sticky top-20">
             <CardHeader>
-              <CardTitle className="text-xl text-white">Funding Progress</CardTitle>
+              <CardTitle className="text-xl text-white">
+                Funding Progress
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
@@ -860,7 +1103,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Raised</span>
                     <span className="text-white font-medium">
-                      {project.raised.toLocaleString()} / {project.goal.toLocaleString()} USDC
+                      {project.raised.toLocaleString()} /{" "}
+                      {project.goal.toLocaleString()} USDC
                     </span>
                   </div>
                   <Progress
@@ -869,22 +1113,32 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                     indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
                   />
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">{project.progress}% funded</span>
-                    <span className="text-amber-400">{project.daysLeft} days left</span>
+                    <span className="text-gray-400">
+                      {project.progress}% funded
+                    </span>
+                    <span className="text-amber-400">
+                      {project.daysLeft} days left
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex justify-between">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{project.investors}</div>
-                    <div className="text-xs text-gray-400">Investors</div>
+                    <div className="text-2xl font-bold text-white">
+                      {project.tokenPrice}
+                    </div>
+                    <div className="text-xs text-gray-400">Token Price</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{project.minInvestment}</div>
-                    <div className="text-xs text-gray-400">Min. Investment</div>
+                    <div className="text-2xl font-bold text-white">
+                      {project.stage}
+                    </div>
+                    <div className="text-xs text-gray-400">Startup Stage</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{project.daysLeft}</div>
+                    <div className="text-2xl font-bold text-white">
+                      {project.daysLeft}
+                    </div>
                     <div className="text-xs text-gray-400">Days Left</div>
                   </div>
                 </div>
@@ -893,9 +1147,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               <Separator className="bg-gray-800" />
 
               <div className="flex flex-col gap-3">
-                <Dialog open={showInvestDialog} onOpenChange={setShowInvestDialog}>
+                <Dialog
+                  open={showInvestDialog}
+                  onOpenChange={setShowInvestDialog}
+                >
                   <DialogTrigger asChild>
-                    <Button className="w-full bg-black hover:bg-gray-900 text-white border border-gray-800">
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border">
                       Invest Now
                     </Button>
                   </DialogTrigger>
@@ -903,7 +1160,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                     <DialogHeader>
                       <DialogTitle>Invest in {project.title}</DialogTitle>
                       <DialogDescription className="text-gray-400">
-                        Choose your investment amount and complete the transaction
+                        Choose your investment amount and complete the
+                        transaction
                       </DialogDescription>
                     </DialogHeader>
 
@@ -940,11 +1198,17 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                 </Button>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" className="flex-1 border-gray-800 text-white">
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-gray-800 text-white"
+                  >
                     <Share2 className="mr-2 h-4 w-4" />
                     Share
                   </Button>
-                  <Button variant="outline" className="flex-1 border-gray-800 text-white">
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-gray-800 text-white"
+                  >
                     <MessageSquare className="mr-2 h-4 w-4" />
                     Contact
                   </Button>
@@ -954,7 +1218,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               <Separator className="bg-gray-800" />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-white">Project Verification</h3>
+                <h3 className="text-lg font-medium text-white">
+                  Project Verification
+                </h3>
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 border border-gray-800">
@@ -962,15 +1228,19 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                       <Shield className="h-5 w-5 text-green-500 mr-2" />
                       <span className="text-gray-300">KYC Verified</span>
                     </div>
-                    <Badge className="bg-green-600">Passed</Badge>
+                    {project.verifiedStatus === "Unverified" ? <Badge className="bg-red-600">Not Verified</Badge> :  
+                      <Badge className="bg-green-600">Passed</Badge>
+                    }
                   </div>
 
                   <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 border border-gray-800">
                     <div className="flex items-center">
                       <Shield className="h-5 w-5 text-green-500 mr-2" />
-                      <span className="text-gray-300">Smart Contract Audit</span>
+                      <span className="text-gray-300">
+                        Smart Contract Audit
+                      </span>
                     </div>
-                    <Badge className="bg-green-600">Passed</Badge>
+                    <Badge className="bg-amber-600">coming Soon</Badge>
                   </div>
 
                   <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 border border-gray-800">
@@ -978,18 +1248,21 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                       <Users className="h-5 w-5 text-green-500 mr-2" />
                       <span className="text-gray-300">Team Verification</span>
                     </div>
-                    <Badge className="bg-green-600">Verified</Badge>
+                    <Badge className="bg-amber-600">coming Soon</Badge>
                   </div>
-                </div>
+                </div>  
 
                 <div className="p-4 rounded-lg bg-blue-900/20 border border-blue-800">
                   <div className="flex items-start">
                     <Info className="h-5 w-5 text-blue-400 mr-2 shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="text-white font-medium">AI Risk Assessment</h4>
+                      <h4 className="text-white font-medium">
+                        AI Risk Assessment
+                      </h4>
                       <p className="text-gray-300 text-sm mt-1">
-                        Optimus AI has analyzed this project and assigned it a low risk score based on team credentials,
-                        code quality, and tokenomics model.
+                        Optimus AI has analyzed this project and assigned it a
+                        low risk score based on team credentials, code quality,
+                        and tokenomics model.
                       </p>
                     </div>
                   </div>
@@ -1000,6 +1273,5 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         </div>
       </div>
     </div>
-  )
+  );
 }
-

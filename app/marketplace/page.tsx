@@ -11,12 +11,13 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, Loader2, CheckCircle } from "lucide-react"
+import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, CheckCircle } from "lucide-react"
 import { useUser } from "@auth0/nextjs-auth0/client"
 
 // Define the startup interface based on the updated API response
 interface Startup {
   startupName: string
+  startup_id: string
   startupLogo?: string
   bannerImage?: string
   founderName: string
@@ -121,8 +122,8 @@ export default function MarketplacePage() {
     if (activeTab === "all") return true
     if (activeTab === "trending") return startup.featuredStatus === "Trending"
     if (activeTab === "featured") return startup.featuredStatus === "Featured"
-    if (activeTab === "defi") return startup.featuredStatus === "DeFi"
-    if (activeTab === "nfts") return startup.featuredStatus === "NFTs"
+    if (activeTab === "defi") return startup.category === "DEFI"
+    if (activeTab === "nfts") return startup.category === "NFT"
     // Filter by category
     return startup.category.toLowerCase() === activeTab.toLowerCase()
   })
@@ -147,10 +148,110 @@ export default function MarketplacePage() {
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-            <span className="ml-2 text-gray-400">Loading startups...</span>
-          </div>
+          <>
+            {/* Featured Startups Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {Array.from({ length: 2 }).map((_, index) => (
+                <Card key={`featured-skeleton-${index}`} className="bg-gray-900 border-gray-800 overflow-hidden">
+                  <div className="relative h-48 w-full bg-gray-800/50 animate-pulse"></div>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-md bg-gray-800/70 animate-pulse"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-5 w-40 bg-gray-800/70 rounded animate-pulse"></div>
+                        <div className="h-4 w-32 bg-gray-800/70 rounded animate-pulse"></div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <div className="h-4 w-16 bg-gray-800/70 rounded animate-pulse"></div>
+                        <div className="h-4 w-24 bg-gray-800/70 rounded animate-pulse"></div>
+                      </div>
+                      <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div className="h-full bg-gray-800/70 rounded animate-pulse" style={{ width: "40%" }}></div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div className="space-y-2">
+                        <div className="h-4 w-16 mx-auto bg-gray-800/70 rounded animate-pulse"></div>
+                        <div className="h-4 w-20 mx-auto bg-gray-800/70 rounded animate-pulse"></div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="h-4 w-16 mx-auto bg-gray-800/70 rounded animate-pulse"></div>
+                        <div className="h-4 w-20 mx-auto bg-gray-800/70 rounded animate-pulse"></div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="h-4 w-16 mx-auto bg-gray-800/70 rounded animate-pulse"></div>
+                        <div className="h-4 w-20 mx-auto bg-gray-800/70 rounded animate-pulse"></div>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex gap-2">
+                    <div className="flex-1 h-10 bg-gray-800/70 rounded animate-pulse"></div>
+                    <div className="w-10 h-10 bg-gray-800/70 rounded animate-pulse"></div>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+
+            {/* Search and Filter Skeleton */}
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 h-10 bg-gray-800/70 rounded animate-pulse"></div>
+              <div className="w-[180px] h-10 bg-gray-800/70 rounded animate-pulse"></div>
+            </div>
+
+            {/* Tabs Skeleton */}
+            <div className="space-y-6">
+              <div className="h-10 bg-gray-800/70 rounded animate-pulse"></div>
+
+              {/* Regular Cards Skeleton */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <Card key={`card-skeleton-${index}`} className="bg-gray-900 border-gray-800 overflow-hidden">
+                    <div className="relative h-40 w-full bg-gray-800/50 animate-pulse"></div>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-md bg-gray-800/70 animate-pulse"></div>
+                        <div className="flex-1 space-y-2">
+                          <div className="h-5 w-32 bg-gray-800/70 rounded animate-pulse"></div>
+                          <div className="flex gap-2">
+                            <div className="h-4 w-16 bg-gray-800/70 rounded animate-pulse"></div>
+                            <div className="h-4 w-20 bg-gray-800/70 rounded animate-pulse"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="h-4 w-full bg-gray-800/70 rounded animate-pulse"></div>
+                      <div className="h-4 w-3/4 bg-gray-800/70 rounded animate-pulse"></div>
+
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <div className="h-3 w-12 bg-gray-800/70 rounded animate-pulse"></div>
+                          <div className="h-3 w-20 bg-gray-800/70 rounded animate-pulse"></div>
+                        </div>
+                        <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-gray-800/70 rounded animate-pulse" style={{ width: "60%" }}></div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <div className="h-3 w-24 bg-gray-800/70 rounded animate-pulse"></div>
+                        <div className="h-3 w-24 bg-gray-800/70 rounded animate-pulse"></div>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex gap-2">
+                      <div className="flex-1 h-9 bg-gray-800/70 rounded animate-pulse"></div>
+                      <div className="w-10 h-9 bg-gray-800/70 rounded animate-pulse"></div>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </>
         ) : error ? (
           <div className="text-center py-12">
             <div className="text-red-500 mb-4">{error}</div>
@@ -245,8 +346,8 @@ export default function MarketplacePage() {
                             ? "flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                             : "w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                         }
-                      >
-                        <Link href={`/marketplace/${startup.startupName}`}>View Project</Link>
+                      > 
+                        <Link href={`/marketplace/project/${startup.startup_id}`}>View Project</Link>
                       </Button>
 
                       {shouldShowBookmark() && (
@@ -407,7 +508,7 @@ export default function MarketplacePage() {
                               : "w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                           }
                         >
-                          <Link href={`/marketplace/${startup.startupName}`}>
+                          <Link href={`/marketplace/project/${startup.startup_id}`}>
                             View Details
                             <ArrowUpRight className="ml-1 h-4 w-4" />
                           </Link>

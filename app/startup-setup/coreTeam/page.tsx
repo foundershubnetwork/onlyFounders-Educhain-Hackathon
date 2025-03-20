@@ -15,6 +15,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { useToast } from "@/hooks/use-toast"
+import { Progress } from "@/components/ui/progress"
+import { AppLayout } from "@/components/layout/app-layout"
 
 const teamMemberSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -189,16 +191,25 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
     }
   }
 
-  if (isLoading) {
-    return <div className="text-center text-white">Loading user information...</div>
-  }
-
   if (error) {
     return <div className="text-center text-red-500">Error loading user information. Please refresh the page.</div>
   }
 
   return (
-    <div className="flex items-center justify-center mx-auto mt-4">
+    <div className="flex items-center justify-center mx-auto mt-4 py-4">
+      <div className="w-full max-w-4xl">
+                <div className="space-y-2 mb-6">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400">Startup Setup</span>
+                        <span className="text-white font-medium">Step 3 of 5</span>
+                      </div>
+                      <Progress
+                        value={60}
+                        className="h-2 bg-gray-700"
+                        indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
+                      />
+                </div>
+              <div className="bg-gray-900 p-6 rounded-lg">
       <div className="space-y-8">
         <div className="space-y-4">
           <p className="text-gray-400">
@@ -439,6 +450,8 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
             {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
           </Button>
         </div>
+      </div>
+      </div>
       </div>
     </div>
   )

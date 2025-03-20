@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { useToast } from "@/hooks/use-toast"
+import { Progress } from "@/components/ui/progress"
 
 const milestoneSchema = z.object({
   quarter: z.string().min(1, { message: "Quarter is required" }),
@@ -228,9 +229,6 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 6 }, (_, i) => (currentYear + i).toString())
 
-  if (isLoading) {
-    return <div className="text-center text-white">Loading user information...</div>
-  }
 
   if (error) {
     return <div className="text-center text-red-500">Error loading user information. Please refresh the page.</div>
@@ -238,6 +236,19 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
 
   return (
     <div className="flex items-center justify-center mx-auto h-screen">
+      <div className="w-full max-w-4xl">
+                      <div className="space-y-2 mb-6">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-400">Startup Setup</span>
+                              <span className="text-white font-medium">Step 4 of 5</span>
+                            </div>
+                            <Progress
+                              value={80}
+                              className="h-2 bg-gray-700"
+                              indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
+                            />
+                      </div>
+                    <div className="bg-gray-900 p-6 rounded-lg">
       <div className="space-y-8">
         <div className="space-y-4">
           <p className="text-gray-400">
@@ -429,6 +440,8 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
         </div>
       </div>
     </div>
+  </div>
+</div>
   )
 }
 

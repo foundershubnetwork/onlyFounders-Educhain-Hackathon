@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
+import { Progress } from "@/components/ui/progress"
+import { AppLayout } from "@/components/layout/app-layout"
 
 const tractionMetricsSchema = z.object({
   waitlistSignups: z.string().optional(),
@@ -19,7 +21,6 @@ const tractionMetricsSchema = z.object({
   githubStars: z.string().optional(),
   storageCapacity: z.string().optional(),
   nodeOperators: z.string().optional(),
-  developerInterest: z.string().optional(),
   growthMetrics: z.string().optional(),
   additionalMetrics: z.string().optional(),
 })
@@ -47,7 +48,6 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
       githubStars: data?.githubStars || "",
       storageCapacity: data?.storageCapacity || "",
       nodeOperators: data?.nodeOperators || "",
-      developerInterest: data?.developerInterest || "",
       growthMetrics: data?.growthMetrics || "",
       additionalMetrics: data?.additionalMetrics || "",
     },
@@ -81,7 +81,6 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
         githubStars: values.githubStars || "",
         storageCapacity: values.storageCapacity || "",
         nodeOperators: values.nodeOperators || "",
-        developerInterest: values.developerInterest || "",
         growthMetrics: values.growthMetrics || "",
       }
 
@@ -120,7 +119,20 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
   }
 
   return (
-    <div className="flex items-center justify-center mx-auto mt-4">
+    <div className="flex items-center justify-center mx-auto mt-4 py-4">
+      <div className="w-full max-w-4xl">
+                      <div className="space-y-2 mb-6">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-400">Startup Setup</span>
+                              <span className="text-white font-medium">Step 2 of 5</span>
+                            </div>
+                            <Progress
+                              value={40}
+                              className="h-2 bg-gray-700"
+                              indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
+                            />
+                      </div>
+                    <div className="bg-gray-900 p-6 rounded-lg">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <div className="space-y-4">
@@ -213,27 +225,6 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
 
             <FormField
               control={form.control}
-              name="developerInterest"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Developer Interest</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Describe developer engagement or contributions..."
-                      className="bg-gray-800 border-gray-700 text-white min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription className="text-gray-500">
-                    Additional metrics showcasing developer engagement
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="growthMetrics"
               render={({ field }) => (
                 <FormItem>
@@ -287,6 +278,8 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
           </div>
         </form>
       </Form>
+    </div>
+    </div>
     </div>
   )
 }

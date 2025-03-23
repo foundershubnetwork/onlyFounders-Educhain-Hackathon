@@ -264,9 +264,9 @@ export default function NetworkPage() {
   ]
 
   return (
-    <AppLayout>
+    <AppLayout className="z-50">
       {/* Coming Soon Overlay */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-md">
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md">
         <Card className="w-full max-w-md mx-4 bg-gradient-to-br from-indigo-950/90 to-purple-900/90 border-purple-800/30 shadow-xl">
           <CardHeader className="pb-2 text-center">
             <div className="mx-auto w-16 h-16 rounded-full bg-blue-600/20 flex items-center justify-center mb-4">

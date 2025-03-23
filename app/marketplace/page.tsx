@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, CheckCircle } from "lucide-react"
 import { useUser } from "@auth0/nextjs-auth0/client"
+import {useToast} from '../../hooks/use-toast'
 
 // Define the startup interface based on the updated API response
 interface Startup {
@@ -43,6 +44,21 @@ export default function MarketplacePage() {
   const [userRole, setUserRole] = useState<UserRole>(null)
   const [isRoleLoading, setIsRoleLoading] = useState(false)
   const { user, isLoading: isUserLoading } = useUser()
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { toast } = useToast()
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      if (!isLoading && !user) {
+        setIsLoggedIn(false);
+      }
+      else{
+        setIsLoggedIn(true);
+      }
+    }
+  
+   checkLoggedIn();
+  }, [isLoading, user])
 
   // Fetch user role from API
   useEffect(() => {
@@ -140,11 +156,11 @@ export default function MarketplacePage() {
             <p className="text-gray-400">Discover and invest in promising blockchain projects</p>
           </div>
 
-          <div className="flex gap-4">
+          <div className="hidden gap-4">
             <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
               <Link href="/startup-setup/basicInfo">Create a Project</Link>
             </Button>
-          </div>
+          </div>  
         </div>
 
         {isLoading ? (
@@ -347,7 +363,20 @@ export default function MarketplacePage() {
                             : "w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                         }
                       > 
-                        <Link href={`/marketplace/project/${startup.startup_id}`}>View Project</Link>
+                        <Button onClick={() => {
+                          if (isLoggedIn) {
+                            window.open(`/marketplace/project/${startup.startup_id}`, "_blank")
+                          } else {
+                            toast({
+                              title: "Message",
+                              description: "Please login to view startup details",
+                              variant: "destructive",
+                            })
+                          }
+                        }} disabled={isLoading}>
+                          View Details
+                          <ArrowUpRight className="ml-1 h-4 w-4" />
+                        </Button>
                       </Button>
 
                       {shouldShowBookmark() && (
@@ -508,10 +537,20 @@ export default function MarketplacePage() {
                               : "w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                           }
                         >
-                          <Link href={`/marketplace/project/${startup.startup_id}`}>
-                            View Details
-                            <ArrowUpRight className="ml-1 h-4 w-4" />
-                          </Link>
+                          <Button onClick={() => {
+                          if (isLoggedIn) {
+                            window.open(`/marketplace/project/${startup.startup_id}`, "_blank")
+                          } else {
+                            toast({
+                              title: "Message",
+                              description: "Please login to view startup details",
+                              variant: "destructive",
+                            })
+                          }
+                        }} disabled={isLoading}>
+                          View Details
+                          <ArrowUpRight className="ml-1 h-4 w-4" />
+                        </Button>
                         </Button>
 
                         {shouldShowBookmark() && (

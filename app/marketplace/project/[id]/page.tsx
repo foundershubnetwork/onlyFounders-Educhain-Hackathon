@@ -267,7 +267,7 @@ export default function ProjectDetailPage({
   const { user } = useUser();
   const { toast } = useToast();
   const router = useRouter();
-
+  const [daysRemaining, setDaysRemaining] = useState<number | null>();
   useEffect(() => {
     const fetchStartupData = async () => {
       try {
@@ -303,6 +303,36 @@ export default function ProjectDetailPage({
 
     fetchStartupData();
   }, [params.id, router, toast, user]);
+
+
+  useEffect(() => {
+    const fetchStartups = async () => {
+      try {
+        const response = await fetch(
+          "https://onlyfounders.azurewebsites.net/api/startup/get-startup-listing"
+        );
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.startups && data.startups.length > 0) {
+          const deadline = new Date(data.startups[0].deadline);
+          const currentDate = new Date();
+          const timeDifference = deadline.getTime() - currentDate.getTime();
+          const daysLeft = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+          setDaysRemaining(daysLeft);
+        }
+      } catch (err) {
+        console.error("Error fetching startups:", err);
+      }
+    };
+
+    fetchStartups();
+  }, []);
 
   // Use API data when available, otherwise fallback to mock data
   const project: Startup = startupData
@@ -489,7 +519,7 @@ export default function ProjectDetailPage({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-10">
       <div className="flex items-center gap-2">
         <Button
           asChild
@@ -880,8 +910,15 @@ export default function ProjectDetailPage({
                           </div>
 
                           <div className="flex-1">
-                            <h3 className="text-lg font-medium text-white">
-                              {milestone.title}
+                            <h3 className="flex items-center justify-between text-lg font-medium text-white">
+                              <span>{milestone.title}</span>
+                              <div className="">
+                                {milestone.completedStatus === 'Incomplete' ? (
+                                  <Badge className="bg-red-500">
+                                    Incomplete
+                                  </Badge>
+                                ):(<Badge className="bg-green-500">Complete</Badge>)}
+                            </div>
                             </h3>
                             {milestone.description.map((item, index) => (
                               <div className="flex items-center gap-1">
@@ -892,13 +929,7 @@ export default function ProjectDetailPage({
                               </div>
                             ))}
                             
-                            <div className="">
-                            {milestone.completedStatus === 'Incomplete' ? (
-                              <Badge className="bg-red-500">
-                                Incomplete
-                              </Badge>
-                            ):(<Badge className="bg-green-500">Complete</Badge>)}
-                            </div>
+                            
                           </div>
                         </div>
                       </div>
@@ -1117,7 +1148,7 @@ export default function ProjectDetailPage({
                       {project.progress}% funded
                     </span>
                     <span className="text-amber-400">
-                      {project.daysLeft} days left
+                      {daysRemaining} days left
                     </span>
                   </div>
                 </div>
@@ -1137,7 +1168,7 @@ export default function ProjectDetailPage({
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white">
-                      {project.daysLeft}
+                      {daysRemaining}
                     </div>
                     <div className="text-xs text-gray-400">Days Left</div>
                   </div>

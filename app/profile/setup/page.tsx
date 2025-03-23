@@ -31,7 +31,7 @@ export default function ProfileSetupPage() {
           description: "Please sign in again to continue.",
           variant: "destructive",
         })
-        router.push("/login")
+        router.push("/api/auth/login")
         return
       }
 
@@ -74,7 +74,7 @@ export default function ProfileSetupPage() {
     <div className="max-w-4xl mx-auto py-12">
       <div className="space-y-6">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold text-white">Welcome to Optimus AI</h1>
+          <h1 className="text-3xl font-bold text-white">Welcome to OnlyFounders</h1>
           <p className="text-gray-400 max-w-2xl mx-auto">
             Complete your profile to get started with our Web3 fundraising platform
           </p>
@@ -168,15 +168,6 @@ export default function ProfileSetupPage() {
                 </Button>
               </CardFooter>
             </Card>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-400 text-sm">
-                Already have a profile?{" "}
-                <Link href="/login" className="text-blue-400 hover:underline">
-                  Sign in
-                </Link>
-              </p>
-            </div>
           </div>
         </div>
       </div>

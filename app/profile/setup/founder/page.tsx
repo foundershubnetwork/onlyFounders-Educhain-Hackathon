@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -43,6 +43,7 @@ export default function FounderProfileSetupPage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { user, isLoading } = useUser();
+  const [onboardingStatus, setOnboardingStatus] = useState<boolean>()
 
   const form = useForm<FounderProfileValues>({
     resolver: zodResolver(founderProfileSchema),
@@ -258,6 +259,40 @@ export default function FounderProfileSetupPage() {
     "Zimbabwe",
   ]
 
+  useEffect(() => {
+    const getOnboardingStatus = async () => {
+      try {
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-onboarding-status", {
+          method: "GET",
+          headers: {
+            user_id: user?.sub?.substring(14),
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to fetch onboarding status");
+        }
+  
+        const data = await response.json();
+        setOnboardingStatus(data.status);
+      } catch (error) {
+        console.error("Error fetching onboarding status:", error);
+        toast({
+          title: "Failed to fetch onboarding status",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
+      }
+    };
+  
+    if (user) {
+      getOnboardingStatus();
+    }
+  }, [user]);
+
+  
+
+
   async function onSubmit(data: FounderProfileValues) {
     setIsSubmitting(true)
 
@@ -271,7 +306,7 @@ export default function FounderProfileSetupPage() {
           description: "Please sign in again to continue.",
           variant: "destructive",
         })
-        router.push("/login")
+        router.push("/api/auth/login")
         return
       }
 
@@ -327,7 +362,7 @@ export default function FounderProfileSetupPage() {
       })
 
       // Navigate to next step
-      router.push("/profile")
+      router.push("/profile-page/founder")
     } catch (error) {
       console.error("Error submitting profile:", error)
       toast({
@@ -637,7 +672,7 @@ export default function FounderProfileSetupPage() {
                       variant="outline"
                       onClick={() => router.push("/profile")}
                       className="border-gray-700 text-white"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || onboardingStatus === true}
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       Back

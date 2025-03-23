@@ -15,7 +15,10 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-
+import { featureCards } from "@/data/featureCards";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 export default function HomePage() {
   const [projects, setProjects] = useState<
     Array<{
@@ -32,7 +35,57 @@ export default function HomePage() {
       deadline?: string;
     }>
   >([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isloading, setIsLoading] = useState(true);
+
+  const {user, isLoading} = useUser();
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+  const [onboardingStatus, setOnboardingStatus] = useState(false);
+  const router = useRouter();
+  const {toast} = useToast();
+
+
+  useEffect(() => {
+      const getOnboardingStatus = async () => {
+        try {
+          if (!user || isLoading) return;
+    
+          setIsProfileLoading(true);
+          const userID = user.sub?.substring(14);
+    
+          const response = await fetch(
+            "https://onlyfounders.azurewebsites.net/api/profile/get-onboarding-status",
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                user_id: userID || "",
+              },
+            }
+          );
+    
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+          }
+    
+          const data = await response.json();
+          setOnboardingStatus(data.status);
+    
+          // Navigate based on the fetched status
+          if (data.status === true) {
+            router.push("/");
+          } else {
+            router.push("/profile/setup");
+          }
+        } catch (error) {
+          console.error("Error checking profile status:", error);
+        } finally {
+          setIsProfileLoading(false);
+        }
+      };
+    
+      getOnboardingStatus();
+    }, [user, isLoading, router]);
+    
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -73,24 +126,27 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* Left side - Text content */}
             <div className="flex flex-col items-center md:items-start text-left space-y-6">
-              <Badge className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 px-4 py-1.5 text-sm font-medium text-blue-400 border-blue-500/20">
+              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-1.5 text-sm font-medium text-white border-blue-500/20">
                 The Future of Web3 Fundraising
               </Badge>
 
               <h1 className="text-4xl text-center md:text-start md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
-                AI-Powered Investment Platform for{" "}
+                Where{" "}
                 <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  Web3 Startups
+                  Founders
                 </span>
+                <br /> Meet {" "}
+                <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  Money
+                </span>  
               </h1>
 
               <p className="text-lg text-center md:text-start text-purple-200/70 max-w-xl">
-                OnlyFounders combines AI-driven investment intelligence with
-                decentralized crowdfunding to democratize early-stage startup
-                funding.
+              The only permissionless web3 fundraising platform that doesn't suck. Connect with investors, raise funds, and build your startup without the BS.
               </p>
 
-              <div className="flex flex-col md:flex-row items-center gap-4 pt-4">
+              {/* Desktop buttons */}
+              <div className="hidden md:flex flex-col md:flex-row items-center gap-4 pt-4">
                 <Link href="/marketplace" className="w-72 md:w-auto">
                   <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-6 text-lg">
                     Explore Startups <ArrowRight className="ml-2 h-5 w-5" />
@@ -115,7 +171,7 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-950/50 z-10 rounded-xl"></div>
               <div className="relative z-0 rounded-xl overflow-hidden border border-purple-800/20 shadow-xl">
                 <Image
-                  src="/placeholder.svg?height=600&width=800&text=Optimus+AI+Platform+Preview"
+                  src="/hero.gif"
                   alt="OnlyFounders Platform"
                   width={800}
                   height={600}
@@ -124,6 +180,26 @@ export default function HomePage() {
                 />
               </div>
             </div>
+
+            {/* mobile buttons  */}
+            <div className="flex flex-col md:hidden items-center gap-4 pt-4">
+                <Link href="/marketplace" className="w-72 md:w-auto">
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-6 text-lg">
+                    Explore Startups <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link
+                  href="api/auth/login"
+                  className="w-72 md:w-auto"
+                >
+                  <Button
+                    variant="outline"
+                    className="w-full border-purple-800/20 text-white hover:bg-purple-900/30 px-8 py-6 text-lg"
+                  >
+                    Start Fundraising
+                  </Button>
+                </Link>
+              </div>
           </div>
         </div>
       </section>
@@ -132,126 +208,35 @@ export default function HomePage() {
       <section className="py-20 bg-gray-900">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center mb-16">
-            <Badge className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 px-4 py-1.5 text-sm font-medium text-blue-400 border-blue-500/20 mb-4">
+            <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-1.5 text-sm font-medium text-white border-blue-500/20 mb-4">
               Key Features
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Revolutionizing Web3 Fundraising
+            Everything You Need, Nothing You Don't
             </h2>
             <p className="text-purple-200/70 max-w-2xl mx-auto">
-              OnlyFounders leverages cutting-edge technology to create a
-              seamless investment experience for both founders and investors.
+            We've stripped away the VC nonsense and built a platform that actually helps founders raise money.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="bg-gradient-to-br from-indigo-950/50 to-purple-900/30 border-purple-800/20 hover:border-blue-600 transition-colors">
+          {featureCards.map((item,index) => (
+            <Card key={index} className="bg-gradient-to-br from-indigo-950/50 to-purple-900/30 border-purple-800/20 hover:border-blue-600 transition-colors">
               <CardContent className="p-6 space-y-4">
                 <div className="h-12 w-12 rounded-lg bg-blue-600/20 flex items-center justify-center">
-                  <Shield className="h-6 w-6 text-blue-400" />
+                  <item.icon className="h-6 w-6 text-blue-400" />
                 </div>
                 <h3 className="text-xl font-bold text-white">
-                  AI Investment Insights
+                  {item.title}
                 </h3>
                 <p className="text-purple-200/70">
-                  Our AI agents evaluate startups on financials, team, market
-                  potential, and blockchain data, boosting investment success by
-                  up to 40%.
+                  {item.description}
                 </p>
-                <ul className="space-y-2">
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-blue-400 mr-2 mt-0.5" />
-                    <span className="text-purple-200/70">
-                      Smart contract analysis
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-blue-400 mr-2 mt-0.5" />
-                    <span className="text-purple-200/70">
-                      Team background verification
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-blue-400 mr-2 mt-0.5" />
-                    <span className="text-purple-200/70">
-                      Market opportunity assessment
-                    </span>
-                  </li>
-                </ul>
               </CardContent>
             </Card>
-
-            <Card className="bg-gradient-to-br from-indigo-950/50 to-purple-900/30 border-purple-800/20 hover:border-blue-600 transition-colors">
-              <CardContent className="p-6 space-y-4">
-                <div className="h-12 w-12 rounded-lg bg-purple-600/20 flex items-center justify-center">
-                  <Zap className="h-6 w-6 text-purple-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white">
-                  DCA-Enabled Crowdfunding
-                </h3>
-                <p className="text-purple-200/70">
-                  Investors can deploy funds gradually to minimize risk and
-                  optimize returns, reducing exposure to market volatility by an
-                  estimated 35%.
-                </p>
-                <ul className="space-y-2">
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-purple-400 mr-2 mt-0.5" />
-                    <span className="text-purple-200/70">
-                      Automated investment scheduling
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-purple-400 mr-2 mt-0.5" />
-                    <span className="text-purple-200/70">
-                      Risk-adjusted position sizing
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-purple-400 mr-2 mt-0.5" />
-                    <span className="text-purple-200/70">
-                      Milestone-based funding releases
-                    </span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-indigo-950/50 to-purple-900/30 border-purple-800/20 hover:border-blue-600 transition-colors">
-              <CardContent className="p-6 space-y-4">
-                <div className="h-12 w-12 rounded-lg bg-green-600/20 flex items-center justify-center">
-                  <Star className="h-6 w-6 text-green-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white">
-                  Multi-Chain Infrastructure
-                </h3>
-                <p className="text-purple-200/70">
-                  Permissionless investment infrastructure ensuring transparency
-                  and accessibility, tapping into a $1 trillion+ Web3 economy.
-                </p>
-                <ul className="space-y-2">
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-2 mt-0.5" />
-                    <span className="text-purple-200/70">
-                      Cross-chain compatibility
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-2 mt-0.5" />
-                    <span className="text-purple-200/70">
-                      Gas-optimized transactions
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-2 mt-0.5" />
-                    <span className="text-purple-200/70">
-                      Decentralized governance
-                    </span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+          ))}
           </div>
+
         </div>
       </section>
 
@@ -259,15 +244,14 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-to-b from-gray-900 to-indigo-950">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center mb-16">
-            <Badge className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 px-4 py-1.5 text-sm font-medium text-blue-400 border-blue-500/20 mb-4">
-              Process
+            <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-1.5 text-sm font-medium text-white border-blue-500/20 mb-4">
+              How it Works
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              How OnlyFounders Works
+            Fundraising That Doesn't Make You Want to Quit
             </h2>
             <p className="text-purple-200/70 max-w-2xl mx-auto">
-              Our platform streamlines the fundraising process for founders and
-              provides investors with AI-powered insights.
+            We've simplified the fundraising process so you can focus on building your startup, not chasing investors.
             </p>
           </div>
 
@@ -275,61 +259,58 @@ export default function HomePage() {
             <div className="order-2 md:order-1">
               <div className="space-y-8">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold">
                     1
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                    Create Your Profile
+                    </h3>
+                    <p className="text-purple-200/70">
+                    Set up your founder or startup profile with all the details investors actually care about.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold">
+                    2
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white mb-2">
                       Startup Submission
                     </h3>
                     <p className="text-purple-200/70">
-                      Founders submit their Startups with detailed information
-                      about their team, technology, and funding goals.
+                    Founders submit their Startups with detailed information
+                    about their team, technology, and funding goals.
                     </p>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-                    2
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-2">
-                      AI Evaluation
-                    </h3>
-                    <p className="text-purple-200/70">
-                      Our AI system analyzes the startup, verifies claims, and
-                      generates a comprehensive risk assessment.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold">
                     3
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white mb-2">
-                      Investor Matching
+                    Launch Your Campaign
                     </h3>
                     <p className="text-purple-200/70">
-                      Startups are matched with investors based on their
-                      investment preferences and risk tolerance.
+                    Create your fundraising campaign with your funding goals, equity offering, and project details.
                     </p>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold">
                     4
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white mb-2">
-                      DCA Investment
+                    Get Funded
                     </h3>
                     <p className="text-purple-200/70">
-                      Investors deploy capital gradually based on startup
-                      milestones and performance metrics.
+                    Connect with investors, receive funds directly to your wallet, and manage your cap table on-chain.
                     </p>
                   </div>
                 </div>
@@ -339,10 +320,10 @@ export default function HomePage() {
             <div className="order-1 md:order-2">
               <div className="relative rounded-xl overflow-hidden border border-purple-800/20">
                 <Image
-                  src="/placeholder.svg?height=500&width=600&text=How+It+Works"
+                  src="/workflow.png"
                   alt="How OnlyFounders Works"
-                  width={600}
-                  height={500}
+                  width={400}
+                  height={300}
                   className="w-full"
                 />
               </div>
@@ -356,7 +337,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
             <div>
-              <Badge className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 px-4 py-1.5 text-sm font-medium text-blue-400 border-blue-500/20 mb-4">
+              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-1.5 text-sm font-medium text-white border-blue-500/20 mb-4">
                 Opportunities
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
@@ -378,7 +359,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {isLoading
+            {isloading
               ? // Skeleton cards while loading
                 Array.from({ length: 3 }).map((_, index) => (
                   <Card
@@ -543,14 +524,15 @@ export default function HomePage() {
                         asChild
                         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                       >
-                        <Link
-                          href={`/marketplace/project/${item.startupName
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")}`}
+                        <Button
+                          onClick={() => toast({
+                            title: "Message",
+                            description: "Startup Details will be available soon!",
+                          })}
                         >
                           View Startup Details
                           <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
+                        </Button>
                       </Button>
                     </div>
                   </Card>
@@ -566,15 +548,12 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                  Ready to Transform Web3 Fundraising?
+                Ready to Join the Only Founders Community?
                 </h2>
                 <p className="text-purple-200/70 mb-6">
-                  Join OnlyFounders today and be part of the future of
-                  decentralized investment. Whether you're a founder looking to
-                  raise funds or an investor seeking opportunities, our platform
-                  provides the tools you need to succeed.
+                Whether you're a founder looking to raise funds or an investor seeking the next big thing, Only Founders has you covered.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex gap-4">
                   <Link href="/marketplace" className="w-72 md:w-auto">
                     <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                       Explore Startups <ArrowRight className="ml-2 h-4 w-4" />
@@ -589,14 +568,6 @@ export default function HomePage() {
                     </Button>
                   </Link>
                 </div>
-              </div>
-              <div className="relative h-64 md:h-auto">
-                <Image
-                  src="/placeholder.svg?height=300&width=500&text=Join+Optimus+AI"
-                  alt="Join OnlyFounders"
-                  fill
-                  className="object-cover rounded-xl"
-                />
               </div>
             </div>
           </div>

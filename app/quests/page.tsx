@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect ,useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { AppLayout } from "@/components/layout/app-layout"
@@ -28,8 +28,41 @@ import {
   Rocket,
 } from "lucide-react"
 
+import { commonConfig } from "@/config/common"
+import { buildFoundersPersonalityTraitsSurveyRequest } from "@/features/survey-request/utils"
+import { buildVeridaRequestUrl } from "@/features/verida-request/utils"
+import { UserProfile, useUser } from "@auth0/nextjs-auth0/client"
+import {useToast} from '../../hooks/use-toast'
+
+
+
+const surveryRequest = buildFoundersPersonalityTraitsSurveyRequest()
+const veridaRequestUrl = buildVeridaRequestUrl(
+  surveryRequest,
+  commonConfig.VERIDA_VAULT_BASE_URL
+)
+
+
+
+
 export default function QuestsPage() {
   const [activeTab, setActiveTab] = useState("investor")
+  const {user, isLoading} = useUser();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const {toast} = useToast();
+
+useEffect(() => {
+  const checkLoggedIn = async () => {
+    if (!isLoading && !user) {
+      setIsLoggedIn(false);
+    }
+    else{
+      setIsLoggedIn(true);
+    }
+  }
+
+ checkLoggedIn();
+}, [isLoading, user])
 
   // Mock data for investor quests
   const investorQuests = [
@@ -324,6 +357,74 @@ export default function QuestsPage() {
   return (
     <AppLayout>
       <div className="container mx-auto py-8 space-y-8">
+
+    {/* heading */}
+      <div className="flex flex-col items-center">
+          <h1 className="text-4xl font-semibold">Global Founder Survey</h1>
+          <p className="text-gray-400 mt-2">Join the Founders Community, make an impact, and collaborate, while ensuring your data remains private and secure.</p>
+      </div>
+
+      <div className="w-full bg-gradient-radial from-[#044D55] to-black text-white rounded-lg overflow-hidden flex flex-col md:flex-row font-poppins">
+      {/* Left content - adjusted with wider text container */}
+      <div className="py-10 pl-10 pr-6 md:pr-10 flex-grow flex flex-col justify-center">
+        <div className="max-w-[800px] mx-auto md:mx-0">
+          <div className="inline-flex items-center gap-1.5 bg-black/30 border border-[#004a45] rounded-full px-3 py-1.5 text-sm font-medium mb-6">
+            <Zap className="h-4 w-4" />
+            <span>Featured</span>
+          </div>
+
+          <h1 className="text-4xl font-semibold mb-4">Global Founders Survey</h1>
+
+          <p className="text-lg text-gray-300 mb-8">
+            Discover insights into your personality as a founder! This short survey helps us understand how your traits
+            shape your business decisions.
+          </p>
+
+          <Button
+            onClick={() => {
+              if(isLoggedIn){
+                window.open(veridaRequestUrl.toString(), "_blank")
+              }
+              else{
+                      toast({
+                        title: "Message",
+                        description: "Please login to start the survey",
+                        variant: "destructive",
+                      })
+              }
+            }}   
+          
+            disabled={isLoading}
+            className="inline-flex items-center gap-2 bg-[#00DDFF] hover:bg-[#33E5FF] text-black font-medium px-6 py-3 rounded-md transition-colors"
+          >
+            Start Survey Now
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="ml-1"
+            >
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </Button>
+        </div>
+      </div>
+
+      {/* Right image - positioned at extreme right */}
+      <div className="flex-shrink-0">
+        <div className="w-[800px] h-[500px] relative">
+          <Image src="/founders-verida.png" alt="Founders x Verida Network" fill className="object-contain" priority />
+        </div>
+      </div>
+    </div>
+
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white">Quests</h1>

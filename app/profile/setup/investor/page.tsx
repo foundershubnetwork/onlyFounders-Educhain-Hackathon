@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Camera, Check, Linkedin, Twitter, User, Wallet } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { AppLayout } from "@/components/layout/app-layout"
 
 const investorProfileSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -46,6 +47,7 @@ export default function InvestorProfileSetupPage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { user, isLoading } = useUser();
+  const [onboardingStatus, setOnboardingStatus] = useState<boolean>()
 
   const interestOptions = [
     { id: "defi", label: "DeFi" },
@@ -275,13 +277,44 @@ export default function InvestorProfileSetupPage() {
   })
 
  
+  useEffect(() => {
+      const getOnboardingStatus = async () => {
+        try {
+          const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-onboarding-status", {
+            method: "GET",
+            headers: {
+              user_id: user?.sub?.substring(14),
+            },
+          });
+    
+          if (!response.ok) {
+            throw new Error("Failed to fetch onboarding status");
+          }
+    
+          const data = await response.json();
+          setOnboardingStatus(data.status);
+        } catch (error) {
+          console.error("Error fetching onboarding status:", error);
+          toast({
+            title: "Failed to fetch onboarding status",
+            description: "Please try again later.",
+            variant: "destructive",
+          });
+        }
+      };
+    
+      if (user) {
+        getOnboardingStatus();
+      }
+    }, [user]);
+
 
   async function onSubmit(data: InvestorProfileValues) {
     setIsSubmitting(true)
 
     try {
       // Get user_id from wherever it's stored in your application
-      const userId = user.sub?.substring(14);
+      const userId = user?.sub?.substring(14);
 
       if (!userId) {
         toast({
@@ -383,6 +416,7 @@ export default function InvestorProfileSetupPage() {
   }
 
   return (
+    <AppLayout>
     <div className="max-w-4xl mx-auto py-12">
       <div className="space-y-6">
         <div className="space-y-2">
@@ -752,7 +786,7 @@ export default function InvestorProfileSetupPage() {
                       variant="outline"
                       onClick={() => router.push("/profile/setup")}
                       className="border-gray-700 text-white"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || onboardingStatus === true}
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       Back
@@ -773,6 +807,7 @@ export default function InvestorProfileSetupPage() {
         </div>
       </div>
     </div>
+    </AppLayout>
   )
 }
 

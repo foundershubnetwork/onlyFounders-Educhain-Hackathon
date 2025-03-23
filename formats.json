@@ -1,0 +1,38 @@
+{
+    "_id": "67daa546f174fcf15c373e73",
+    "user_id": "5e3f387facab685f",
+    "role": "Investor",
+    "status": "Unverified",
+    "completedStatus": true,
+    "createdAt": "2025-03-19T11:06:46.509Z",
+    "updatedAt": "2025-03-22T11:21:55.866Z",
+    "__v": 0,
+    "bio": "Something about investor",
+    "location": "India",
+    "professionalTitle": "New Angel Investor",
+    "profilePic": {
+        "file_name": "logo.jpg",
+        "file_url": "https://f3ai.blob.core.windows.net/fhn/72e6de8c-93c5-4347-92f7-ca79982cdb1a-logo.jpg",
+        "_id": "67de9d5396df5a380548e8fa"
+    },
+    "username": "New Investor",
+    "investorData": {
+        "investorType": "individual",
+        "investmentExperience": "intermediate",
+        "minInvestment": 1000,
+        "maxInvestment": 10000,
+        "investmentInterest": [
+            "defi"
+        ],  
+        "socialLinks": {
+            "Linkedin": "linkedin.com",
+            "Twitter": "www.twitter.com"
+        },
+        "completedStatus": "false",
+        "watchList": [],
+        "_id": "67de9d5396df5a380548e8fb",
+        "recentActivity": [],
+        "createdAt": "2025-03-22T11:21:55.866Z",
+        "updatedAt": "2025-03-22T11:21:55.866Z"
+    }
+}

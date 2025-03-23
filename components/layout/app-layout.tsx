@@ -43,13 +43,14 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { useAccount } from "wagmi"
 import axios from "axios"
 import { useToast } from "../ui/use-toast"
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "../ui/navigation-menu"
 
 interface AppLayoutProps {
   children: ReactNode
   showHero?: boolean
 }
 
-export function AppLayout({ children, showHero = false }: AppLayoutProps) {
+export function AppLayout({ className, children, showHero = false }: AppLayoutProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [scrolled, setScrolled] = useState(false)
@@ -60,7 +61,7 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
   const { user, isLoading } = useUser()
   const { address, isConnected } = useAccount()
   const toast = useToast()
-  
+  const [onboardingStatus, setOnboardingStatus] = useState<boolean>(false)
 
   // Add the profile navigation handler 
   const handleProfileNavigation = async () => {
@@ -85,13 +86,15 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
       const data = await response.json()
 
       // Route based on profile status
-      if (data.status === true) {
-        router.push("/")
-        console.log("Profile is complete, redirecting to home page")
-      } else {
-        router.push("/profile")
-        console.log("first")
-      }
+        if(data.role === "Investor"){
+          router.push("/profile-page/investor")
+        }
+        else if(data.role === "Founder"){
+          router.push("/profile-page/founder")
+        }
+        else if(data.role === "ServiceProvider"){
+          router.push("/profile-page/service-provider")
+        }
     } catch (error) {
       console.error("Error checking profile status:", error)
       // Default to profile page on error
@@ -107,10 +110,11 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
       // Add a small delay to ensure smooth transition
       const timer = setTimeout(() => {
         setAuthReady(true)
-      }, 100)
+      }, 20)
       return () => clearTimeout(timer)
     }
   }, [isLoading])
+  
 
   //sending wallet address to the backend after user connected wallet.
   useEffect(() => {
@@ -200,14 +204,14 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
     { href: "/", label: "Home", icon: Home },
     { href: "/marketplace", label: "Marketplace", icon: Store },
     { href: "/network", label: "Network", icon: Users },
-    { href: "/resources", label: "Resources", icon: BookOpen },
-    { href: "/blog", label: "Blog", icon: FileText },
+    { href: "/", label: "Resources", icon: BookOpen },
+    { href: "/", label: "Blog", icon: FileText },
     { href: "/quests", label: "Quests", icon: Trophy },
   ]
 
   const dashboardNavItems = [
-    { href: "/investor-dashboard", label: "Investor Dashboard", icon: Wallet },
-    { href: "/founder-dashboard", label: "Founder Dashboard", icon: Building },
+    { href: "/", label: "Investor Dashboard", icon: Wallet },
+    { href: "/", label: "Founder Dashboard", icon: Building },
   ]
 
   const isActive = (path: string) => {
@@ -308,13 +312,13 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href="/investor-dashboard">
+                  <Link href="/">
                     <Wallet className="mr-2 h-4 w-4" />
                     Investor Dashboard
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href="/founder-dashboard">
+                  <Link href="/">
                     <Building className="mr-2 h-4 w-4" />
                     Founder Dashboard
                   </Link>
@@ -326,7 +330,7 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-gray-800" />
-                <a href="api/auth/logout">
+                <a href="/api/auth/logout">
                   <DropdownMenuItem className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign out
@@ -335,7 +339,7 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <a href="api/auth/login">
+            <a href="/api/auth/login">
               <Button
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                 variant="outline"
@@ -370,7 +374,7 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
             </Link>
 
             <nav className="hidden md:flex items-center gap-6">
-              {mainNavItems.map((item) => (
+              {/* {mainNavItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -381,28 +385,123 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
                 >
                   {item.label}
                 </Link>
-              ))}
+              ))} */}
 
-              {/* Only render dashboards dropdown when auth is ready and user exists */}
-              {authReady && user && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="text-muted-foreground hover:text-primary">
-                      Dashboards <ChevronDown className="ml-1 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-gray-800 text-white">
-                    {dashboardNavItems.map((item) => (
-                      <DropdownMenuItem key={item.href} asChild className="cursor-pointer">
-                        <Link href={item.href} className="flex items-center">
-                          <item.icon className="mr-2 h-4 w-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
+            <NavigationMenu>
+              <NavigationMenuList className="flex gap-4">
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Marketplace</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <div className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
+                      <span className="row-span-3">
+                        <NavigationMenuLink asChild>
+                          <a
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-indigo-500/50 to-purple-500/50 p-6 no-underline outline-none focus:shadow-md"
+                            href="/marketplace"
+                          >
+                            <div className="mb-2 mt-4 text-lg font-medium text-white">Startup Bazaar</div>
+                            <p className="text-sm leading-tight text-white/90">
+                              Where dreams are sold and wallets are emptied
+                            </p>
+                          </a>
+                        </NavigationMenuLink>
+                      </span>
+                      <a href="/marketplace" title="Hot Right Now" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        Startups that investors are fighting over
+                      </a>
+                      <a href="/marketplace" title="Fresh Meat" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        Newly hatched startups seeking funding
+                      </a>
+                      <a href="/marketplace" title="Categories" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        From "Actually Useful" to "Pure Speculation"
+                      </a>
+                    </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem> 
+                  <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                      <a title="Survival Guides" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        How to pitch without crying
+                      </a>
+                      <a title="War Stories" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        Tales from the startup trenches
+                      </a>
+                      <a title="Networking Parties" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        Free food and awkward conversations
+                      </a>
+                      <a title="Dumb Questions" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        There are no dumb questions (except these)
+                      </a>
+                    </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Network</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                      <a href="/network" title="Money People" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        They have cash, you need cash
+                      </a>
+                      <a href="/network" title="Fellow Dreamers" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        Other sleep-deprived entrepreneurs
+                      </a>
+                      <a href="/network" title="Been There, Done That" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        Learn from their expensive mistakes
+                      </a>
+                      <a href="/network" title="Useful Connections" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                        People who might actually help you
+                      </a>
+                    </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <a
+                      href="/quests"
+                      className="py-2.5 px-3 rounded-md hover:cursor-pointer bg-gray-950 hover:bg-gray-800"
+                    >
+                      Quests
+                    </a>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                
+                {/* <Link href="/quests" className="flex items-center gap-3 px-3 py-2 bg-slate-950 text-sm rounded-md">
+                    Quests
+                </Link> */}
+
+                {authReady && user && (
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>Dashboards</NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                        <NavigationMenuLink asChild>
+                          <a
+                            className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                            href="/"
+                          >
+                            Investor Dashboard
+                          </a>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <a
+                            className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                            href="/"
+                          >
+                            Founder Dashboard
+                          </a>
+                        </NavigationMenuLink>
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                )}
+                 
+              </NavigationMenuList>
+            </NavigationMenu>
 
               {/* Show skeleton for dashboards dropdown when loading */}
               {!authReady && <Skeleton className="h-9 w-28 rounded-md" />}
@@ -423,13 +522,13 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
                 <div className="flex flex-col h-full">
                   <div className="p-4 border-b border-gray-800 flex items-center">
                     <Image
-                      src="/placeholder.svg?height=32&width=32"
-                      alt="Optimus AI Logo"
+                      src="/favicon.svg"
+                      alt="OnlyFounders Logo"
                       width={32}
                       height={32}
                       className="rounded-md mr-2"
                     />
-                    <span className="font-bold text-xl text-white">Optimus AI</span>
+                    <span className="font-bold text-xl text-white">OnlyFounders</span>
                   </div>
                   <div className="flex-1 overflow-auto py-2">
                     <div className="grid gap-1 px-2">
@@ -439,9 +538,6 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
                           href={item.href}
                           className={cn(
                             "flex items-center gap-3 px-3 py-3 text-sm rounded-md",
-                            isActive(item.href)
-                              ? "bg-gray-800 text-white"
-                              : "text-gray-400 hover:bg-gray-800 hover:text-white",
                           )}
                         >
                           <item.icon className="h-5 w-5" />
@@ -480,20 +576,6 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
                     )}
 
                     <div className="grid gap-1 px-2">
-                      <Link
-                        href="/messages"
-                        className="flex items-center gap-3 px-3 py-3 text-sm rounded-md text-gray-400 hover:bg-gray-800 hover:text-white"
-                      >
-                        <MessageSquare className="h-5 w-5" />
-                        Messages
-                      </Link>
-                      <Link
-                        href="/settings"
-                        className="flex items-center gap-3 px-3 py-3 text-sm rounded-md text-gray-400 hover:bg-gray-800 hover:text-white"
-                      >
-                        <Settings className="h-5 w-5" />
-                        Settings
-                      </Link>
                     </div>
                   </div>
 
@@ -518,12 +600,22 @@ export function AppLayout({ children, showHero = false }: AppLayoutProps) {
                         </ConnectButton.Custom>
                       </div>
                     ) : (
-                      <a href="api/auth/login">
+                      <a href="/api/auth/login">
                         <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                           Login
                         </Button>
                       </a>
                     )}
+
+                    {!authReady ?(
+                      <Skeleton className="h-10 w-full rounded-md" />
+                    ) : user ? (
+                      <a href="/api/auth/logout">
+                        <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                          Logout
+                        </Button>
+                      </a>
+                    ):(null)}
                   </div>
                 </div>
               </SheetContent>

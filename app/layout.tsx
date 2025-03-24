@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.website.xyz"),
   title: "OnlyFounders - Web3 Fundraising Platform",
   description:
     "AI-powered Web3 fundraising platform connecting innovative blockchain projects with global investors",
@@ -32,6 +33,8 @@ export default function RootLayout({
           <AuthTracking /> {/* Tracking user login */}
           <Providers>
             {children}
+            <Analytics />
+            <SpeedInsights />
             <Toaster/>
             <Analytics />
             <SpeedInsights />

@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import { AppLayout } from "@/components/layout/app-layout";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import { featureCards } from "@/data/featureCards";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+
 export default function HomePage() {
   const [projects, setProjects] = useState<
     Array<{
@@ -42,6 +43,7 @@ export default function HomePage() {
   const [onboardingStatus, setOnboardingStatus] = useState(false);
   const router = useRouter();
   const {toast} = useToast();
+
 
 
   useEffect(() => {
@@ -168,13 +170,12 @@ export default function HomePage() {
 
             {/* Right side - Image */}
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-950/50 z-10 rounded-xl"></div>
-              <div className="relative z-0 rounded-xl overflow-hidden border border-purple-800/20 shadow-xl">
+              <div className="relative z-0 rounded-xl overflow-hidden">
                 <Image
                   src="/hero.gif"
                   alt="OnlyFounders Platform"
-                  width={800}
-                  height={600}
+                  width={512}
+                  height={512}
                   className="w-full h-auto"
                   priority
                 />
@@ -189,7 +190,7 @@ export default function HomePage() {
                   </Button>
                 </Link>
                 <Link
-                  href="api/auth/login"
+                  href="/"
                   className="w-72 md:w-auto"
                 >
                   <Button
@@ -318,12 +319,12 @@ export default function HomePage() {
             </div>
 
             <div className="order-1 md:order-2">
-              <div className="relative rounded-xl overflow-hidden border border-purple-800/20">
+              <div className="relative rounded-xl overflow-hidden">
                 <Image
                   src="/workflow.png"
                   alt="How OnlyFounders Works"
-                  width={400}
-                  height={300}
+                  width={350}
+                  height={275}
                   className="w-full"
                 />
               </div>
@@ -559,7 +560,7 @@ export default function HomePage() {
                       Explore Startups <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
-                  <Link href="/founder-dashboard" className="w-72 md:w-auto">
+                  <Link href="/" className="w-72 md:w-auto">
                     <Button
                       variant="outline"
                       className="border-purple-800/20 text-white hover:bg-purple-900/30"

@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, CheckCircle } from "lucide-react"
+import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, CheckCircle, Rocket } from "lucide-react"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import {useToast} from '../../hooks/use-toast'
 
@@ -148,7 +148,49 @@ export default function MarketplacePage() {
   const featuredStartups = startups.filter((startup) => startup.featuredStatus === "Featured")
 
   return (
-    <AppLayout>
+    <AppLayout className="z-50">
+      {/* Coming Soon Overlay */}
+            <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md">
+              <Card className="w-full max-w-md mx-4 border-purple-800/30 shadow-xl rounded-2xl relative overflow-hidden">
+                        {/* Background Image with 75% Opacity */}
+                        <div
+                          className="absolute inset-0 bg-cover bg-center opacity-40"
+                          style={{ backgroundImage: "url('/coming-soon-card.gif')" }}
+                        />
+              
+                        <CardHeader className="pb-2 text-center relative z-10">
+                          <div className="mx-auto flex items-center justify-center mb-4">
+                            <Image
+                              src="/favicon.svg"
+                              alt="OnlyFounders"
+                              width={75}
+                              height={75}
+                            />
+                          </div>
+                          <CardTitle className="text-2xl md:text-3xl font-bold text-white">
+                            Coming Soon!
+                          </CardTitle>
+                          <CardDescription className="text-white text-lg">
+                            We're building something amazing
+                          </CardDescription>
+                        </CardHeader>
+              
+                        <CardContent className="space-y-6 text-center relative z-10">
+                          <p className="text-gray-300">
+                            Our marketplace feature is currently in the works. We're crafting
+                            a seamless platform where founders can showcase their startups and
+                            investors can effortlessly explore and discover opportunities.
+                          </p>
+                          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <Button className="border-purple-800/30 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                              <Link href="/">Return to Home</Link>
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+            </div>
+
+
       <div className="container mx-auto py-8 space-y-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>

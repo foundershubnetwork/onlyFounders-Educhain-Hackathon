@@ -1,16 +1,28 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { AppLayout } from "@/components/layout/app-layout"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { AppLayout } from "@/components/layout/app-layout";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Briefcase,
   Calendar,
@@ -24,10 +36,10 @@ import {
   Users,
   Bell,
   Rocket,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function NetworkPage() {
-  const [activeTab, setActiveTab] = useState("members")
+  const [activeTab, setActiveTab] = useState("members");
 
   // Mock data for members
   const members = [
@@ -109,14 +121,15 @@ export default function NetworkPage() {
       projects: 2,
       verified: false,
     },
-  ]
+  ];
 
   // Mock data for events
   const events = [
     {
       id: "1",
       title: "Optimus AI DeFi Summit",
-      description: "Join us for a day of discussions on the future of decentralized finance",
+      description:
+        "Join us for a day of discussions on the future of decentralized finance",
       date: "Apr 15, 2025",
       time: "9:00 AM - 5:00 PM",
       location: "San Francisco, CA",
@@ -128,7 +141,8 @@ export default function NetworkPage() {
     {
       id: "2",
       title: "Smart Contract Security Workshop",
-      description: "Learn best practices for securing your smart contracts from industry experts",
+      description:
+        "Learn best practices for securing your smart contracts from industry experts",
       date: "Apr 10, 2025",
       time: "1:00 PM - 4:00 PM",
       location: "Virtual",
@@ -152,7 +166,8 @@ export default function NetworkPage() {
     {
       id: "4",
       title: "Tokenomics Masterclass",
-      description: "Deep dive into designing effective token economics for your project",
+      description:
+        "Deep dive into designing effective token economics for your project",
       date: "May 5, 2025",
       time: "10:00 AM - 12:00 PM",
       location: "Virtual",
@@ -161,7 +176,7 @@ export default function NetworkPage() {
       type: "Webinar",
       virtual: true,
     },
-  ]
+  ];
 
   // Mock data for jobs
   const jobs = [
@@ -207,9 +222,14 @@ export default function NetworkPage() {
       type: "Full-time",
       salary: "$70K - $90K",
       posted: "Just now",
-      skills: ["Community Building", "Social Media", "Discord", "Content Creation"],
+      skills: [
+        "Community Building",
+        "Social Media",
+        "Discord",
+        "Content Creation",
+      ],
     },
-  ]
+  ];
 
   // Mock data for partners
   const partners = [
@@ -217,7 +237,8 @@ export default function NetworkPage() {
       id: "1",
       name: "BlockSecure",
       logo: "/placeholder.svg?height=80&width=80",
-      description: "Leading blockchain security firm providing smart contract audits and security services",
+      description:
+        "Leading blockchain security firm providing smart contract audits and security services",
       category: "Security",
       website: "https://blocksecure.io",
     },
@@ -225,7 +246,8 @@ export default function NetworkPage() {
       id: "2",
       name: "CryptoLegal",
       logo: "/placeholder.svg?height=80&width=80",
-      description: "Specialized legal services for blockchain projects and crypto startups",
+      description:
+        "Specialized legal services for blockchain projects and crypto startups",
       category: "Legal",
       website: "https://cryptolegal.com",
     },
@@ -241,7 +263,8 @@ export default function NetworkPage() {
       id: "4",
       name: "ChainVentures",
       logo: "/placeholder.svg?height=80&width=80",
-      description: "Venture capital firm focused on early-stage blockchain startups",
+      description:
+        "Venture capital firm focused on early-stage blockchain startups",
       category: "Investment",
       website: "https://chainventures.capital",
     },
@@ -249,7 +272,8 @@ export default function NetworkPage() {
       id: "5",
       name: "MetaExchange",
       logo: "/placeholder.svg?height=80&width=80",
-      description: "Decentralized exchange with deep liquidity and multi-chain support",
+      description:
+        "Decentralized exchange with deep liquidity and multi-chain support",
       category: "Exchange",
       website: "https://metaexchange.io",
     },
@@ -257,36 +281,50 @@ export default function NetworkPage() {
       id: "6",
       name: "NodeProviders",
       logo: "/placeholder.svg?height=80&width=80",
-      description: "Infrastructure provider offering node services and API endpoints",
+      description:
+        "Infrastructure provider offering node services and API endpoints",
       category: "Infrastructure",
       website: "https://nodeproviders.net",
     },
-  ]
+  ];
 
   return (
     <AppLayout className="z-50">
       {/* Coming Soon Overlay */}
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md">
-        <Card className="w-full max-w-md mx-4 bg-gradient-to-br from-indigo-950/90 to-purple-900/90 border-purple-800/30 shadow-xl">
-          <CardHeader className="pb-2 text-center">
-            <div className="mx-auto w-16 h-16 rounded-full bg-blue-600/20 flex items-center justify-center mb-4">
-              <Rocket className="h-8 w-8 text-blue-400" />
-            </div>
-            <CardTitle className="text-2xl md:text-3xl font-bold text-white">Coming Soon!</CardTitle>
-            <CardDescription className="text-purple-200/80 text-lg">We're building something amazing</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 text-center">
-            <p className="text-gray-300">
-              Our network feature is currently under development. We're working hard to create the ultimate Web3
-              networking experience for founders, investors, and professionals.
-            </p>
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md overflow-x-auto">
+        <Card className="w-full max-w-md mx-4 border-purple-800/30 shadow-xl rounded-2xl relative overflow-hidden">
+          {/* Background Image with 75% Opacity */}
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-40"
+            style={{ backgroundImage: "url('/coming-soon-card.gif')" }}
+          />
 
+          <CardHeader className="pb-2 text-center relative z-10">
+            <div className="mx-auto flex items-center justify-center mb-4">
+              <Image
+                src="/favicon.svg"
+                alt="OnlyFounders"
+                width={75}
+                height={75}
+              />
+            </div>
+            <CardTitle className="text-2xl md:text-3xl font-bold text-white">
+              Coming Soon!
+            </CardTitle>
+            <CardDescription className="text-white text-lg">
+              We're building something amazing
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-6 text-center relative z-10">
+            <p className="text-gray-300">
+              Our marketplace feature is currently in the works. We're crafting
+              a seamless platform where founders can showcase their startups and
+              investors can effortlessly explore and discover opportunities.
+            </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button className="border-purple-800/30 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                 <Link href="/">Return to Home</Link>
-              </Button>
-              <Button variant="outline" className="border-purple-800/30 text-white">
-                <Link href="/marketplace">Explore Marketplace</Link>
               </Button>
             </div>
           </CardContent>
@@ -297,11 +335,19 @@ export default function NetworkPage() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white">Network</h1>
-            <p className="text-gray-400">Connect with founders, investors, and professionals in the blockchain space</p>
+            <p className="text-gray-400">
+              Connect with founders, investors, and professionals in the
+              blockchain space
+            </p>
           </div>
         </div>
 
-        <Tabs defaultValue="members" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          defaultValue="members"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="bg-gray-900 border border-gray-800 p-1">
             <TabsTrigger
               value="members"
@@ -358,7 +404,10 @@ export default function NetworkPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {members.map((member) => (
-                <Card key={member.id} className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors">
+                <Card
+                  key={member.id}
+                  className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors"
+                >
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-4">
@@ -373,9 +422,13 @@ export default function NetworkPage() {
                         </Avatar>
                         <div>
                           <div className="flex items-center">
-                            <CardTitle className="text-lg text-white">{member.name}</CardTitle>
+                            <CardTitle className="text-lg text-white">
+                              {member.name}
+                            </CardTitle>
                             {member.verified && (
-                              <Badge className="ml-2 bg-blue-900/30 text-blue-400 border-blue-800">Verified</Badge>
+                              <Badge className="ml-2 bg-blue-900/30 text-blue-400 border-blue-800">
+                                Verified
+                              </Badge>
                             )}
                           </div>
                           <CardDescription className="text-gray-400">
@@ -390,7 +443,11 @@ export default function NetworkPage() {
 
                     <div className="flex flex-wrap gap-2">
                       {member.skills.map((skill, index) => (
-                        <Badge key={index} variant="outline" className="bg-gray-800/50 text-gray-300 border-gray-700">
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="bg-gray-800/50 text-gray-300 border-gray-700"
+                        >
                           {skill}
                         </Badge>
                       ))}
@@ -416,7 +473,10 @@ export default function NetworkPage() {
                       <Button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                         Connect
                       </Button>
-                      <Button variant="outline" className="flex-1 text-gray-300 border-gray-700">
+                      <Button
+                        variant="outline"
+                        className="flex-1 text-gray-300 border-gray-700"
+                      >
                         <MessageSquare className="mr-2 h-4 w-4" />
                         Message
                       </Button>
@@ -431,7 +491,10 @@ export default function NetworkPage() {
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-                <Input placeholder="Search events..." className="pl-9 bg-gray-900 border-gray-700 text-white" />
+                <Input
+                  placeholder="Search events..."
+                  className="pl-9 bg-gray-900 border-gray-700 text-white"
+                />
               </div>
               <Select defaultValue="all">
                 <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700 text-white">
@@ -455,25 +518,38 @@ export default function NetworkPage() {
                   className="bg-gray-900 border-gray-800 overflow-hidden hover:border-blue-600 transition-colors"
                 >
                   <div className="relative h-48 w-full">
-                    <Image src={event.image || "/placeholder.svg"} alt={event.title} fill className="object-cover" />
+                    <Image
+                      src={event.image || "/placeholder.svg"}
+                      alt={event.title}
+                      fill
+                      className="object-cover"
+                    />
                     <Badge
                       className={`absolute top-2 right-2 ${
                         event.type === "Conference"
                           ? "bg-blue-600"
                           : event.type === "Workshop"
-                            ? "bg-purple-600"
-                            : event.type === "Networking"
-                              ? "bg-teal-600"
-                              : "bg-amber-600"
+                          ? "bg-purple-600"
+                          : event.type === "Networking"
+                          ? "bg-teal-600"
+                          : "bg-amber-600"
                       }`}
                     >
                       {event.type}
                     </Badge>
-                    {event.virtual && <Badge className="absolute top-2 left-2 bg-gray-800">Virtual</Badge>}
+                    {event.virtual && (
+                      <Badge className="absolute top-2 left-2 bg-gray-800">
+                        Virtual
+                      </Badge>
+                    )}
                   </div>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-xl text-white">{event.title}</CardTitle>
-                    <CardDescription className="text-gray-400">{event.description}</CardDescription>
+                    <CardTitle className="text-xl text-white">
+                      {event.title}
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      {event.description}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex flex-col gap-2">
@@ -499,7 +575,10 @@ export default function NetworkPage() {
                       <Button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                         Register
                       </Button>
-                      <Button variant="outline" className="flex-1 text-gray-300 border-gray-700">
+                      <Button
+                        variant="outline"
+                        className="flex-1 text-gray-300 border-gray-700"
+                      >
                         <Calendar className="mr-2 h-4 w-4" />
                         Add to Calendar
                       </Button>
@@ -535,22 +614,35 @@ export default function NetworkPage() {
 
             <div className="space-y-4">
               {jobs.map((job) => (
-                <Card key={job.id} className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors">
+                <Card
+                  key={job.id}
+                  className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors"
+                >
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div className="flex items-start gap-4">
                         <div className="relative h-12 w-12 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0">
-                          <Image src={job.logo || "/placeholder.svg"} alt={job.company} fill className="object-cover" />
+                          <Image
+                            src={job.logo || "/placeholder.svg"}
+                            alt={job.company}
+                            fill
+                            className="object-cover"
+                          />
                         </div>
                         <div>
-                          <h3 className="text-lg font-medium text-white">{job.title}</h3>
+                          <h3 className="text-lg font-medium text-white">
+                            {job.title}
+                          </h3>
                           <p className="text-gray-400">{job.company}</p>
                           <div className="flex flex-wrap items-center gap-3 mt-2 text-sm">
                             <div className="flex items-center text-gray-300">
                               <MapPin className="h-4 w-4 mr-1 text-gray-500" />
                               {job.location}
                             </div>
-                            <Badge variant="outline" className="bg-gray-800/50 text-gray-300 border-gray-700">
+                            <Badge
+                              variant="outline"
+                              className="bg-gray-800/50 text-gray-300 border-gray-700"
+                            >
                               {job.type}
                             </Badge>
                             <div className="text-green-400">{job.salary}</div>
@@ -559,7 +651,9 @@ export default function NetworkPage() {
                       </div>
 
                       <div className="flex flex-col items-end gap-2">
-                        <div className="text-xs text-gray-500">Posted {job.posted}</div>
+                        <div className="text-xs text-gray-500">
+                          Posted {job.posted}
+                        </div>
                         <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                           Apply Now
                         </Button>
@@ -569,7 +663,11 @@ export default function NetworkPage() {
                     <div className="mt-4 pt-4 border-t border-gray-800">
                       <div className="flex flex-wrap gap-2">
                         {job.skills.map((skill, index) => (
-                          <Badge key={index} variant="outline" className="bg-blue-900/20 text-blue-400 border-blue-800">
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="bg-blue-900/20 text-blue-400 border-blue-800"
+                          >
                             {skill}
                           </Badge>
                         ))}
@@ -585,7 +683,10 @@ export default function NetworkPage() {
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-                <Input placeholder="Search partners..." className="pl-9 bg-gray-900 border-gray-700 text-white" />
+                <Input
+                  placeholder="Search partners..."
+                  className="pl-9 bg-gray-900 border-gray-700 text-white"
+                />
               </div>
               <Select defaultValue="all">
                 <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700 text-white">
@@ -604,7 +705,10 @@ export default function NetworkPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {partners.map((partner) => (
-                <Card key={partner.id} className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors">
+                <Card
+                  key={partner.id}
+                  className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors"
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0">
@@ -616,18 +720,33 @@ export default function NetworkPage() {
                         />
                       </div>
                       <div>
-                        <h3 className="text-lg font-medium text-white">{partner.name}</h3>
-                        <Badge variant="outline" className="bg-gray-800/50 text-gray-300 border-gray-700">
+                        <h3 className="text-lg font-medium text-white">
+                          {partner.name}
+                        </h3>
+                        <Badge
+                          variant="outline"
+                          className="bg-gray-800/50 text-gray-300 border-gray-700"
+                        >
                           {partner.category}
                         </Badge>
                       </div>
                     </div>
 
-                    <p className="text-gray-300 text-sm mb-4">{partner.description}</p>
+                    <p className="text-gray-300 text-sm mb-4">
+                      {partner.description}
+                    </p>
 
                     <div className="flex gap-2">
-                      <Button asChild variant="outline" className="flex-1 text-gray-300 border-gray-700">
-                        <Link href={partner.website} target="_blank" rel="noopener noreferrer">
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="flex-1 text-gray-300 border-gray-700"
+                      >
+                        <Link
+                          href={partner.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <Globe className="mr-2 h-4 w-4" />
                           Visit Website
                         </Link>
@@ -644,6 +763,5 @@ export default function NetworkPage() {
         </Tabs>
       </div>
     </AppLayout>
-  )
+  );
 }
-

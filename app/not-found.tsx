@@ -19,12 +19,12 @@ export default function NotFound() {
               Back to Home
             </Link>
           </Button>
-          <Button asChild variant="outline" className="border-gray-700 text-white">
+          {/* <Button asChild variant="outline" className="border-gray-700 text-white">
             <Link href="/marketplace">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Explore Projects
             </Link>
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>

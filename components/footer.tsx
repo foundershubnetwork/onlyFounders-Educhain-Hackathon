@@ -61,7 +61,7 @@ export function Footer() {
               <ul className="space-y-2">
                 <li>
                   <Link
-                    href="/marketplace"
+                    href="/network"
                     className="text-gray-400 hover:text-white"
                   >
                     Network
@@ -69,7 +69,7 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/network"
+                    href="/marketplace"
                     className="text-gray-400 hover:text-white"
                   >
                     Marketplace
@@ -88,19 +88,19 @@ export function Footer() {
               <ul className="space-y-2">
                 <li>
                   <Link
-                    href="/blogs"
+                    href="/"
                     className="text-gray-400 hover:text-white"
                   >
                     Blogs
                   </Link>
                 </li>
                 <li>
-                  <Link href="/" className="text-gray-400 hover:text-white">
+                  <Link href="/quests" className="text-gray-400 hover:text-white">
                     Quests
                   </Link>
                 </li>
                 <li>
-                  <Link href="/" className="text-gray-400 hover:text-white">
+                  <Link href="/resources" className="text-gray-400 hover:text-white">
                     Resources
                   </Link>
                 </li>

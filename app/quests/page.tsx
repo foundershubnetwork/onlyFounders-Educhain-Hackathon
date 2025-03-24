@@ -356,24 +356,25 @@ useEffect(() => {
 
   return (
     <AppLayout>
-      <div className="container mx-auto py-8 space-y-8">
+      <div className="container mx-0 md:mx-auto py-8 space-y-8">
 
     {/* heading */}
       <div className="flex flex-col items-center">
-          <h1 className="text-4xl font-semibold">Global Founder Survey</h1>
+          <h1 className="text-4xl md:text-5xl text-[#00DDFF] font-bold">Global Founder Survey</h1>
           <p className="text-gray-400 mt-2">Join the Founders Community, make an impact, and collaborate, while ensuring your data remains private and secure.</p>
       </div>
 
       <div className="w-full bg-gradient-radial from-[#044D55] to-black text-white rounded-lg overflow-hidden flex flex-col md:flex-row font-poppins">
       {/* Left content - adjusted with wider text container */}
-      <div className="py-10 pl-10 pr-6 md:pr-10 flex-grow flex flex-col justify-center">
+      
+      <div className="py-10 pl-0 md:pl-10 pr-6 md:pr-10 flex-grow flex flex-col justify-center">
         <div className="max-w-[800px] mx-auto md:mx-0">
           <div className="inline-flex items-center gap-1.5 bg-black/30 border border-[#004a45] rounded-full px-3 py-1.5 text-sm font-medium mb-6">
             <Zap className="h-4 w-4" />
             <span>Featured</span>
           </div>
 
-          <h1 className="text-4xl font-semibold mb-4">Global Founders Survey</h1>
+          <h1 className="text-4xl md:text-5xl font-semibold mb-4">Global Founders Survey</h1>
 
           <p className="text-lg text-gray-300 mb-8">
             Discover insights into your personality as a founder! This short survey helps us understand how your traits
@@ -381,19 +382,23 @@ useEffect(() => {
           </p>
 
           <Button
-            onClick={() => {
-              if(isLoggedIn){
-                window.open(veridaRequestUrl.toString(), "_blank")
-              }
-              else{
-                      toast({
-                        title: "Message",
-                        description: "Please login to start the survey",
-                        variant: "destructive",
-                      })
-              }
-            }}   
+            // onClick={() => {
+            //   if(isLoggedIn){
+            //     window.open(veridaRequestUrl.toString(), "_blank")
+            //   }
+            //   else{
+            //           toast({
+            //             title: "Message",
+            //             description: "Please login to start the survey",
+            //             variant: "destructive",
+            //           })
+            //   }
+            // }}   
           
+            onClick={() => {
+              window.open(veridaRequestUrl.toString(), "_blank")
+            }}
+
             disabled={isLoading}
             className="inline-flex items-center gap-2 bg-[#00DDFF] hover:bg-[#33E5FF] text-black font-medium px-6 py-3 rounded-md transition-colors"
           >
@@ -420,19 +425,20 @@ useEffect(() => {
       {/* Right image - positioned at extreme right */}
       <div className="flex-shrink-0">
         <div className="w-[800px] h-[500px] relative">
-          <Image src="/founders-verida.png" alt="Founders x Verida Network" fill className="object-contain" priority />
+          <Image src="/founders-verida.png" alt="Founders x Verida Network" fill className="hidden md:flex object-contain" priority />
+          <Image src="/founders-verida-mobile.png" alt="Founders x Verida Network" width={350} height={800} className="md:hidden lg:hidden object-contain" priority />
         </div>
       </div>
     </div>
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {/* <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white">Quests</h1>
             <p className="text-gray-400">Complete quests to learn, grow, and earn rewards</p>
           </div>
-        </div>
+        </div> */}
 
-        <Tabs defaultValue="investor" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        {/* <Tabs defaultValue="investor" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-gray-900 border border-gray-800 p-1">
             <TabsTrigger
               value="investor"
@@ -639,7 +645,7 @@ useEffect(() => {
               </div>
             </div>
           </TabsContent>
-        </Tabs>
+        </Tabs> */}
       </div>
     </AppLayout>
   )

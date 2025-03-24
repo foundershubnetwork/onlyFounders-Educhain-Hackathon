@@ -204,8 +204,8 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
     { href: "/", label: "Home", icon: Home },
     { href: "/marketplace", label: "Marketplace", icon: Store },
     { href: "/network", label: "Network", icon: Users },
-    { href: "/", label: "Resources", icon: BookOpen },
-    { href: "/", label: "Blog", icon: FileText },
+    { href: "/resources", label: "Resources", icon: BookOpen },
+    // { href: "/", label: "Blog", icon: FileText },
     { href: "/quests", label: "Quests", icon: Trophy },
   ]
 
@@ -339,12 +339,12 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <a href="/api/auth/login">
+            <a href="/early-access">
               <Button
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                 variant="outline"
               >
-                Login
+               Early Access
               </Button>
             </a>
           )}
@@ -423,16 +423,16 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                   <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                      <a title="Survival Guides" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                      <a href="/resources" title="Survival Guides" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
                         How to pitch without crying
                       </a>
-                      <a title="War Stories" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                      <a href="/resources" title="War Stories" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
                         Tales from the startup trenches
                       </a>
-                      <a title="Networking Parties" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                      <a href="/resources" title="Networking Parties" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
                         Free food and awkward conversations
                       </a>
-                      <a title="Dumb Questions" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
+                      <a href="/resources" title="Dumb Questions" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
                         There are no dumb questions (except these)
                       </a>
                     </div>
@@ -600,9 +600,9 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                         </ConnectButton.Custom>
                       </div>
                     ) : (
-                      <a href="/api/auth/login">
+                      <a href="/early-access">
                         <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                          Login
+                          Early Access
                         </Button>
                       </a>
                     )}

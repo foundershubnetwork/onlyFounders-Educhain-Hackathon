@@ -1,5 +1,5 @@
 import { CommonConfigSchema } from "@/config/schemas"
-import { version } from "./version"
+// import { version } from "./version"
 
 const commonConfigCheckResult = CommonConfigSchema.safeParse({
   // Have to pass the variables one-by-one on the client because they are set
@@ -14,7 +14,7 @@ const commonConfigCheckResult = CommonConfigSchema.safeParse({
     process.env.NEXT_PUBLIC_DATA_PROCESSING_ENDPOINT_URL,
   SURVEY_DATA_SCHEMA_ID: process.env.NEXT_PUBLIC_SURVEY_DATA_SCHEMA_ID,
   isClient: !(typeof window === "undefined"),
-  appVersion: version,
+  // appVersion: version,
 })
 
 if (!commonConfigCheckResult.success) {

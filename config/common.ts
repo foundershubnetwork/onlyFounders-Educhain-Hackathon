@@ -1,5 +1,5 @@
 import { CommonConfigSchema } from "@/config/schemas"
-import { version } from "@/config/version"
+import { version } from "./version"
 
 const commonConfigCheckResult = CommonConfigSchema.safeParse({
   // Have to pass the variables one-by-one on the client because they are set

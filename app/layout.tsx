@@ -9,6 +9,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import AuthTracking from "./MIXPanel/AuthTracking";
 import AuthProvider from "../components/AuthProvider"; // Use AuthProvider instead of UserProvider
 import { Toaster } from "@/components/ui/toaster";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-R97GNL407V"
+        ></Script>
+        <Script id="google-analytics">
+          {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-R97GNL407V');
+          `}
+        </Script>
+      </head>
       <body className={inter.className}>
         <AuthProvider>
           <AuthTracking /> {/* Tracking user login */}
@@ -35,9 +50,7 @@ export default function RootLayout({
             {children}
             <Analytics />
             <SpeedInsights />
-            <Toaster/>
-            <Analytics />
-            <SpeedInsights />
+            <Toaster />
           </Providers>
         </AuthProvider>
       </body>

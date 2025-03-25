@@ -11,7 +11,7 @@ export const CommonConfigSchema = z.object({
   DATA_PROCESSING_ENDPOINT_URL: z.string().url(),
   SURVEY_DATA_SCHEMA_ID: z.string(),
   isClient: z.boolean(),
-  appVersion: z.string(),
+  // appVersion: z.string(),
 })
 
 export const ServerConfigSchema = z.object({

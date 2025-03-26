@@ -9,7 +9,7 @@ type FormData = {
   xHandle: string;
   founderType: string;
   walletAddress: string;
-  role: "Founder (Tired of VC BS)" | "Investor (The Cool Kind)";
+  role: "Founder" | "Investor";
 };
 
 // Admin Notification Email

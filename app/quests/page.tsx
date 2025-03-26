@@ -1,16 +1,29 @@
-"use client"
+"use client";
 
-import { useEffect ,useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { AppLayout } from "@/components/layout/app-layout"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { AppLayout } from "@/components/layout/app-layout";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Award,
   BookOpen,
@@ -26,43 +39,39 @@ import {
   Shield,
   FileText,
   Rocket,
-} from "lucide-react"
+} from "lucide-react";
 
-import { commonConfig } from "@/config/common"
-import { buildFoundersPersonalityTraitsSurveyRequest } from "@/features/survey-request/utils"
-import { buildVeridaRequestUrl } from "@/features/verida-request/utils"
-import { UserProfile, useUser } from "@auth0/nextjs-auth0/client"
-import {useToast} from '../../hooks/use-toast'
+import { commonConfig } from "@/config/common";
+import { buildFoundersPersonalityTraitsSurveyRequest } from "@/features/survey-request/utils";
+import { buildVeridaRequestUrl } from "@/features/verida-request/utils";
+import { UserProfile, useUser } from "@auth0/nextjs-auth0/client";
+import { useToast } from "../../hooks/use-toast";
+import ModernButton from "@/components/modern-button";
+import BlogSection from "./blog";
 
-
-
-const surveryRequest = buildFoundersPersonalityTraitsSurveyRequest()
+const surveryRequest = buildFoundersPersonalityTraitsSurveyRequest();
 const veridaRequestUrl = buildVeridaRequestUrl(
   surveryRequest,
   commonConfig.VERIDA_VAULT_BASE_URL
-)
-
-
-
+);
 
 export default function QuestsPage() {
-  const [activeTab, setActiveTab] = useState("investor")
-  const {user, isLoading} = useUser();
+  const [activeTab, setActiveTab] = useState("investor");
+  const { user, isLoading } = useUser();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const {toast} = useToast();
+  const { toast } = useToast();
 
-useEffect(() => {
-  const checkLoggedIn = async () => {
-    if (!isLoading && !user) {
-      setIsLoggedIn(false);
-    }
-    else{
-      setIsLoggedIn(true);
-    }
-  }
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      if (!isLoading && !user) {
+        setIsLoggedIn(false);
+      } else {
+        setIsLoggedIn(true);
+      }
+    };
 
- checkLoggedIn();
-}, [isLoading, user])
+    checkLoggedIn();
+  }, [isLoading, user]);
 
   // Mock data for investor quests
   const investorQuests = [
@@ -103,7 +112,8 @@ useEffect(() => {
     {
       id: "3",
       title: "Smart Contract Auditor",
-      description: "Learn to identify common vulnerabilities in smart contracts",
+      description:
+        "Learn to identify common vulnerabilities in smart contracts",
       image: "/placeholder.svg?height=200&width=400",
       category: "Security",
       difficulty: "Advanced",
@@ -156,7 +166,8 @@ useEffect(() => {
     {
       id: "6",
       title: "Community Evaluator",
-      description: "Learn to assess the strength and engagement of project communities",
+      description:
+        "Learn to assess the strength and engagement of project communities",
       image: "/placeholder.svg?height=200&width=400",
       category: "Analysis",
       difficulty: "Beginner",
@@ -170,7 +181,7 @@ useEffect(() => {
       estimatedTime: "2 hours",
       featured: false,
     },
-  ]
+  ];
 
   // Mock data for founder quests
   const founderQuests = [
@@ -194,7 +205,8 @@ useEffect(() => {
     {
       id: "2",
       title: "Tokenomics Designer",
-      description: "Design a sustainable token economics model for your project",
+      description:
+        "Design a sustainable token economics model for your project",
       image: "/placeholder.svg?height=200&width=400",
       category: "Economics",
       difficulty: "Intermediate",
@@ -211,7 +223,8 @@ useEffect(() => {
     {
       id: "3",
       title: "Community Builder",
-      description: "Learn strategies to build and engage your project community",
+      description:
+        "Learn strategies to build and engage your project community",
       image: "/placeholder.svg?height=200&width=400",
       category: "Community",
       difficulty: "Beginner",
@@ -228,7 +241,8 @@ useEffect(() => {
     {
       id: "4",
       title: "Security First",
-      description: "Implement security best practices for your blockchain project",
+      description:
+        "Implement security best practices for your blockchain project",
       image: "/placeholder.svg?height=200&width=400",
       category: "Security",
       difficulty: "Advanced",
@@ -246,7 +260,8 @@ useEffect(() => {
     {
       id: "5",
       title: "Regulatory Navigator",
-      description: "Understand the regulatory landscape for blockchain projects",
+      description:
+        "Understand the regulatory landscape for blockchain projects",
       image: "/placeholder.svg?height=200&width=400",
       category: "Legal",
       difficulty: "Intermediate",
@@ -263,7 +278,8 @@ useEffect(() => {
     {
       id: "6",
       title: "Investor Relations",
-      description: "Learn how to effectively communicate with investors post-funding",
+      description:
+        "Learn how to effectively communicate with investors post-funding",
       image: "/placeholder.svg?height=200&width=400",
       category: "Communication",
       difficulty: "Beginner",
@@ -278,7 +294,7 @@ useEffect(() => {
       featured: false,
       completed: true,
     },
-  ]
+  ];
 
   const getQuestStatusBadge = (quest: any) => {
     if (quest.locked) {
@@ -287,7 +303,7 @@ useEffect(() => {
           <Lock className="mr-1 h-3 w-3" />
           Locked
         </Badge>
-      )
+      );
     }
 
     if (quest.completed) {
@@ -296,7 +312,7 @@ useEffect(() => {
           <CheckCircle className="mr-1 h-3 w-3" />
           Completed
         </Badge>
-      )
+      );
     }
 
     if (quest.progress > 0 && quest.progress < 100) {
@@ -305,7 +321,7 @@ useEffect(() => {
           <Clock className="mr-1 h-3 w-3" />
           In Progress
         </Badge>
-      )
+      );
     }
 
     return (
@@ -313,123 +329,132 @@ useEffect(() => {
         <Zap className="mr-1 h-3 w-3" />
         New
       </Badge>
-    )
-  }
+    );
+  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "Beginner":
-        return "bg-green-600"
+        return "bg-green-600";
       case "Intermediate":
-        return "bg-blue-600"
+        return "bg-blue-600";
       case "Advanced":
-        return "bg-purple-600"
+        return "bg-purple-600";
       default:
-        return "bg-gray-600"
+        return "bg-gray-600";
     }
-  }
+  };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "Education":
       case "Economics":
-        return <BookOpen className="h-4 w-4" />
+        return <BookOpen className="h-4 w-4" />;
       case "Analysis":
       case "Strategy":
-        return <TrendingUp className="h-4 w-4" />
+        return <TrendingUp className="h-4 w-4" />;
       case "Security":
-        return <Shield className="h-4 w-4" />
+        return <Shield className="h-4 w-4" />;
       case "Community":
       case "Communication":
-        return <Users className="h-4 w-4" />
+        return <Users className="h-4 w-4" />;
       case "Marketing":
-        return <TrendingUp className="h-4 w-4" />
+        return <TrendingUp className="h-4 w-4" />;
       case "Legal":
-        return <FileText className="h-4 w-4" />
+        return <FileText className="h-4 w-4" />;
       default:
-        return <Star className="h-4 w-4" />
+        return <Star className="h-4 w-4" />;
     }
-  }
+  };
 
-  const activeQuests = activeTab === "investor" ? investorQuests : founderQuests
-  const featuredQuests = activeQuests.filter((quest) => quest.featured)
+  const activeQuests =
+    activeTab === "investor" ? investorQuests : founderQuests;
+  const featuredQuests = activeQuests.filter((quest) => quest.featured);
 
   return (
     <AppLayout>
-      <div className="container mx-0 md:mx-auto py-8 space-y-8">
+      <div className="container max-w-8xl mx-0 md:mx-auto py-8 space-y-8">
+        {/* heading */}
+        <div className="flex flex-col items-center">
+          <h1 className="text-4xl md:text-5xl font-bold">
+            Global <span className="text-[#00DDFF]">Founders</span> Survey
+          </h1>
+          <p className="text-gray-400 mt-2">
+            Join the Founders Community, make an impact, and collaborate, while
+            ensuring your data remains private and secure.
+          </p>
+        </div>
 
-    {/* heading */}
-      <div className="flex flex-col items-center">
-          <h1 className="text-4xl md:text-5xl text-[#00DDFF] font-bold">Global Founder Survey</h1>
-          <p className="text-gray-400 mt-2">Join the Founders Community, make an impact, and collaborate, while ensuring your data remains private and secure.</p>
-      </div>
+        <div className="w-full bg-gradient-radial from-[#044D55] to-black text-white rounded-lg flex flex-col items-center justify-center md:flex-row font-poppins gap-10">
+          {/* Left content - adjusted with wider text container */}
 
-      <div className="w-full bg-gradient-radial from-[#044D55] to-black text-white rounded-lg overflow-hidden flex flex-col md:flex-row font-poppins">
-      {/* Left content - adjusted with wider text container */}
-      
-      <div className="py-10 pl-0 md:pl-10 pr-6 md:pr-10 flex-grow flex flex-col justify-center">
-        <div className="max-w-[800px] mx-auto md:mx-0">
-          <div className="inline-flex items-center gap-1.5 bg-black/30 border border-[#004a45] rounded-full px-3 py-1.5 text-sm font-medium mb-6">
-            <Zap className="h-4 w-4" />
-            <span>Featured</span>
+          <div className="py-10 pl-0 flex-grow flex flex-col items-center justify-center">
+            <div className="mx-auto md:mx-0 max-w-4xl">
+              <div className="inline-flex items-center gap-1.5 bg-black/30 border border-[#004a45] rounded-full px-3 py-1.5 text-sm font-medium mb-6">
+                <Zap className="h-4 w-4" />
+                <span>Featured</span>
+              </div>
+
+              <h1 className="text-4xl md:text-5xl font-semibold mb-4">
+                Global Founders Survey
+              </h1>
+
+              <p className=" text-lg text-gray-300 mb-8">
+                Discover insights into your personality as a founder! This short
+                survey helps us understand how your traits shape your business
+                decisions.
+              </p>
+
+              {/* <Button
+                onClick={() => {
+                  window.open(veridaRequestUrl.toString(), "_blank");
+                }}
+                disabled={isLoading}
+                className="inline-flex items-center gap-2 bg-[#00DDFF] hover:bg-[#33E5FF] text-black font-medium px-6 py-3 rounded-md transition-colors"
+              >
+                Start Survey Now
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="ml-1"
+                >
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+              </Button> */}
+              <ModernButton/>
+            </div>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-semibold mb-4">Global Founders Survey</h1>
-
-          <p className="text-lg text-gray-300 mb-8">
-            Discover insights into your personality as a founder! This short survey helps us understand how your traits
-            shape your business decisions.
-          </p>
-
-          <Button
-            // onClick={() => {
-            //   if(isLoggedIn){
-            //     window.open(veridaRequestUrl.toString(), "_blank")
-            //   }
-            //   else{
-            //           toast({
-            //             title: "Message",
-            //             description: "Please login to start the survey",
-            //             variant: "destructive",
-            //           })
-            //   }
-            // }}   
-          
-            onClick={() => {
-              window.open(veridaRequestUrl.toString(), "_blank")
-            }}
-
-            disabled={isLoading}
-            className="inline-flex items-center gap-2 bg-[#00DDFF] hover:bg-[#33E5FF] text-black font-medium px-6 py-3 rounded-md transition-colors"
-          >
-            Start Survey Now
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="ml-1"
-            >
-              <path d="M5 12h14"></path>
-              <path d="m12 5 7 7-7 7"></path>
-            </svg>
-          </Button>
+          {/* Right image - positioned at extreme right */}
+          <div className="">
+            <div className="">
+              <Image
+                src="/founders-verida.png"
+                alt="Founders x Verida Network"
+                width={800}
+                height={600}
+                className="hidden md:flex object-contain"
+                priority
+              />
+              <Image
+                src="/founders-verida-mobile.png"
+                alt="Founders x Verida Network"
+                width={350}
+                height={800}
+                className="md:hidden object-contain"
+                priority
+              />
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Right image - positioned at extreme right */}
-      <div className="flex-shrink-0">
-        <div className="w-[800px] h-[500px] relative">
-          <Image src="/founders-verida.png" alt="Founders x Verida Network" fill className="hidden md:flex object-contain" priority />
-          <Image src="/founders-verida-mobile.png" alt="Founders x Verida Network" width={350} height={800} className="md:hidden lg:hidden object-contain" priority />
-        </div>
-      </div>
-    </div>
 
         {/* <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -647,7 +672,7 @@ useEffect(() => {
           </TabsContent>
         </Tabs> */}
       </div>
+      <BlogSection/>
     </AppLayout>
-  )
+  );
 }
-

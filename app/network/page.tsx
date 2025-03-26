@@ -318,9 +318,7 @@ export default function NetworkPage() {
 
           <CardContent className="space-y-6 text-center relative z-10">
             <p className="text-gray-300">
-              Our marketplace feature is currently in the works. We're crafting
-              a seamless platform where founders can showcase their startups and
-              investors can effortlessly explore and discover opportunities.
+            A Web3 space for founders, investors, and professionals to connect, collaborate, and grow stronger together.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button className="border-purple-800/30 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
@@ -331,7 +329,7 @@ export default function NetworkPage() {
         </Card>
       </div>
 
-      <div className="container mx-auto py-8 space-y-8">
+      <div className="w-screen overflow-x-hidden container mx-auto py-8 space-y-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white">Network</h1>

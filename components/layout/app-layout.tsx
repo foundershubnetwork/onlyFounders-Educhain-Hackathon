@@ -36,6 +36,7 @@ import {
   Trophy,
   Users,
   Wallet,
+  Info,
 } from "lucide-react"
 
 import { useUser } from "@auth0/nextjs-auth0/client"
@@ -202,6 +203,7 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
 
   const mainNavItems = [
     { href: "/", label: "Home", icon: Home },
+    { href: "/about", label: "About", icon: Info },
     { href: "/marketplace", label: "Marketplace", icon: Store },
     { href: "/network", label: "Network", icon: Users },
     { href: "/resources", label: "Resources", icon: BookOpen },
@@ -370,7 +372,7 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-6 md:gap-10">
             <Link href="/" className="flex items-center space-x-2 pr-5">
-              <Image src="/onlyFounder_logo.svg" alt="Optimus AI Logo" width={128} height={48} className="rounded-md" />
+              <Image src="/onlyFounder_logo.svg" alt="Optimus AI Logo" width={160} height={60} className="rounded-md" />
             </Link>
 
             <nav className="hidden md:flex items-center gap-6">
@@ -390,7 +392,17 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
             <NavigationMenu>
               <NavigationMenuList className="flex gap-4">
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger>Marketplace</NavigationMenuTrigger>
+                  <NavigationMenuLink className="bg-transparent" asChild>
+                    <a
+                      href="/about"
+                      className="py-2.5 px-3 rounded-md hover:cursor-pointer hover:bg-gray-800"
+                    >
+                      About
+                    </a>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="bg-transparent">Marketplace</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <div className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
                       <span className="row-span-3">
@@ -420,7 +432,7 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                 </NavigationMenuItem>
 
                 <NavigationMenuItem> 
-                  <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="bg-transparent">Resources</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       <a href="/resources" title="Survival Guides" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
@@ -440,7 +452,7 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger>Network</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="bg-transparent">Network</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       <a href="/network" title="Money People" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
@@ -460,10 +472,10 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
+                  <NavigationMenuLink className="bg-transparent" asChild>
                     <a
                       href="/quests"
-                      className="py-2.5 px-3 rounded-md hover:cursor-pointer bg-gray-950 hover:bg-gray-800"
+                      className="py-2.5 px-3 rounded-md hover:cursor-pointer hover:bg-gray-800"
                     >
                       Quests
                     </a>
@@ -476,7 +488,7 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
 
                 {authReady && user && (
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger>Dashboards</NavigationMenuTrigger>
+                    <NavigationMenuTrigger className="bg-transparent" >Dashboards</NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                         <NavigationMenuLink asChild>

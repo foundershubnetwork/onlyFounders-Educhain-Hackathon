@@ -267,9 +267,7 @@ export default function ResourcesPage() {
 
           <CardContent className="space-y-6 text-center relative z-10">
             <p className="text-gray-300">
-              Our marketplace feature is currently in the works. We're crafting
-              a seamless platform where founders can showcase their startups and
-              investors can effortlessly explore and discover opportunities.
+            A shared hub for insights, tools, and content to help founders, investors, and communities grow together.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button className="border-purple-800/30 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
@@ -280,7 +278,7 @@ export default function ResourcesPage() {
         </Card>
       </div>
 
-      <div className="container mx-auto py-8 space-y-12">
+      <div className="w-screen overflow-x-hidden container mx-auto py-8 space-y-12">
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-white mb-4">
             {activeTab === "ai-agents"

@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/layout/app-layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import './globals.css'
 import {
   ArrowRight,
   CheckCircle,
@@ -25,8 +26,8 @@ export default function HomePage() {
     Array<{
       startupName: string;
       startupStage: string;
-      imageURL?: string;
-      logoURL?: string;
+      bannerImage?: string;
+      startupLogo?: string;
       founderName: string;
       category: string;
       blockchainPlatform?: string[];
@@ -160,7 +161,7 @@ export default function HomePage() {
                 >
                   <Button
                     variant="outline"
-                    className="w-full border-purple-800/20 text-white hover:bg-purple-900/30 px-8 py-6 text-lg"
+                    className="w-full border-purple-900 text-white hover:bg-purple-900/30 px-8 py-6 text-lg"
                   >
                     Start Fundraising
                   </Button>
@@ -195,7 +196,7 @@ export default function HomePage() {
                 >
                   <Button
                     variant="outline"
-                    className="w-full border-purple-800/20 text-white hover:bg-purple-900/30 px-8 py-6 text-lg"
+                    className="w-full border-purple-800 text-white hover:bg-purple-900/30 px-8 py-6 text-lg"
                   >
                     Start Fundraising
                   </Button>
@@ -416,7 +417,7 @@ export default function HomePage() {
                     <div className="relative h-48 w-full">
                       <Image
                         src={
-                          item.imageURL ||
+                          item.bannerImage ||
                           "/placeholder.svg?height=200&width=400&text=Startup"
                         }
                         alt={item.startupName}
@@ -425,10 +426,10 @@ export default function HomePage() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                       <div className="absolute top-2 right-2">
-                        <Badge className="bg-blue-600">Featured</Badge>
+                        <Badge className="bg-gray-800 border-gray-700 text-white">Featured</Badge>
                       </div>
                       <div className="absolute bottom-2 left-2">
-                        <Badge className="bg-blue-600">{item.category}</Badge>
+                        <Badge className="bg-gray-800 border-gray-700 text-white">{item.category}</Badge>
                       </div>
                     </div>
                     <CardContent className="p-6">
@@ -436,7 +437,7 @@ export default function HomePage() {
                         <div className="h-10 w-10 rounded-full overflow-hidden relative bg-gray-800 border-2 border-gray-700">
                           <Image
                             src={
-                              item.logoURL ||
+                              item.startupLogo ||
                               "/placeholder.svg?height=40&width=40&text=S"
                             }
                             alt="Startup Logo"
@@ -549,10 +550,10 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Ready to Join the Only Founders Community?
+                Join the OnlyFounders Community?
                 </h2>
                 <p className="text-purple-200/70 mb-6">
-                Whether you're a founder looking to raise funds or an investor seeking the next big thing, Only Founders has you covered.
+                Whether you're a founder looking to raise funds or an investor seeking the next big thing, OnlyFounders has you covered.
                 </p>
                 <div className="flex gap-4">
                   <Link href="/marketplace" className="w-72 md:w-auto">

@@ -2,7 +2,18 @@
 
 import { useRef } from "react"
 import { ArrowRight } from "lucide-react"
+import Link from "next/link"
 
+import { Button } from "@/components/ui/button"
+import { commonConfig } from "@/config/common"
+import { buildFoundersPersonalityTraitsSurveyRequest } from "@/features/survey-request/utils"
+import { buildVeridaRequestUrl } from "@/features/verida-request/utils"
+
+const surveryRequest = buildFoundersPersonalityTraitsSurveyRequest()
+const veridaRequestUrl = buildVeridaRequestUrl(
+  surveryRequest,
+  commonConfig.VERIDA_VAULT_BASE_URL
+)
 export default function ModernButton() {
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -31,7 +42,7 @@ export default function ModernButton() {
             lightning-border
             group
           "
-          onClick={() => console.log("Button clicked!")}
+          onClick={() =>{window.open(veridaRequestUrl.toString(), "_blank");}}
         >
           <span>Start Quest Now</span>
           <ArrowRight className="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1" />

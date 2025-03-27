@@ -236,7 +236,7 @@ export default function AboutPage() {
               {
                 name: "Moe",
                 role: "CEO/Founder",
-                image: "/team/moe.jpg",
+                image: "/team/Moe.jpg",
                 bio: "Ex-TradFi, 2x Exits, Advisor & Mentor, 20+ yrs in Sports, Finance, Health, Tech, and Investments, Health & Wellness, Art Gallery.",
                 id: "01",
               },
@@ -250,14 +250,14 @@ export default function AboutPage() {
               {
                 name: "Raj",
                 role: "CPO",
-                image: "/team/raj.jpg",
+                image: "/team/Raj.jpg",
                 bio: "Co-Founder - DcodeBlock, UX Designer, Growth Strategist.",
                 id: "02",
               },
               {
                 name: "V0 & Vercel",
                 role: "Product Owner",
-                image: "/team/v0.jpg",
+                image: "/team/V0.jpg",
                 bio: "Full-stack Developer, DevOps specialist, Web3 Architect.",
                 id: "04",
               },
@@ -310,13 +310,13 @@ export default function AboutPage() {
                 {
                   name: "Ravi Aggarwal",
                   role: "Polygon x Privado ID",
-                  image: "/team/ravi.jpg",
+                  image: "/team/Ravi.jpg",
                   id: "A2",
                 },
                 {
                   name: "Vijay Parvin",
                   role: "bitsCrunch",
-                  image: "/team/vijay.jpg",
+                  image: "/team/Vijay.jpg",
                   id: "A3",
                 },
               ].map((advisor, index) => (

@@ -72,3 +72,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+@font-face {
+  font-family: 'masked-hero';
+  src: url('/fonts/MaskedHero.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body{
+  font-family: 'masked-hero';
+}

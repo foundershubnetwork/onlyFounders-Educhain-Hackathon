@@ -189,6 +189,11 @@ export function Footer() {
                     PitchDeck
                   </Link>
                 </li>
+                <li>
+                  <Link href="/resources" className="text-gray-400 hover:text-white">
+                    Resources
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

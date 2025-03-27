@@ -11,15 +11,33 @@ import AuthProvider from "../components/AuthProvider"; // Use AuthProvider inste
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
 
+
+
 const inter = Inter({ subsets: ["latin"] });
 
+
+//social Preview settings
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.website.xyz"),
+  metadataBase: new URL("https://www.onlyfounders.xyz"),
   title: "OnlyFounders - Web3 Fundraising Platform",
-  description:
-    "AI-powered Web3 fundraising platform connecting innovative blockchain projects with global investors",
-  generator: "v0.dev",
-  icons: "/favicon.svg",
+  description: "AI-powered Web3 fundraising platform connecting innovative blockchain projects with global investors",
+  openGraph: {
+    title: "Welcome to OnlyFounders",
+    description: "Discover amazing experiences and quests.",
+    images: [
+      {
+        url: "/founders-verida-mobile.png",
+        width: 1200,
+        height: 630,
+        alt: "Home Preview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Welcome to Our OnlyFounders",
+    images: ["/home.jpg"],
+  },
 };
 
 export default function RootLayout({

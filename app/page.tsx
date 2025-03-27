@@ -21,6 +21,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
+
 export default function HomePage() {
   const [projects, setProjects] = useState<
     Array<{
@@ -44,8 +45,6 @@ export default function HomePage() {
   const [onboardingStatus, setOnboardingStatus] = useState(false);
   const router = useRouter();
   const {toast} = useToast();
-
-
 
   useEffect(() => {
       const getOnboardingStatus = async () => {

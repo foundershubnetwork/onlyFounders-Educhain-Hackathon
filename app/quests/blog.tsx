@@ -109,16 +109,6 @@ export default function BlogSection() {
           </p>
 
           <p className="mt-8 font-semibold text-justify">OnlyFounders Team</p>
-
-          <div className="mt-4 bg-gray-800/50 p-4 rounded-md inline-block">
-            <a
-              href="https://verida.ai"
-              target="_blank"
-              className="text-cyan-400 hover:text-cyan-300 no-underline font-mono"
-            >
-              verida.ai
-            </a>
-          </div>
         </div>
       </article>
     </div>

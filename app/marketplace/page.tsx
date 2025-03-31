@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, CheckCircle, Rocket } from "lucide-react"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import {useToast} from '../../hooks/use-toast'
+import { NextSeo } from "next-seo"
 
 // Define the startup interface based on the updated API response
 interface Startup {

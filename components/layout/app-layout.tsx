@@ -45,6 +45,7 @@ import { useAccount } from "wagmi"
 import axios from "axios"
 import { useToast } from "../ui/use-toast"
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "../ui/navigation-menu"
+import AnimatedButton from "../animatedButton"
 
 interface AppLayoutProps {
   children: ReactNode
@@ -342,12 +343,7 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
             </DropdownMenu>
           ) : (
             <a href="/early-access">
-              <Button
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                variant="outline"
-              >
-               Early Access
-              </Button>
+              <AnimatedButton title="Early Access" />
             </a>
           )}
         </div>

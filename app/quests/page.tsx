@@ -48,6 +48,7 @@ import { UserProfile, useUser } from "@auth0/nextjs-auth0/client";
 import { useToast } from "../../hooks/use-toast";
 import ModernButton from "@/components/modern-button";
 import BlogSection from "./blog";
+import { NextSeo } from "next-seo";
 
 const surveryRequest = buildFoundersPersonalityTraitsSurveyRequest();
 const veridaRequestUrl = buildVeridaRequestUrl(

@@ -40,6 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { NextSeo } from "next-seo";
 
 export default function ResourcesPage() {
   const searchParams = useSearchParams();

@@ -17,6 +17,7 @@ import { sendConfirmationEmail, sendFormData } from "./actions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
+import { NextSeo } from "next-seo";
 
 // Load Inter font
 const inter = Inter({ subsets: ["latin"] });

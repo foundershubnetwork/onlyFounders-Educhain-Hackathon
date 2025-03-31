@@ -37,6 +37,7 @@ import {
   Bell,
   Rocket,
 } from "lucide-react";
+import { NextSeo } from "next-seo";
 
 export default function NetworkPage() {
   const [activeTab, setActiveTab] = useState("members");

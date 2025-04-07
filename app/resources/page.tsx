@@ -40,7 +40,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NextSeo } from "next-seo";
 
 export default function ResourcesPage() {
   const searchParams = useSearchParams();
@@ -131,7 +130,7 @@ export default function ResourcesPage() {
       title: "Tokenomics Calculator",
       description:
         "Simulate different tokenomic models and their impact on project sustainability and investor returns.",
-      image: "/placeholder.svg?height=200&width=400&text=Tokenomics+Calculator",
+      image: "/resources-tools.jpg",
       category: "Analysis",
     },
     {
@@ -139,7 +138,7 @@ export default function ResourcesPage() {
       title: "Investment Portfolio Tracker",
       description:
         "Track your Web3 investments across multiple chains and platforms in one dashboard.",
-      image: "/placeholder.svg?height=200&width=400&text=Portfolio+Tracker",
+      image: "/resources-tools.jpg",
       category: "Management",
     },
     {
@@ -147,7 +146,7 @@ export default function ResourcesPage() {
       title: "Smart Contract Analyzer",
       description:
         "Analyze smart contracts for common vulnerabilities and best practices.",
-      image: "/placeholder.svg?height=200&width=400&text=Contract+Analyzer",
+      image: "/resources-tools.jpg",
       category: "Security",
     },
   ];
@@ -241,9 +240,8 @@ export default function ResourcesPage() {
   return (
     <AppLayout className="z-50">
       {/* Coming Soon Overlay */}
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md">
+      {/* <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md">
         <Card className="w-full max-w-md mx-4 border-purple-800/30 shadow-xl rounded-2xl relative overflow-hidden">
-          {/* Background Image with 75% Opacity */}
           <div
             className="absolute inset-0 bg-cover bg-center opacity-40"
             style={{ backgroundImage: "url('/coming-soon-card.gif')" }}
@@ -277,22 +275,22 @@ export default function ResourcesPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       <div className="w-screen overflow-x-hidden container mx-auto py-8 space-y-12">
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-white mb-4">
             {activeTab === "ai-agents"
-              ? "Optimus AI AI Agents"
+              ? "OnlyFounders AI Agents"
               : activeTab === "guides"
-              ? "Optimus AI Investment Guides"
+              ? "OnlyFounders Investment Guides"
               : activeTab === "videos"
-              ? "Optimus AI Video Masterclasses"
+              ? "OnlyFounders Video Masterclasses"
               : activeTab === "tools"
-              ? "Optimus AI Investment Tools"
+              ? "OnlyFounders Investment Tools"
               : activeTab === "grants"
-              ? "Optimus AI Grants & Funding"
-              : "Optimus AI Resources"}
+              ? "OnlyFounders Grants & Funding"
+              : "OnlyFounders Resources"}
           </h1>
           <p className="text-gray-400">
             Explore our comprehensive library of resources designed to help both
@@ -458,7 +456,7 @@ export default function ResourcesPage() {
                       : activeTab === "videos"
                       ? "/placeholder.svg?height=300&width=400&text=Video+Masterclasses"
                       : activeTab === "tools"
-                      ? "/placeholder.svg?height=300&width=400&text=Analysis+Tools"
+                      ? "/resources-tools-card.jpg"
                       : activeTab === "grants"
                       ? "/placeholder.svg?height=300&width=400&text=Grants+Program"
                       : "/placeholder.svg?height=300&width=400&text=Resources"
@@ -968,7 +966,7 @@ export default function ResourcesPage() {
               </div>
               <div className="relative h-48 w-full md:w-1/3 rounded-lg overflow-hidden">
                 <Image
-                  src="/placeholder.svg?height=200&width=300&text=Custom+Resources"
+                  src="/resources-footer.jpg"
                   alt="Custom Resources"
                   fill
                   className="object-cover"

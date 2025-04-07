@@ -377,7 +377,7 @@ export default function ProjectDetailPage({
     };
 
     fetchStartupData();
-  }, [params.id, router, toast, user, loadDeleteMember]);
+  }, [params.id, router, toast, user, loadDeleteMember ]);
 
   useEffect(() => {
     const fetchStartups = async () => {
@@ -446,8 +446,10 @@ export default function ProjectDetailPage({
         //traction
         waitlistSignups: startupData.traction.waitlistSignups,
         strategicPartners: startupData.traction.strategicPartners,
+        githubStars: startupData.traction.githubStars,
+        nodeOperators: startupData.traction.nodeOperators,
         growthMetrics: startupData.traction.growthMetrics,
-        others: startupData.traction.others,
+        storageCapacity: startupData.traction.storageCapacity,
 
         team:
           startupData.coreTeam?.map((member) => ({
@@ -581,24 +583,22 @@ export default function ProjectDetailPage({
       const userId = user?.sub?.substring(14);
       const requestBody = { startupId: projectId, teamMemberId: memberId };
       console.log(JSON.stringify(requestBody));
+      
+      const response = await axios.delete("https://onlyfounders.azurewebsites.net/api/startup/delete-teamMember", {
+        headers: {
+          "Content-Type": "application/json",
+          user_id: userId,
+        },
+        data: requestBody,
+      });
 
-      const response = await axios.delete(
-        "https://onlyfounders.azurewebsites.net/api/startup/delete-teamMember",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            user_id: userId,
-          },
-          data: requestBody,
-        }
-      );
-
-      if (response.status === 200) {
+      if(response.status === 200) {
         toast({
           title: "Success",
           description: "Team member deleted successfully.",
           variant: "default",
         });
+
       }
     } catch (error) {
       console.error("Error deleting team member:", error);
@@ -607,33 +607,37 @@ export default function ProjectDetailPage({
         description: "Failed to delete team member.",
         variant: "destructive",
       });
-    } finally {
+    }
+    finally {
       setLoadDeleteMember(false);
     }
   };
 
-  const handleMilestoneComplete = async (roadmapId, index) => {
-    try {
+  const handleMilestoneComplete = async (roadmapId ,index) => {
+    try{
       if (!user || !projectId) return;
       const userId = user?.sub?.substring(14);
       const requestBody = { startupId: projectId, teamMemberId: memberId };
       console.log(JSON.stringify(requestBody));
+      
+      const response = await axios.delete("https://onlyfounders.azurewebsites.net/startup/delete-teamMember", {
+        headers: {
+          "Content-Type": "application/json",
+          user_id: userId,
+        },
+        data: requestBody,
+      });   
+      }
 
-      const response = await axios.delete(
-        "https://onlyfounders.azurewebsites.net/startup/delete-teamMember",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            user_id: userId,
-          },
-          data: requestBody,
-        }
-      );
-    } catch (error) {
+      catch (error) {
       console.error("Error deleting team member:", error);
-    } finally {
-    }
-  };
+      }
+
+      finally{
+
+      }
+}
+  
 
   const handleInvest = (amount: number) => {
     console.log(`Investing ${amount} USDC in ${project.title}`);
@@ -925,38 +929,31 @@ export default function ProjectDetailPage({
                           {project.strategicPartners}
                         </span>
                       </div>
-                      {/* <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
+                      <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
                         <Github className="text-green-400" size={28} />
                         <p className="text-gray-400 text-lg">Github Stars</p>
                         <span className="text-3xl font-bold">
                           {project.githubStars}
                         </span>
-                      </div> */}
+                      </div>
                     </div>
 
                     <CardTitle className="text-xl">
                       Additional Metrics
                     </CardTitle>
                     <div className="flex flex-col gap-1">
-                      {project.growthMetrics?.map((metric, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between"
-                        >
-                          <p className="text-gray-400">{metric.metricName}</p>
-                          <span>{metric.metricValue}</span>
-                        </div>
-                      ))}
-
-                      {project.others?.map((metric, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between"
-                        >
-                          <p className="text-gray-400">{metric.metricName}</p>
-                          <span>{metric.metricValue}</span>
-                        </div>
-                      ))}
+                      <div className="flex items-center justify-between">
+                        <p className="text-gray-400">Storage Capacity</p>
+                        <span>{project.storageCapacity}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-gray-400">Node Operators</p>
+                        <span>{project.nodeOperators}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-gray-400">Growth Metrics</p>
+                        <span>{project.growthMetrics}</span>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -1050,7 +1047,7 @@ export default function ProjectDetailPage({
                       <div key={milestone.title} className="relative">
                         {index < project.roadmap.length - 1 && (
                           <div className="absolute left-6 top-12 bottom-0 w-px bg-gray-800 z-0"></div>
-                        )}
+                        )} 
 
                         <div
                           className={`relative z-10 flex items-start gap-4 p-4 rounded-lg border ${
@@ -1091,17 +1088,7 @@ export default function ProjectDetailPage({
                                   </Badge>
                                 )}
                                 {milestone.completedStatus === "Incomplete" && (
-                                  <button
-                                    onClick={() =>
-                                      handleMilestoneComplete(
-                                        milestone._id,
-                                        index
-                                      )
-                                    }
-                                    className="bg-gray-700 text-xs px-2 py-1 rounded-full hover:bg-gray-600 transition-all duration-300"
-                                  >
-                                    Mark as complete
-                                  </button>
+                                <button onClick={() => handleMilestoneComplete(milestone._id,index)} className="bg-gray-700 text-xs px-2 py-1 rounded-full hover:bg-gray-600 transition-all duration-300">Mark as complete</button>
                                 )}
                               </div>
                             </h3>

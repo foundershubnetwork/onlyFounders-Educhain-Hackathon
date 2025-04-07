@@ -14,7 +14,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, CheckCircle, Rocket } from "lucide-react"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import {useToast} from '../../hooks/use-toast'
-import { NextSeo } from "next-seo"
 
 // Define the startup interface based on the updated API response
 interface Startup {
@@ -151,9 +150,8 @@ export default function MarketplacePage() {
   return (
     <AppLayout className="z-50">
       {/* Coming Soon Overlay */}
-            <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md">
+            {/* <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md">
               <Card className="w-full max-w-md mx-4 border-purple-800/30 shadow-xl rounded-2xl relative overflow-hidden">
-                        {/* Background Image with 75% Opacity */}
                         <div
                           className="absolute inset-0 bg-cover bg-center opacity-40"
                           style={{ backgroundImage: "url('/coming-soon-card.gif')" }}
@@ -187,7 +185,7 @@ export default function MarketplacePage() {
                           </div>
                         </CardContent>
                       </Card>
-            </div>
+            </div> */}
 
 
       <div className="container mx-auto py-8 space-y-8">
@@ -197,7 +195,7 @@ export default function MarketplacePage() {
             <p className="text-gray-400">Discover and invest in promising blockchain projects</p>
           </div>
 
-          <div className="hidden gap-4">
+          <div className="gap-4">
             <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
               <Link href="/startup-setup/basicInfo">Create a Project</Link>
             </Button>
@@ -542,7 +540,7 @@ export default function MarketplacePage() {
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        <p className="text-sm text-gray-400 line-clamp-2">{startup.tagline}</p>
+                        <p className="text-sm text-gray-400 leading-snug min-h-[3.5rem] line-clamp-2">{startup.tagline}</p>
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-xs">

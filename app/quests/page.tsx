@@ -48,7 +48,8 @@ import { UserProfile, useUser } from "@auth0/nextjs-auth0/client";
 import { useToast } from "../../hooks/use-toast";
 import ModernButton from "@/components/modern-button";
 import BlogSection from "./blog";
-import { NextSeo } from "next-seo";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const surveryRequest = buildFoundersPersonalityTraitsSurveyRequest();
 const veridaRequestUrl = buildVeridaRequestUrl(
@@ -61,6 +62,38 @@ export default function QuestsPage() {
   const { user, isLoading } = useUser();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
+  const [questData, setQuestData] = useState<any>(null);
+  const [questDataLoading, setQuestDataLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchQuestData = async () => {
+      if (!user || isLoading) return;
+
+      try {
+        const userID = user.sub?.substring(14);
+        const response = await axios.get(
+          "https://onlyfounders.azurewebsites.net/api/nft/quest-status",
+          {
+            method: "GET",
+            headers: {
+              user_id: userID,
+            },
+          }
+        );
+        setQuestData(response.data);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch quest data.",
+          variant: "destructive",
+        });
+      } finally {
+        setQuestDataLoading(false);
+      }
+    };
+    fetchQuestData();
+  }, [user]);
 
   useEffect(() => {
     const checkLoggedIn = async () => {
@@ -368,12 +401,192 @@ export default function QuestsPage() {
     }
   };
 
-  const activeQuests =
-    activeTab === "investor" ? investorQuests : founderQuests;
-  const featuredQuests = activeQuests.filter((quest) => quest.featured);
+  // const activeQuests =
+  //   activeTab === "investor" ? investorQuests : founderQuests;
+  // const featuredQuests = activeQuests.filter((quest) => quest.featured);
+
+  // Quest data from the EduChain Hackathon document
+  const quests = [
+    // Basic Quests
+    {
+      id: "quest-1",
+      title: "Master the Basics of Startup Pitching",
+      description:
+        "Creating a compelling pitch is the cornerstone of your startup's success. This quest introduces the key elements of a winning pitch.",
+      image: "/quest_easy.jpg",
+      difficulty: "Basic",
+      nftReward: "Founder Basics NFT",
+      founderPoints: 20,
+      reputationPoints: 30,
+      questions: 3,
+    },
+    {
+      id: "quest-2",
+      title: "Building a Strong Value Proposition",
+      description:
+        "A compelling value proposition sets your startup apart from competitors. Learn to articulate your unique benefits.",
+      image: "/quest_easy.jpg",
+      difficulty: "Basic",
+      nftReward: "Founder Basics NFT",
+      founderPoints: 20,
+      reputationPoints: 30,
+      questions: 3,
+    },
+
+    // Intermediate Quests
+    {
+      id: "quest-3",
+      title: "Mastering Competitive Analysis",
+      description:
+        "Learn to identify key players in your market and find opportunities to differentiate your startup.",
+      image: "/quest_medium.jpg",
+      difficulty: "Intermediate",
+      nftReward: "Growth Strategist NFT",
+      founderPoints: 40,
+      reputationPoints: 60,
+      questions: 4,
+    },
+    {
+      id: "quest-4",
+      title: "Effective Fundraising Strategies",
+      description:
+        "Explore different fundraising approaches and learn how to build lasting relationships with potential investors.",
+      image: "/quest_medium.jpg",
+      difficulty: "Intermediate",
+      nftReward: "Growth Strategist NFT",
+      founderPoints: 40,
+      reputationPoints: 60,
+      questions: 4,
+    },
+
+    // Advanced Quests
+    {
+      id: "quest-5",
+      title: "Scaling Your Startup",
+      description:
+        "Navigate the challenges of scaling and implement strategies for sustainable growth.",
+      image: "/quest_hard.jpg",
+      difficulty: "Advanced",
+      nftReward: "Venture Master NFT",
+      founderPoints: 50,
+      reputationPoints: 80,
+      questions: 6,
+    },
+    {
+      id: "quest-6",
+      title: "Crafting a Sustainable Business Model",
+      description:
+        "Explore different business model frameworks and create lasting value in changing markets.",
+      image: "/quest_hard.jpg",
+      difficulty: "Advanced",
+      nftReward: "Venture Master NFT",
+      founderPoints: 50,
+      reputationPoints: 80,
+      questions: 6,
+    },
+  ];
+
+  // Group quests by difficulty
+  const basicQuests = quests.filter((quest) => quest.difficulty === "Basic");
+  const intermediateQuests = quests.filter(
+    (quest) => quest.difficulty === "Intermediate"
+  );
+  const advancedQuests = quests.filter(
+    (quest) => quest.difficulty === "Advanced"
+  );
+
+  // Handle start quest button click
+  interface Quest {
+    id: string;
+    title: string;
+    description: string;
+    image: string;
+    difficulty: string;
+    nftReward: string;
+    founderPoints: number;
+    reputationPoints: number;
+    questions: number;
+  }
+
+  const handleStartQuest = (questId: Quest["id"]): void => {
+    router.push(`/quests/${questId}`);
+  };
+
+  interface QuestSectionProps {
+    title: string;
+    quests: Quest[];
+  }
+
+  const QuestSection: React.FC<QuestSectionProps> = ({ title, quests }) => (
+    <div className="mb-12">
+      <h2 className="text-2xl font-bold mb-6 text-[#00D3FF] border-b border-[#15847D]/30 pb-2">
+        {title}
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+        {quests.map((quest) => {
+          // Check if questData.quests contains a match for the current quest.id
+          const completion = questData?.quests?.find(
+            (q: any) => q.questId === quest.id
+          );
+
+          return (
+            <div key={quest.id} className="w-full">
+              <Card className="overflow-hidden bg-gradient-to-br from-[#00131F] to-[#0088B2]/30 border-0 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="relative w-full h-56 overflow-hidden">
+                  <Image
+                    src={quest.image || "/placeholder.svg"}
+                    alt={quest.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge className="bg-[#1b2f5e] text-[#00E0FF] border-0 px-3 py-1 rounded-full">
+                      {quest.difficulty}
+                    </Badge>
+
+                    {/* ✅ Show attempt status & score if found, otherwise "Not Attempted" */}
+                    {completion ? (
+                      <Badge className="bg-green-800 uppercase text-green-200 border-0 px-3 py-1 rounded-full">
+                        {completion.status} • Score: {completion.score}
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-gray-700 uppercase text-gray-300 border-0 px-3 py-1 rounded-full">
+                        Not Attempted
+                      </Badge>
+                    )}
+                  </div>
+                  <h3 className="text-xl font-bold mb-2 text-[#00D3FF]">
+                    {quest.title}
+                  </h3>
+                  <p className="text-sm text-[#8C9BA8] mb-4 min-h-[3.5rem] leading-snug line-clamp-2">
+                    {quest.description}
+                  </p>
+                  <div className="mt-3 text-xs text-[#8C9BA8] flex items-center justify-between">
+                    <span>Questions: {quest.questions}</span>
+                    <span>Reward: {quest.nftReward}</span>
+                  </div>
+                </CardContent>
+                <CardFooter className="px-6 pb-6 pt-0">
+                  <Button
+                    onClick={() => handleStartQuest(quest.id)}
+                    disabled={completion}
+                    className="w-full bg-[#00CFFF] hover:bg-[#00E0FF] text-[#0B0E17] font-medium shadow-[0_0_10px_rgba(0,207,255,0.3)] hover:shadow-[0_0_15px_rgba(0,224,255,0.5)] transition-all duration-300"
+                  >
+                    Start Quest
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   return (
-    <AppLayout>
+    <AppLayout className="">
       <div className="container max-w-8xl mx-0 md:mx-auto py-8 space-y-8">
         {/* heading */}
         <div className="flex flex-col items-center">
@@ -430,7 +643,7 @@ export default function QuestsPage() {
                   <path d="m12 5 7 7-7 7"></path>
                 </svg>
               </Button> */}
-              <ModernButton/>
+              <ModernButton />
             </div>
           </div>
 
@@ -673,7 +886,28 @@ export default function QuestsPage() {
           </TabsContent>
         </Tabs> */}
       </div>
-      <BlogSection/>
+      <BlogSection />
+
+      {/* Educhain quests section  */}
+      <div className="min-h-screen bg-[#0B0E17] text-[#F5F7FA] p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold mb-2 text-[#00D3FF]">
+              EduChain Quests
+            </h1>
+            <p className="text-[#8C9BA8]">
+              Complete quests to earn exclusive NFT rewards and points
+            </p>
+          </div>
+
+          <QuestSection title="Basic Quests" quests={basicQuests} />
+          <QuestSection
+            title="Intermediate Quests"
+            quests={intermediateQuests}
+          />
+          <QuestSection title="Advanced Quests" quests={advancedQuests} />
+        </div>
+      </div>
     </AppLayout>
   );
 }

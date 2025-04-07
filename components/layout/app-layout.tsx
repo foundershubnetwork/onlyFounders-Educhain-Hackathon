@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { type ReactNode, useState, useEffect, useRef } from "react"
-import { usePathname, useRouter } from "next/navigation"
-import Link from "next/link"
-import Image from "next/image"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
+import { type ReactNode, useState, useEffect, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,8 +18,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Footer } from "@/components/footer"
+} from "@/components/ui/dropdown-menu";
+import { Footer } from "@/components/footer";
 import {
   Bell,
   BookOpen,
@@ -37,93 +37,121 @@ import {
   Users,
   Wallet,
   Info,
-} from "lucide-react"
+  CircleUserIcon,
+} from "lucide-react";
 
-import { useUser } from "@auth0/nextjs-auth0/client"
-import { ConnectButton } from "@rainbow-me/rainbowkit"
-import { useAccount } from "wagmi"
-import axios from "axios"
-import { useToast } from "../ui/use-toast"
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "../ui/navigation-menu"
-import AnimatedButton from "../animatedButton"
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
+import axios from "axios";
+import { useToast } from "../ui/use-toast";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "../ui/navigation-menu";
+import LoginButton from '../ocidLogin-button';
+import { useOCAuth } from '@opencampus/ocid-connect-js';
 
 interface AppLayoutProps {
-  children: ReactNode
-  showHero?: boolean
+  children: ReactNode;
+  showHero?: boolean;
+  className: string;
 }
 
-export function AppLayout({ className, children, showHero = false }: AppLayoutProps) {
-  const pathname = usePathname()
-  const router = useRouter()
-  const [scrolled, setScrolled] = useState(false)
-  const [isSent, setIsSent] = useState(false)
-  const [authReady, setAuthReady] = useState(false)
-  const [isProfileLoading, setIsProfileLoading] = useState(false)
-  const requestSent = useRef(false)
-  const { user, isLoading } = useUser()
-  const { address, isConnected } = useAccount()
-  const toast = useToast()
-  const [onboardingStatus, setOnboardingStatus] = useState<boolean>(false)
+export function AppLayout({
+  className,
+  children,
+  showHero = false,
+}: AppLayoutProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [scrolled, setScrolled] = useState(false);
+  const [isSent, setIsSent] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+  const requestSent = useRef(false);
+  const { user, isLoading } = useUser();
+  const { address, isConnected } = useAccount();
+  const toast = useToast();
+  const [onboardingStatus, setOnboardingStatus] = useState<boolean>(false);
+  const [role, setRole] = useState<string>("");
 
-  // Add the profile navigation handler 
+  //ocid button
+  const { isInitialized, authState, ocAuth } = useOCAuth();
+
+  // Add a loading state
+  if (!isInitialized) {
+    return ;
+  }
+
+  if (authState.error) {
+    return <div>Error: {authState.error.message}</div>;
+  }
+
+  // Add the profile navigation handler
   const handleProfileNavigation = async () => {
-    if (!user) return
+    if (!user) return;
 
     try {
-      setIsProfileLoading(true)
-      const userID = user.sub?.substring(14)
+      setIsProfileLoading(true);
+      const userID = user.sub?.substring(14);
 
-      const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-onboarding-status", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          user_id: userID || "",
-        },
-      })
+      const response = await fetch(
+        "https://onlyfounders.azurewebsites.net/api/profile/get-onboarding-status",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            user_id: userID || "",
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
+        throw new Error(`API error: ${response.status}`);
       }
 
-      const data = await response.json()
+      const data = await response.json();
+      setRole(data.role);
 
       // Route based on profile status
-        if(data.role === "Investor"){
-          router.push("/profile-page/investor")
-        }
-        else if(data.role === "Founder"){
-          router.push("/profile-page/founder")
-        }
-        else if(data.role === "ServiceProvider"){
-          router.push("/profile-page/service-provider")
-        }
+      if (data.role === "Investor") {
+        router.push("/profile-page/investor");
+      } else if (data.role === "Founder") {
+        router.push("/profile-page/founder");
+      } else if (data.role === "ServiceProvider") {
+        router.push("/profile-page/service-provider");
+      }
     } catch (error) {
-      console.error("Error checking profile status:", error)
+      console.error("Error checking profile status:", error);
       // Default to profile page on error
-      router.push("/profile")
+      router.push("/profile");
     } finally {
-      setIsProfileLoading(false)
+      setIsProfileLoading(false);
     }
-  }
+  };
 
   // Set auth ready state once loading is complete
   useEffect(() => {
     if (!isLoading) {
       // Add a small delay to ensure smooth transition
       const timer = setTimeout(() => {
-        setAuthReady(true)
-      }, 20)
-      return () => clearTimeout(timer)
+        setAuthReady(true);
+      }, 20);
+      return () => clearTimeout(timer);
     }
-  }, [isLoading])
-  
+  }, [isLoading]);
 
   //sending wallet address to the backend after user connected wallet.
   useEffect(() => {
     const sendWalletAddress = async () => {
       if (user && isConnected && address) {
         try {
-          const userID = user.sub?.substring(14)
+          const userID = user.sub?.substring(14);
 
           const response = await axios.post(
             "https://onlyfounders.azurewebsites.net/api/profile/add-walletAddress",
@@ -133,74 +161,82 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                 "Content-Type": "application/json",
                 user_id: userID,
               },
-            },
-          )
+            }
+          );
 
-          console.log("Address sent successfully", response.data)
+          console.log("Address sent successfully", response.data);
         } catch (error) {
-          console.error("Error sending address:", error)
+          console.error("Error sending address:", error);
         }
       }
-    }
+    };
 
-    sendWalletAddress()
-  }, [user, isConnected, address])
-
+    sendWalletAddress();
+  }, [user, isConnected, address]);
 
   //sending user data to the backend after user registered.
   useEffect(() => {
     if (!isLoading && user && !isSent && !requestSent.current) {
-      requestSent.current = true
+      requestSent.current = true;
 
       const sendUserData = async () => {
         try {
-          const trimmedUserId = user.sub?.substring(14)
+          const trimmedUserId = user.sub?.substring(14);
           if (!trimmedUserId || !user.email) {
-            console.error("Invalid user data, skipping API call.")
-            return
+            console.error("Invalid user data, skipping API call.");
+            return;
           }
 
-          setIsSent(true)
+          setIsSent(true);
 
-          const response = await fetch("https://onlyfounders.azurewebsites.net/api/auth/register-user", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userInput: {
-                username: user.given_name || "Unknown User",
-                email: user.email,
-                user_id: trimmedUserId,
-                walletAddress: " ",
+          const response = await fetch(
+            "https://onlyfounders.azurewebsites.net/api/auth/register-user",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-            }),
-          })
+              body: JSON.stringify({
+                userInput: {
+                  username: user.given_name || "Unknown User",
+                  email: user.email,
+                  user_id: trimmedUserId,
+                  walletAddress: " ",
+                },
+              }),
+            }
+          );
 
           if (response.ok) {
-            console.log("✅ User data sent successfully!")
+            console.log("✅ User data sent successfully!");
           } else {
-            console.error("❌ Failed to send user data. Status:", response.status)
-            const errorData = await response.json().catch(() => null)
-            console.error("Error details:", errorData || "No error message from server")
+            console.error(
+              "❌ Failed to send user data. Status:",
+              response.status
+            );
+            const errorData = await response.json().catch(() => null);
+            console.error(
+              "Error details:",
+              errorData || "No error message from server"
+            );
           }
         } catch (error) {
-          console.error("❌ Error sending user data:", error)
+          console.error("❌ Error sending user data:", error);
         }
-      }
+      };
 
-      sendUserData()
+      sendUserData();
     }
-  }, [user, isLoading, isSent])
+  }, [user, isLoading, isSent]);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10)
-    }
+      setScrolled(window.scrollY > 10);
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const mainNavItems = [
     { href: "/", label: "Home", icon: Home },
@@ -210,19 +246,19 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
     { href: "/resources", label: "Resources", icon: BookOpen },
     // { href: "/", label: "Blog", icon: FileText },
     { href: "/quests", label: "Quests", icon: Trophy },
-  ]
+  ];
 
   const dashboardNavItems = [
     { href: "/", label: "Investor Dashboard", icon: Wallet },
     { href: "/", label: "Founder Dashboard", icon: Building },
-  ]
+  ];
 
   const isActive = (path: string) => {
     if (path === "/") {
-      return pathname === "/"
+      return pathname === "/";
     }
-    return pathname === path || pathname.startsWith(`${path}/`)
-  }
+    return pathname === path || pathname.startsWith(`${path}/`);
+  };
 
   // Render auth-related UI elements based on loading state
   const renderAuthUI = () => {
@@ -230,13 +266,9 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
     if (!authReady) {
       return (
         <>
-          <div className="hidden md:flex items-center gap-2">
-            <Skeleton className="h-9 w-9 rounded-md" />
-            <Skeleton className="h-9 w-24 rounded-md" />
-          </div>
           <Skeleton className="hidden md:block h-9 w-36 rounded-md" />
         </>
-      )
+      );
     }
 
     // Auth is ready, show the appropriate UI based on user state
@@ -290,7 +322,11 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="border-gray-700 text-white gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-700 text-white gap-2"
+                >
                   <Avatar className="h-6 w-6">
                     <AvatarImage src={(user as any).picture} />
                     <AvatarFallback>U</AvatarFallback>
@@ -304,14 +340,16 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                 <DropdownMenuItem
                   className="cursor-pointer"
                   onSelect={(e) => {
-                    e.preventDefault()
-                    handleProfileNavigation()
+                    e.preventDefault();
+                    handleProfileNavigation();
                   }}
                 >
                   <div className="flex items-center">
                     <Shield className="mr-2 h-4 w-4" />
                     Profile
-                    {isProfileLoading && <span className="ml-2 animate-spin">⟳</span>}
+                    {isProfileLoading && (
+                      <span className="ml-2 animate-spin">⟳</span>
+                    )}
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
@@ -342,16 +380,31 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <a href="/early-access">
-              <AnimatedButton title="Early Access" />
-            </a>
+            <div className="flex items-center gap-2">
+              <a href="/api/auth/login">
+                <Button
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  variant="outline"
+                >
+                  Login
+                </Button>
+              </a>
+              {/* <a href="/early-access">
+              <Button
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                variant="outline"
+              >
+               Early Access
+              </Button>
+            </a> */}
+            </div>
           )}
         </div>
 
         {user ? <ConnectButton /> : null}
       </>
-    )
-  }
+    );
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -361,14 +414,20 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
           scrolled
             ? "bg-gray-900/95"
             : pathname === "/" && !scrolled
-              ? "bg-transparent border-transparent"
-              : "bg-gray-900/95",
+            ? "bg-transparent border-transparent"
+            : "bg-gray-900/95"
         )}
       >
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-6 md:gap-10">
             <Link href="/" className="flex items-center space-x-2 pr-5">
-              <Image src="/onlyFounder_logo.svg" alt="Optimus AI Logo" width={160} height={60} className="rounded-md" />
+              <Image
+                src="/onlyFounder_logo.svg"
+                alt="Optimus AI Logo"
+                width={160}
+                height={60}
+                className="rounded-md"
+              />
             </Link>
 
             <nav className="hidden md:flex items-center gap-6">
@@ -385,131 +444,192 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                 </Link>
               ))} */}
 
-            <NavigationMenu>
-              <NavigationMenuList className="flex gap-4">
-                <NavigationMenuItem>
-                  <NavigationMenuLink className="bg-transparent" asChild>
-                    <a
-                      href="/about"
-                      className="py-2.5 px-3 rounded-md hover:cursor-pointer hover:bg-gray-800"
-                    >
-                      About
-                    </a>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent">Marketplace</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
-                      <span className="row-span-3">
-                        <NavigationMenuLink asChild>
-                          <a
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-indigo-500/50 to-purple-500/50 p-6 no-underline outline-none focus:shadow-md"
-                            href="/marketplace"
-                          >
-                            <div className="mb-2 mt-4 text-lg font-medium text-white">Startup Bazaar</div>
-                            <p className="text-sm leading-tight text-white/90">
-                              Where dreams are sold and wallets are emptied
-                            </p>
-                          </a>
-                        </NavigationMenuLink>
-                      </span>
-                      <a href="/marketplace" title="Hot Right Now" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        Startups that investors are fighting over
-                      </a>
-                      <a href="/marketplace" title="Fresh Meat" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        Newly hatched startups seeking funding
-                      </a>
-                      <a href="/marketplace" title="Categories" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        From "Actually Useful" to "Pure Speculation"
-                      </a>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem> 
-                  <NavigationMenuTrigger className="bg-transparent">Resources</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                      <a href="/resources" title="Survival Guides" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        How to pitch without crying
-                      </a>
-                      <a href="/resources" title="War Stories" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        Tales from the startup trenches
-                      </a>
-                      <a href="/resources" title="Networking Parties" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        Free food and awkward conversations
-                      </a>
-                      <a href="/resources" title="Dumb Questions" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        There are no dumb questions (except these)
-                      </a>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent">Network</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                      <a href="/network" title="Money People" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        They have cash, you need cash
-                      </a>
-                      <a href="/network" title="Fellow Dreamers" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        Other sleep-deprived entrepreneurs
-                      </a>
-                      <a href="/network" title="Been There, Done That" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        Learn from their expensive mistakes
-                      </a>
-                      <a href="/network" title="Useful Connections" className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900">
-                        People who might actually help you
-                      </a>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuLink className="bg-transparent" asChild>
-                    <a
-                      href="/quests"
-                      className="py-2.5 px-3 rounded-md hover:cursor-pointer hover:bg-gray-800"
-                    >
-                      Quests
-                    </a>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-                
-                {/* <Link href="/quests" className="flex items-center gap-3 px-3 py-2 bg-slate-950 text-sm rounded-md">
-                    Quests
-                </Link> */}
-
-                {authReady && user && (
+              <NavigationMenu>
+                <NavigationMenuList className="flex gap-4">
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger className="bg-transparent" >Dashboards</NavigationMenuTrigger>
+                    <NavigationMenuLink className="bg-transparent" asChild>
+                      <a
+                        href="/about"
+                        className="py-2.5 px-3 rounded-md hover:cursor-pointer hover:bg-gray-800"
+                      >
+                        About
+                      </a>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="bg-transparent">
+                      Marketplace
+                    </NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                        <NavigationMenuLink asChild>
-                          <a
-                            className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
-                            href="/"
-                          >
-                            Investor Dashboard
-                          </a>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <a
-                            className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
-                            href="/"
-                          >
-                            Founder Dashboard
-                          </a>
-                        </NavigationMenuLink>
+                      <div className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
+                        <span className="row-span-3">
+                          <NavigationMenuLink asChild>
+                            <a
+                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-indigo-500/50 to-purple-500/50 p-6 no-underline outline-none focus:shadow-md"
+                              href="/marketplace"
+                            >
+                              <div className="mb-2 mt-4 text-lg font-medium text-white">
+                                Startup Bazaar
+                              </div>
+                              <p className="text-sm leading-tight text-white/90">
+                                Where dreams are sold and wallets are emptied
+                              </p>
+                            </a>
+                          </NavigationMenuLink>
+                        </span>
+                        <a
+                          href="/marketplace"
+                          title="Hot Right Now"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          Startups that investors are fighting over
+                        </a>
+                        <a
+                          href="/marketplace"
+                          title="Fresh Meat"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          Newly hatched startups seeking funding
+                        </a>
+                        <a
+                          href="/marketplace"
+                          title="Categories"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          From "Actually Useful" to "Pure Speculation"
+                        </a>
                       </div>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
-                )}
-                 
-              </NavigationMenuList>
-            </NavigationMenu>
+
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="bg-transparent">
+                      Resources
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                        <a
+                          href="/resources"
+                          title="Survival Guides"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          How to pitch without crying
+                        </a>
+                        <a
+                          href="/resources"
+                          title="War Stories"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          Tales from the startup trenches
+                        </a>
+                        <a
+                          href="/resources"
+                          title="Networking Parties"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          Free food and awkward conversations
+                        </a>
+                        <a
+                          href="/resources"
+                          title="Dumb Questions"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          There are no dumb questions (except these)
+                        </a>
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="bg-transparent">
+                      Network
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                        <a
+                          href="/network"
+                          title="Money People"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          They have cash, you need cash
+                        </a>
+                        <a
+                          href="/network"
+                          title="Fellow Dreamers"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          Other sleep-deprived entrepreneurs
+                        </a>
+                        <a
+                          href="/network"
+                          title="Been There, Done That"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          Learn from their expensive mistakes
+                        </a>
+                        <a
+                          href="/network"
+                          title="Useful Connections"
+                          className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                        >
+                          People who might actually help you
+                        </a>
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+
+                  <NavigationMenuItem>
+                    <NavigationMenuLink className="bg-transparent" asChild>
+                      <a
+                        href="/quests"
+                        className="py-2.5 px-3 rounded-md hover:cursor-pointer hover:bg-gray-800"
+                      >
+                        Quests
+                      </a>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+
+                  {/* <Link href="/quests" className="flex items-center gap-3 px-3 py-2 bg-slate-950 text-sm rounded-md">
+                    Quests
+                </Link> */}
+
+                  {/* {authReady && user && (
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="bg-transparent">
+                        Dashboards
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                          <NavigationMenuLink asChild>
+                            <a
+                              className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                              href="/"
+                            >
+                              Investor Dashboard
+                            </a>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <a
+                              className="p-2 rounded-md hover:cursor-pointer hover:bg-slate-900"
+                              href="/"
+                            >
+                              Founder Dashboard
+                            </a>
+                          </NavigationMenuLink>
+                        </div>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  )} */}
+
+                {authState.isAuthenticated ? (
+                        <p>You are logged in! {JSON.stringify(ocAuth.getAuthState())}</p>
+                        
+                      ) : (
+                        <LoginButton />
+                      )}
+
+                </NavigationMenuList>
+              </NavigationMenu>
 
               {/* Show skeleton for dashboards dropdown when loading */}
               {!authReady && <Skeleton className="h-9 w-28 rounded-md" />}
@@ -521,12 +641,19 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
 
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden text-white hover:bg-gray-800">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden text-white hover:bg-gray-800"
+                >
                   <Menu className="h-6 w-6" />
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="p-0 bg-gray-900 border-gray-800 w-[280px]">
+              <SheetContent
+                side="left"
+                className="p-0 bg-gray-900 border-gray-800 w-[280px]"
+              >
                 <div className="flex flex-col h-full">
                   <div className="p-4 border-b border-gray-800 flex items-center">
                     <Image
@@ -536,7 +663,9 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                       height={32}
                       className="rounded-md mr-2"
                     />
-                    <span className="font-bold text-xl text-white">OnlyFounders</span>
+                    <span className="font-bold text-xl text-white">
+                      OnlyFounders
+                    </span>
                   </div>
                   <div className="flex-1 overflow-auto py-2">
                     <div className="grid gap-1 px-2">
@@ -545,7 +674,7 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                           key={item.href}
                           href={item.href}
                           className={cn(
-                            "flex items-center gap-3 px-3 py-3 text-sm rounded-md",
+                            "flex items-center gap-3 px-3 py-3 text-sm rounded-md"
                           )}
                         >
                           <item.icon className="h-5 w-5" />
@@ -559,32 +688,53 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                     {authReady && user && (
                       <>
                         <div className="px-3 mb-2">
-                          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Dashboards</h4>
+                          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            Dashboards
+                          </h4>
                         </div>
                         <div className="grid gap-1 px-2">
-                          {dashboardNavItems.map((item) => (
+                          {role === "Investor" ? (
                             <Link
-                              key={item.href}
-                              href={item.href}
+                              href="/profile-page/investor"
                               className={cn(
                                 "flex items-center gap-3 px-3 py-3 text-sm rounded-md",
-                                isActive(item.href)
+                                isActive("/profile-page/investor")
                                   ? "bg-gray-800 text-white"
-                                  : "text-gray-400 hover:bg-gray-800 hover:text-white",
+                                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
                               )}
                             >
-                              <item.icon className="h-5 w-5" />
-                              {item.label}
+                              <Building className="h-5 w-5" />
+                              Investor Dashboard
                             </Link>
-                          ))}
+                          ) : role === "Founder" ? (
+                            <Link
+                              href="/profile-page/founder"
+                              className={cn(
+                                "flex items-center gap-3 px-3 py-3 text-sm rounded-md",
+                                isActive("/profile-page/founder")
+                                  ? "bg-gray-800 text-white"
+                                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                              )}
+                            >
+                              <Building className="h-5 w-5" />
+                              Founder Dashboard
+                            </Link>
+                          ) : ("")
+                          }
+                          <Button className="bg-gray-800 flex items-center justify-start gap-3 px-3"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleProfileNavigation();
+                            }}
+                          >
+                            <CircleUserIcon/>
+                            Profile
+                          </Button>
                         </div>
-
-                        <Separator className="my-4 bg-gray-800" />
                       </>
                     )}
 
-                    <div className="grid gap-1 px-2">
-                    </div>
+                    <div className="grid gap-1 px-2"></div>
                   </div>
 
                   <div className="p-4 border-t border-gray-800">
@@ -594,28 +744,39 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                       <div className="w-full">
                         <ConnectButton.Custom>
                           {({ account, openConnectModal, mounted }) => {
-                            const connected = mounted && account
+                            const connected = mounted && account;
                             return (
                               <Button
-                                onClick={connected ? undefined : openConnectModal}
+                                onClick={
+                                  connected ? undefined : openConnectModal
+                                }
                                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                               >
                                 <Wallet className="mr-2 h-4 w-4" />
-                                {connected ? "Wallet Connected" : "Connect Wallet"}
+                                {connected
+                                  ? "Wallet Connected"
+                                  : "Connect Wallet"}
                               </Button>
-                            )
+                            );
                           }}
                         </ConnectButton.Custom>
                       </div>
                     ) : (
-                      <a href="/early-access">
-                        <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                          Early Access
-                        </Button>
-                      </a>
+                      <div className="grid gap-1 px-2">
+                        <a href="api/auth/login">
+                          <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                            Login
+                          </Button>
+                        </a>
+                        <a href="/early-access">
+                          <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                            Early Access
+                          </Button>
+                        </a>
+                      </div>
                     )}
 
-                    {!authReady ?(
+                    {!authReady ? (
                       <Skeleton className="h-10 w-full rounded-md" />
                     ) : user ? (
                       <a href="/api/auth/logout">
@@ -623,7 +784,7 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
                           Logout
                         </Button>
                       </a>
-                    ):(null)}
+                    ) : null}
                   </div>
                 </div>
               </SheetContent>
@@ -636,6 +797,5 @@ export function AppLayout({ className, children, showHero = false }: AppLayoutPr
 
       <Footer />
     </div>
-  )
+  );
 }
-

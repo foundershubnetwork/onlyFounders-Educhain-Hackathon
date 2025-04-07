@@ -10,8 +10,13 @@ import AuthTracking from "./MIXPanel/AuthTracking";
 import AuthProvider from "../components/AuthProvider"; // Use AuthProvider instead of UserProvider
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
+import OCConnectWrapper from '../components/OCConnectWrapper';
 
-
+const opts = {
+  clientId: '<Does_Not_Matter_For_Sandbox_mode>',    
+  redirectUri: 'http://localhost:3000/redirect', // Adjust this URL
+  referralCode: 'PARTNER6', // Assign partner code
+};
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -40,6 +45,7 @@ export const metadata: Metadata = {
   },
 };
 
+
 export default function RootLayout({
   children,
 }: {
@@ -65,7 +71,9 @@ export default function RootLayout({
         <AuthProvider>
           <AuthTracking /> {/* Tracking user login */}
           <Providers>
-            {children}
+          <OCConnectWrapper opts={opts} sandboxMode={true}>
+          {children}
+        </OCConnectWrapper>
             <Analytics />
             <SpeedInsights />
             <Toaster />

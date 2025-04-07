@@ -37,7 +37,6 @@ import {
   Bell,
   Rocket,
 } from "lucide-react";
-import { NextSeo } from "next-seo";
 
 export default function NetworkPage() {
   const [activeTab, setActiveTab] = useState("members");
@@ -49,7 +48,7 @@ export default function NetworkPage() {
       name: "Sarah Johnson",
       role: "Founder & CEO",
       company: "DecentraVault",
-      avatar: "/placeholder.svg?height=80&width=80",
+      avatar: "/profile-f1.jpg",
       bio: "Blockchain entrepreneur with 10+ years in fintech",
       skills: ["DeFi", "Smart Contracts", "Tokenomics"],
       location: "San Francisco, CA",
@@ -62,7 +61,7 @@ export default function NetworkPage() {
       name: "Michael Chen",
       role: "CTO",
       company: "MetaCanvas",
-      avatar: "/placeholder.svg?height=80&width=80",
+      avatar: "/profile-m1.jpg",
       bio: "Smart contract developer and security expert",
       skills: ["Solidity", "Security Audits", "NFTs"],
       location: "New York, NY",
@@ -75,7 +74,7 @@ export default function NetworkPage() {
       name: "Alex Rodriguez",
       role: "Product Lead",
       company: "ChainGovernance",
-      avatar: "/placeholder.svg?height=80&width=80",
+      avatar: "/profile-m2.jpg",
       bio: "Product strategist specializing in Web3 applications",
       skills: ["Product Strategy", "UX Design", "DAOs"],
       location: "Austin, TX",
@@ -88,7 +87,7 @@ export default function NetworkPage() {
       name: "Emily Watson",
       role: "Blockchain Developer",
       company: "Freelance",
-      avatar: "/placeholder.svg?height=80&width=80",
+      avatar: "/profile-f2.jpg",
       bio: "Full-stack developer with focus on blockchain integration",
       skills: ["React", "Node.js", "Ethereum"],
       location: "London, UK",
@@ -101,7 +100,7 @@ export default function NetworkPage() {
       name: "David Kim",
       role: "Investor",
       company: "Crypto Ventures",
-      avatar: "/placeholder.svg?height=80&width=80",
+      avatar: "/profile-m3.jpg",
       bio: "Angel investor focusing on early-stage blockchain startups",
       skills: ["Investment", "Tokenomics", "Business Development"],
       location: "Singapore",
@@ -114,7 +113,7 @@ export default function NetworkPage() {
       name: "Sophia Martinez",
       role: "Marketing Director",
       company: "BlockTech Media",
-      avatar: "/placeholder.svg?height=80&width=80",
+      avatar: "/profile-f3.jpg",
       bio: "Marketing specialist with expertise in crypto and blockchain",
       skills: ["Growth Marketing", "Community Building", "Content Strategy"],
       location: "Miami, FL",
@@ -292,9 +291,9 @@ export default function NetworkPage() {
   return (
     <AppLayout className="z-50">
       {/* Coming Soon Overlay */}
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md overflow-x-auto">
+      {/* <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md overflow-x-auto">
         <Card className="w-full max-w-md mx-4 border-purple-800/30 shadow-xl rounded-2xl relative overflow-hidden">
-          {/* Background Image with 75% Opacity */}
+        
           <div
             className="absolute inset-0 bg-cover bg-center opacity-40"
             style={{ backgroundImage: "url('/coming-soon-card.gif')" }}
@@ -328,7 +327,7 @@ export default function NetworkPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       <div className="w-screen overflow-x-hidden container mx-auto py-8 space-y-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

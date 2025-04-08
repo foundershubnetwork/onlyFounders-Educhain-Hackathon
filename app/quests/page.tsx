@@ -39,6 +39,7 @@ import {
   Shield,
   FileText,
   Rocket,
+  Brain,
 } from "lucide-react";
 
 import { commonConfig } from "@/config/common";
@@ -48,7 +49,7 @@ import { UserProfile, useUser } from "@auth0/nextjs-auth0/client";
 import { useToast } from "../../hooks/use-toast";
 import ModernButton from "@/components/modern-button";
 import BlogSection from "./blog";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 
 const surveryRequest = buildFoundersPersonalityTraitsSurveyRequest();
@@ -58,13 +59,26 @@ const veridaRequestUrl = buildVeridaRequestUrl(
 );
 
 export default function QuestsPage() {
-  const [activeTab, setActiveTab] = useState("investor");
   const { user, isLoading } = useUser();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const [questData, setQuestData] = useState<any>(null);
   const [questDataLoading, setQuestDataLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(tabParam || "EDUChain Quests");
+
+  useEffect(() => {
+    if (tabParam && ["EDUChain Quests", "Verida Quests"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    router.push(`/quests?tab=${value}`);
+  };
 
   useEffect(() => {
     const fetchQuestData = async () => {
@@ -587,39 +601,66 @@ export default function QuestsPage() {
 
   return (
     <AppLayout className="">
-      <div className="container max-w-8xl mx-0 md:mx-auto py-8 space-y-8">
-        {/* heading */}
-        <div className="flex flex-col items-center">
-          <h1 className="text-4xl md:text-5xl font-bold">
-            Global <span className="text-[#00DDFF]">Founders</span> Survey
-          </h1>
-          <p className="text-gray-400 mt-2">
-            Join the Founders Community, make an impact, and collaborate, while
-            ensuring your data remains private and secure.
-          </p>
+      <Tabs
+        defaultValue="EDUChain Quests"
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="space-y-8"
+      >
+        <div className="mt-8 flex items-center justify-center">
+          <TabsList className="bg-gray-900 border border-gray-800">
+            <TabsTrigger
+              value="EDUChain Quests"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+            >
+              <Brain className="mr-2 h-4 w-4" />
+              EDUChain Quests
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="Verida Quests"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+            >
+              <Brain className="mr-2 h-4 w-4" />
+              Verida Quests
+            </TabsTrigger>
+          </TabsList>
         </div>
 
-        <div className="w-full bg-gradient-radial from-[#044D55] to-black text-white rounded-lg flex flex-col items-center justify-center md:flex-row font-poppins gap-10">
-          {/* Left content - adjusted with wider text container */}
-
-          <div className="py-10 pl-0 flex-grow flex flex-col items-center justify-center">
-            <div className="mx-auto md:mx-0 max-w-4xl">
-              <div className="inline-flex items-center gap-1.5 bg-black/30 border border-[#004a45] rounded-full px-3 py-1.5 text-sm font-medium mb-6">
-                <Zap className="h-4 w-4" />
-                <span>Featured</span>
-              </div>
-
-              <h1 className="text-4xl md:text-5xl font-semibold mb-4">
-                Global Founders Survey
+        <TabsContent value="Verida Quests">
+          <div className="container max-w-8xl mx-0 md:mx-auto py-8 space-y-8">
+            {/* heading */}
+            <div className="flex flex-col items-center">
+              <h1 className="text-4xl md:text-5xl font-bold">
+                Global <span className="text-[#00DDFF]">Founders</span> Survey
               </h1>
-
-              <p className=" text-lg text-gray-300 mb-8">
-                Discover insights into your personality as a founder! This short
-                survey helps us understand how your traits shape your business
-                decisions.
+              <p className="text-gray-400 mt-2">
+                Join the Founders Community, make an impact, and collaborate,
+                while ensuring your data remains private and secure.
               </p>
+            </div>
 
-              {/* <Button
+            <div className="w-full bg-gradient-radial from-[#044D55] to-black text-white rounded-lg flex flex-col items-center justify-center md:flex-row font-poppins gap-10">
+              {/* Left content - adjusted with wider text container */}
+
+              <div className="py-10 pl-0 flex-grow flex flex-col items-center justify-center">
+                <div className="mx-auto md:mx-0 max-w-4xl">
+                  <div className="inline-flex items-center gap-1.5 bg-black/30 border border-[#004a45] rounded-full px-3 py-1.5 text-sm font-medium mb-6">
+                    <Zap className="h-4 w-4" />
+                    <span>Featured</span>
+                  </div>
+
+                  <h1 className="text-4xl md:text-5xl font-semibold mb-4">
+                    Global Founders Survey
+                  </h1>
+
+                  <p className=" text-lg text-gray-300 mb-8">
+                    Discover insights into your personality as a founder! This
+                    short survey helps us understand how your traits shape your
+                    business decisions.
+                  </p>
+
+                  {/* <Button
                 onClick={() => {
                   window.open(veridaRequestUrl.toString(), "_blank");
                 }}
@@ -641,62 +682,62 @@ export default function QuestsPage() {
                 >
                   <path d="M5 12h14"></path>
                   <path d="m12 5 7 7-7 7"></path>
-                </svg>
-              </Button> */}
-              <ModernButton />
-            </div>
-          </div>
+                  </svg>
+                  </Button> */}
+                  <ModernButton />
+                </div>
+              </div>
 
-          {/* Right image - positioned at extreme right */}
-          <div className="">
-            <div className="">
-              <Image
-                src="/founders-verida.png"
-                alt="Founders x Verida Network"
-                width={800}
-                height={600}
-                className="hidden md:flex object-contain"
-                priority
-              />
-              <Image
-                src="/founders-verida-mobile.png"
-                alt="Founders x Verida Network"
-                width={350}
-                height={800}
-                className="md:hidden object-contain"
-                priority
-              />
+              {/* Right image - positioned at extreme right */}
+              <div className="">
+                <div className="">
+                  <Image
+                    src="/founders-verida.png"
+                    alt="Founders x Verida Network"
+                    width={800}
+                    height={600}
+                    className="hidden md:flex object-contain"
+                    priority
+                  />
+                  <Image
+                    src="/founders-verida-mobile.png"
+                    alt="Founders x Verida Network"
+                    width={350}
+                    height={800}
+                    className="md:hidden object-contain"
+                    priority
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            {/* <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white">Quests</h1>
             <p className="text-gray-400">Complete quests to learn, grow, and earn rewards</p>
-          </div>
+            </div>
         </div> */}
 
-        {/* <Tabs defaultValue="investor" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            {/* <Tabs defaultValue="investor" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-gray-900 border border-gray-800 p-1">
-            <TabsTrigger
-              value="investor"
+          <TabsTrigger
+          value="investor"
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
             >
-              <BookOpen className="mr-2 h-4 w-4" />
+            <BookOpen className="mr-2 h-4 w-4" />
               Investor Quests
             </TabsTrigger>
             <TabsTrigger
-              value="founder"
+            value="founder"
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
-            >
+              >
               <Rocket className="mr-2 h-4 w-4" />
               Founder Quests
-            </TabsTrigger>
-          </TabsList>
+              </TabsTrigger>
+              </TabsList>
 
-          <TabsContent value={activeTab} className="space-y-8">
-            {featuredQuests.length > 0 && (
+              <TabsContent value={activeTab} className="space-y-8">
+              {featuredQuests.length > 0 && (
               <div>
                 <h2 className="text-xl font-bold text-white mb-4">Featured Quests</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -753,7 +794,7 @@ export default function QuestsPage() {
                         <div>
                           <div className="text-sm font-medium text-white mb-2">Rewards:</div>
                           <div className="flex flex-wrap gap-2">
-                            {quest.rewards.map((reward, index) => (
+                          {quest.rewards.map((reward, index) => (
                               <Badge key={index} variant="outline" className="bg-gray-800/50 border-gray-700">
                                 {reward.type === "XP" ? (
                                   <Zap className="mr-1 h-3 w-3 text-amber-400" />
@@ -793,28 +834,28 @@ export default function QuestsPage() {
 
                 <div className="flex flex-col md:flex-row gap-4">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-                    <Input placeholder="Search quests..." className="pl-9 bg-gray-900 border-gray-700 text-white" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                  <Input placeholder="Search quests..." className="pl-9 bg-gray-900 border-gray-700 text-white" />
                   </div>
                   <Select defaultValue="all">
                     <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700 text-white">
-                      <Filter className="mr-2 h-4 w-4" />
+                    <Filter className="mr-2 h-4 w-4" />
                       <SelectValue placeholder="Filter by" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-900 border-gray-800 text-white">
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-900 border-gray-800 text-white">
                       <SelectItem value="all">All Quests</SelectItem>
                       <SelectItem value="beginner">Beginner</SelectItem>
                       <SelectItem value="intermediate">Intermediate</SelectItem>
                       <SelectItem value="advanced">Advanced</SelectItem>
                       <SelectItem value="inprogress">In Progress</SelectItem>
                       <SelectItem value="completed">Completed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                      </SelectContent>
+                      </Select>
+                      </div>
+                      </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {activeQuests.map((quest) => (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {activeQuests.map((quest) => (
                   <Card
                     key={quest.id}
                     className={`bg-gray-900 border-gray-800 overflow-hidden ${quest.locked ? "opacity-70" : "hover:border-blue-600"} transition-colors`}
@@ -875,39 +916,43 @@ export default function QuestsPage() {
                         disabled={quest.locked}
                       >
                         <Link href={`/quests/${quest.id}`}>
-                          {quest.progress > 0 && quest.progress < 100 ? "Continue" : quest.completed ? "View" : "Start"}
+                        {quest.progress > 0 && quest.progress < 100 ? "Continue" : quest.completed ? "View" : "Start"}
                         </Link>
                       </Button>
-                    </CardFooter>
+                      </CardFooter>
                   </Card>
                 ))}
               </div>
             </div>
           </TabsContent>
         </Tabs> */}
-      </div>
-      <BlogSection />
-
-      {/* Educhain quests section  */}
-      <div className="min-h-screen bg-[#0B0E17] text-[#F5F7FA] p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-10">
-            <h1 className="text-3xl font-bold mb-2 text-[#00D3FF]">
-              EduChain Quests
-            </h1>
-            <p className="text-[#8C9BA8]">
-              Complete quests to earn exclusive NFT rewards and points
-            </p>
           </div>
+          <BlogSection />
+        </TabsContent>
 
-          <QuestSection title="Basic Quests" quests={basicQuests} />
-          <QuestSection
-            title="Intermediate Quests"
-            quests={intermediateQuests}
-          />
-          <QuestSection title="Advanced Quests" quests={advancedQuests} />
-        </div>
-      </div>
+        <TabsContent value="EDUChain Quests">
+          {/* Educhain quests section  */}
+          <div className="min-h-screen text-[#F5F7FA] p-6">
+            <div className="max-w-7xl mx-auto">
+              <div className="mb-10">
+                <h1 className="text-3xl font-bold mb-2 text-[#00D3FF]">
+                  EduChain Quests
+                </h1>
+                <p className="text-[#8C9BA8]">
+                  Complete quests to earn exclusive NFT rewards and points
+                </p>
+              </div>
+
+              <QuestSection title="Basic Quests" quests={basicQuests} />
+              <QuestSection
+                title="Intermediate Quests"
+                quests={intermediateQuests}
+              />
+              <QuestSection title="Advanced Quests" quests={advancedQuests} />
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </AppLayout>
   );
 }

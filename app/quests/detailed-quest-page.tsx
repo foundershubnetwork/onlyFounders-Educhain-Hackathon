@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import NFTSuccessModal from "./nft-success-modal"
+import {AppLayout} from '../../components/layout/app-layout'
 
 // Comprehensive quest data based on the EduChain Hackathon document and JSON data
 const questsData = {
@@ -744,6 +745,7 @@ export default function DetailedQuestPage({ questId }) {
   }
 
   return (
+    <AppLayout className="">
     <div className="min-h-screen bg-[#0B0E17] text-[#F5F7FA] p-6 font-['Poppins',sans-serif]">
       {/* Custom font styles */}
       <style jsx global>{`
@@ -1451,6 +1453,7 @@ export default function DetailedQuestPage({ questId }) {
         })()
       }
   </div>
+  </AppLayout>
   )
 }
 

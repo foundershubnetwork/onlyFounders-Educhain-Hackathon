@@ -127,27 +127,39 @@ export default function ResourcesPage() {
   const tools = [
     {
       id: "tool-1",
-      title: "Tokenomics Calculator",
+      title: "Cap Table Calculator",
       description:
         "Simulate different tokenomic models and their impact on project sustainability and investor returns.",
       image: "/resources-tools.jpg",
       category: "Analysis",
+      redirectlink:"https://v0-web3-cap-table-calculator.vercel.app/",
     },
     {
       id: "tool-2",
-      title: "Investment Portfolio Tracker",
+      title: "AccountaBuddy",
       description:
         "Track your Web3 investments across multiple chains and platforms in one dashboard.",
       image: "/resources-tools.jpg",
       category: "Management",
+      redirectlink:"https://v0-bet-on-yourself.vercel.app/",
     },
     {
       id: "tool-3",
-      title: "Smart Contract Analyzer",
+      title: "Startup Evaluator",
       description:
         "Analyze smart contracts for common vulnerabilities and best practices.",
       image: "/resources-tools.jpg",
       category: "Security",
+      redirectlink:"https://v0-web3-valuation-app-jpvkyq.vercel.app/",
+    },
+    {
+      id: "tool-3",
+      title: "Startup Evaluator",
+      description:
+        "Analyze smart contracts for common vulnerabilities and best practices.",
+      image: "/resources-tools.jpg",
+      category: "Security",
+      redirectlink:"https://v0-web3-valuation-app-jpvkyq.vercel.app/",
     },
   ];
 
@@ -725,9 +737,11 @@ export default function ResourcesPage() {
                       </Badge>
                     </CardContent>
                     <CardFooter>
+                      <a href={tool.redirectlink} target="_blank">
                       <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                         Launch Tool
                       </Button>
+                      </a>
                     </CardFooter>
                   </Card>
                 ))}

@@ -26,6 +26,7 @@ export default function Home() {
     name: "",
     email: "",
     xHandle: "",
+    telegram: "",
     founderType: "",
     walletAddress: "",
   });
@@ -62,6 +63,7 @@ export default function Home() {
             email: formData.email,
             role: formData.founderType,
             twitter: formData.xHandle,
+            telegram: formData.telegram,
             walletAddress: formData.walletAddress,
           }),
         }
@@ -99,6 +101,7 @@ export default function Home() {
         name: "",
         email: "",
         xHandle: "",
+        telegram: "",
         founderType: "",
         walletAddress: "",
       });
@@ -209,6 +212,15 @@ export default function Home() {
                 value={formData.xHandle}
                 onChange={handleChange}
                 placeholder="X Handle (For The Spicy Takes)"
+                className="w-full h-10 px-3 py-2 bg-[#0d0d2d] border border-[#272874] rounded-md text-sm text-white placeholder:text-gray-500 focus:border-[#6e56cf] focus:ring-2 focus:ring-[#6e56cf]/25 outline-none transition-all"
+              />
+
+              <input
+                type="text"
+                name="telegram"
+                value={formData.telegram}
+                onChange={handleChange}
+                placeholder="Telegram Handle (Join Us)"
                 className="w-full h-10 px-3 py-2 bg-[#0d0d2d] border border-[#272874] rounded-md text-sm text-white placeholder:text-gray-500 focus:border-[#6e56cf] focus:ring-2 focus:ring-[#6e56cf]/25 outline-none transition-all"
               />
 

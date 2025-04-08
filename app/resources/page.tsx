@@ -130,7 +130,7 @@ export default function ResourcesPage() {
       title: "Cap Table Calculator",
       description:
         "Simulate different tokenomic models and their impact on project sustainability and investor returns.",
-      image: "/resources-tools.jpg",
+      image: "/resources-tool1.jpg",
       category: "Analysis",
       redirectlink:"https://v0-web3-cap-table-calculator.vercel.app/",
     },
@@ -139,7 +139,7 @@ export default function ResourcesPage() {
       title: "AccountaBuddy",
       description:
         "Track your Web3 investments across multiple chains and platforms in one dashboard.",
-      image: "/resources-tools.jpg",
+      image: "/resources-tool2.jpg",
       category: "Management",
       redirectlink:"https://v0-bet-on-yourself.vercel.app/",
     },
@@ -148,18 +148,18 @@ export default function ResourcesPage() {
       title: "Startup Evaluator",
       description:
         "Analyze smart contracts for common vulnerabilities and best practices.",
-      image: "/resources-tools.jpg",
+      image: "/resources-tool3.jpg",
       category: "Security",
       redirectlink:"https://v0-web3-valuation-app-jpvkyq.vercel.app/",
     },
     {
       id: "tool-3",
-      title: "Startup Evaluator",
+      title: "Founder GPT",
       description:
-        "Analyze smart contracts for common vulnerabilities and best practices.",
-      image: "/resources-tools.jpg",
+        "Your AI-powered assistant for all aspects of building and growing your startup.",
+      image: "/resources-tool4.jpg",
       category: "Security",
-      redirectlink:"https://v0-web3-valuation-app-jpvkyq.vercel.app/",
+      redirectlink:"https://v0-founder-gpt-chat-interface-6yakhw.vercel.app/",
     },
   ];
 

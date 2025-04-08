@@ -626,7 +626,7 @@ export function AppLayout({
                         
                       ) : (
                         <LoginButton />
-                      )}
+                )}
 
                 </NavigationMenuList>
               </NavigationMenu>

@@ -692,26 +692,46 @@ export default function DetailedQuestPage({ questId }) {
       }
 
       const userId = user?.user?.sub?.substring(14)
-      const response = await fetch("https://onlyfounders.azurewebsites.net/api/nft/mint-nft", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+
+      const walletConnect = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-walletconnect-status", {
+        method:"GET",
+        headers:{
           user_id: userId,
         },
-        body: JSON.stringify({
-          questId: questId,
-          questType: quest.difficulty,
-        }),
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        setMintData(data)
-        setMintingSuccess(true)
-        setMintModal(true)
-      } else {
-        setApiError("Failed to mint NFT. Please try again.")
+      if(walletConnect.status === 200){
+        const walletData = await walletConnect.json()
+        if(walletData.message !== "Wallet connected"){
+          alert("Please connect your wallet to mint the NFT.")
+          return
+        }
+        else{
+          const response = await fetch("https://onlyfounders.azurewebsites.net/api/nft/mint-nft", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              user_id: userId,
+            },
+            body: JSON.stringify({
+              questId: questId,
+              questType: quest.difficulty,
+            }),
+          })
+    
+          if (response.ok) {
+            const data = await response.json()
+            setMintData(data)
+            setMintingSuccess(true)
+            setMintModal(true)
+          } else {
+            setApiError("Failed to mint NFT. Please try again.")
+          }
+        }
       }
+
+      
+
     } catch (error) {
       console.error("Error minting NFT:", error)
       setApiError("Error connecting to server. Please try again.")

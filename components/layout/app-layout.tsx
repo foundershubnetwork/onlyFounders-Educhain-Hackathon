@@ -53,8 +53,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "../ui/navigation-menu";
-import LoginButton from '../ocidLogin-button';
-import { useOCAuth } from '@opencampus/ocid-connect-js';
+import LoginButton from "../ocidLogin-button";
+import { useOCAuth } from "@opencampus/ocid-connect-js";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -85,7 +85,7 @@ export function AppLayout({
 
   // Add a loading state
   if (!isInitialized) {
-    return ;
+    return;
   }
 
   if (authState.error) {
@@ -419,7 +419,7 @@ export function AppLayout({
         )}
       >
         <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-6 md:gap-10">
+          <div className="flex items-center gap-4 md:gap-4">
             <Link href="/" className="flex items-center space-x-2 pr-5">
               <Image
                 src="/onlyFounder_logo.svg"
@@ -621,13 +621,13 @@ export function AppLayout({
                     </NavigationMenuItem>
                   )} */}
 
-                {authState.isAuthenticated ? (
-                        <p>You are logged in! {JSON.stringify(ocAuth.getAuthState())}</p>
-                        
-                      ) : (
-                        <LoginButton />
-                )}
-
+                  {authState.isAuthenticated ? (
+                    <p>
+                      You are logged in! {JSON.stringify(ocAuth.getAuthState())}
+                    </p>
+                  ) : (
+                    <LoginButton />
+                  )}
                 </NavigationMenuList>
               </NavigationMenu>
 
@@ -681,6 +681,15 @@ export function AppLayout({
                           {item.label}
                         </Link>
                       ))}
+
+                      {authState.isAuthenticated ? (
+                        <p>
+                          You are logged in!{" "}
+                          {JSON.stringify(ocAuth.getAuthState())}
+                        </p>
+                      ) : (
+                        <LoginButton />
+                      )}
                     </div>
 
                     <Separator className="my-4 bg-gray-800" />
@@ -719,15 +728,17 @@ export function AppLayout({
                               <Building className="h-5 w-5" />
                               Founder Dashboard
                             </Link>
-                          ) : ("")
-                          }
-                          <Button className="bg-gray-800 flex items-center justify-start gap-3 px-3"
+                          ) : (
+                            ""
+                          )}
+                          <Button
+                            className="bg-gray-800 flex items-center justify-start gap-3 px-3"
                             onClick={(e) => {
                               e.preventDefault();
                               handleProfileNavigation();
                             }}
                           >
-                            <CircleUserIcon/>
+                            <CircleUserIcon />
                             Profile
                           </Button>
                         </div>

@@ -1,4 +1,4 @@
-# OnlyFounders Hackathon Submission Assessment
+# OnlyFounders Hackathon Submission Assessment.
 
 # [Technical Documentation ](https://www.notion.so/foundershub/OnlyFounders-x-EDU-Chain-Technical-Documentation-1cff8b9deb7980868618ff51b04d6367?pvs=4)
 
@@ -25,7 +25,7 @@ Strategic integration with numerous Open Campus and EDU Chain projects including
 - 5 hackathons with 1,200+ builders  
 - Active partnerships with multiple EDU Chain projects  
 
-**Participation features:**
+**Participation features**
 
 - On-chain recognition for educational quests  
 - Weekly founder spotlights  
@@ -36,12 +36,12 @@ Strategic integration with numerous Open Campus and EDU Chain projects including
 
 ## Blockchain Integration, Code Quality, and Security
 
-**Blockchain integration:**
+**Blockchain integration**
 
 - Purpose-built smart contracts for fund distribution and milestone verification  
 - Native $EDU Token integration for investment and staking  
 - Token-based incentives for community participation  
-- Exclusive opportunities for Capy Friends NFT holders - discount on deals and first access to deal flows.  
+- Exclusive opportunities for Capy Friends NFT holders, such as discounts on deals and first access to deal flows.  
 - OC-ID Integration: OnlyFounders leverages Open Campus ID (Soulbound Tokens) as the foundation for user identity, enabling:  
   - Portable, verifiable founder credentials and achievements  
   - User-controlled sharing of educational and professional profiles  
@@ -49,7 +49,7 @@ Strategic integration with numerous Open Campus and EDU Chain projects including
   - Personalized learning pathways based on verified credentials  
   - Privacy-preserving reputation systems for founders and investors  
 
-**Code quality:**
+**Code quality**
 
 - Modular architecture with clean separation of concerns  
 - Implementation of proxy upgradeability and access control patterns  
@@ -57,7 +57,7 @@ Strategic integration with numerous Open Campus and EDU Chain projects including
 - Well-defined interfaces for EDU Chain project integration  
 - Comprehensive testing coverage and documentation  
 
-**Security and scalability:**
+**Security and scalability**
 
 - Multi-signature wallets for critical operations  
 - Role-based access control system  
@@ -70,7 +70,7 @@ Strategic integration with numerous Open Campus and EDU Chain projects including
 
 ## Impact on Education
 
-**Unique solution:**
+**Unique solution**
 
 - Merges education, funding, and community into one blockchain ecosystem  
 - Implements Proof-of-Knowledge and Proof-of-Contribution validation  
@@ -89,7 +89,7 @@ Strategic integration with numerous Open Campus and EDU Chain projects including
 **Real-world practicality:**
 
 - Bridges web2 and web3 for non-technical founders  
-- Already onboarded 120+ founders with minimal blockchain experience  
+- We have already onboarded 120+ founders with minimal blockchain experience  
 - Established partnerships with 10+ accelerators  
 - Pragmatic roadmap from centralized to decentralized features  
 - Working MVP with positive user feedback  
@@ -106,9 +106,9 @@ Strategic integration with numerous Open Campus and EDU Chain projects including
 
 **Experience:**
 
-- CEO with 20+ years multidisciplinary experience  
+- CEO with 20+ years of multidisciplinary experience  
 - CTO and CPO recruited from DcodeBlock's founding team  
-- Development team with 20+ years collective experience  
+- Development team with 20+ years of collective experience  
 
 **Track record:**
 

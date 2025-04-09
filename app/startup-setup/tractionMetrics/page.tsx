@@ -3,25 +3,65 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, useFieldArray } from "react-hook-form"
 import * as z from "zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { Progress } from "@/components/ui/progress"
 import axios from "axios"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+const growthMetricOptions = [
+  "Monthly Active Users (MAU)",
+  "Daily Active Users",
+  "User Acquisition Cost",
+  "Average Revenue per user",
+  "Lifetime Value",
+  "Conversion Rate",
+  "Churn Rate",
+  "Network Effects",
+  "Partnership secured",
+  "Spaces spoken on",
+  "Spaces hosted",
+  "Events organized",
+  "Events attended",
+]
+
+const otherMetricOptions = [
+  "Total Value locked (TVL)",
+  "Number of active wallets",
+  "Average order size",
+  "Activation Rate",
+  "Net promoter Score (NPS)",
+  "Revenue",
+  "Cost per Customer Acquisition",
+  "Retention Rate",
+]
+
+// Updated schema to handle numbers properly but store as strings
 const tractionMetricsSchema = z.object({
   waitlistSignups: z.string().optional(),
   strategicPartners: z.string().optional(),
-  githubStars: z.string().optional(),
-  storageCapacity: z.string().optional(),
-  nodeOperators: z.string().optional(),
-  growthMetrics: z.string().optional(),
+  growthMetrics: z
+    .array(
+      z.object({
+        metricName: z.string(),
+        metricValue: z.string().optional(), // Keep as string for form handling
+      }),
+    )
+    .default([]),
+  others: z
+    .array(
+      z.object({
+        metricName: z.string(),
+        metricValue: z.string().optional(), // Keep as string for form handling
+      }),
+    )
+    .default([]),
 })
 
 type TractionMetricsValues = z.infer<typeof tractionMetricsSchema>
@@ -40,89 +80,132 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
   const { user } = useUser()
   const [originalTractionData, setOriginalTractionData] = useState<any>(null)
   const [projectId, setProjectId] = useState<string | null>(null)
+  const [selectedGrowthMetric, setSelectedGrowthMetric] = useState<string>("")
+  const [selectedOtherMetric, setSelectedOtherMetric] = useState<string>("")
 
+  // Initialize form with empty arrays for growthMetrics and others
   const form = useForm<TractionMetricsValues>({
     resolver: zodResolver(tractionMetricsSchema),
     defaultValues: {
       waitlistSignups: data?.waitlistSignups || "",
       strategicPartners: data?.strategicPartners || "",
-      githubStars: data?.githubStars || "",
-      storageCapacity: data?.storageCapacity || "",
-      nodeOperators: data?.nodeOperators || "",
-      growthMetrics: data?.growthMetrics || "",
+      growthMetrics: [],
+      others: [],
     },
   })
 
+  const {
+    fields: growthMetricFields,
+    append: appendGrowthMetric,
+    remove: removeGrowthMetric,
+    replace: replaceGrowthMetrics,
+  } = useFieldArray({
+    control: form.control,
+    name: "growthMetrics",
+  })
+
+  const {
+    fields: otherMetricFields,
+    append: appendOtherMetric,
+    remove: removeOtherMetric,
+    replace: replaceOtherMetrics,
+  } = useFieldArray({
+    control: form.control,
+    name: "others",
+  })
+
+  // Ensure fields are initialized as empty arrays
   useEffect(() => {
-        const fetchProjectId = async () => {
-          try{
-            if(!user) return
-            const userId = user?.sub?.substring(14)
-            const response = await fetch("https://onlyfounders.azurewebsites.net/api/startup/get-projectId",{
-              method: "GET",
-              headers: {
-                user_id: userId,
-              },
-            })
-    
-            if(response.status === 200){
-              const data = await response.json()
-              setProjectId(data.projectId)
-            }
-          }
-          catch(error){
-            console.error("Error fetching project ID:", error)
-            toast({
-              title: "Error",
-              description: "Failed to load project ID. Please refresh the page.",
-              variant: "destructive",
-            })
-          }
-        };
-        fetchProjectId();
-      }, [user])
+    replaceGrowthMetrics([])
+    replaceOtherMetrics([])
+  }, [])
+
+  useEffect(() => {
+    const fetchProjectId = async () => {
+      try {
+        if (!user) return
+        const userId = user?.sub?.substring(14)
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/startup/get-projectId", {
+          method: "GET",
+          headers: {
+            user_id: userId,
+          },
+        })
+
+        if (response.status === 200) {
+          const data = await response.json()
+          setProjectId(data.projectId)
+        }
+      } catch (error) {
+        console.error("Error fetching project ID:", error)
+        toast({
+          title: "Error",
+          description: "Failed to load project ID. Please refresh the page.",
+          variant: "destructive",
+        })
+      }
+    }
+    fetchProjectId()
+  }, [user])
 
   useEffect(() => {
     // Function to fetch startup data
     const fetchStartupData = async () => {
       try {
-        if(!user || !projectId) return
-      const userId = user?.sub?.substring(14)
-      const requestBody = { projectId };
-      if (!userId) {
-        toast({
-          title: "Authentication error",
-          description: "Please sign in again to continue.",
-          variant: "destructive",
-        })
-        router.push("/api/auth/login")
-        return
-      }
-      const response = await axios.post(
-        "https://onlyfounders.azurewebsites.net/api/startup/view-startup",
-        requestBody, // ✅ Correct JSON format
-        {
-          headers: {
-            "Content-Type": "application/json", // ✅ Correct header
-            user_id: userId,
-          },
+        if (!user || !projectId) return
+        const userId = user?.sub?.substring(14)
+        const requestBody = { projectId }
+        if (!userId) {
+          toast({
+            title: "Authentication error",
+            description: "Please sign in again to continue.",
+            variant: "destructive",
+          })
+          router.push("/api/auth/login")
+          return
         }
-      );
+        const response = await axios.post(
+          "https://onlyfounders.azurewebsites.net/api/startup/view-startup",
+          requestBody,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              user_id: userId,
+            },
+          },
+        )
 
         const data = response.data
 
         if (data && data.startup && data.startup.traction) {
           const traction = data.startup.traction
 
+          // Ensure we're setting arrays properly and converting numbers to strings
+          const growthMetrics = Array.isArray(traction.growthMetrics)
+            ? traction.growthMetrics.map((metric) => ({
+                metricName: metric.metricName,
+                metricValue: metric.metricValue?.toString() || "",
+              }))
+            : []
+
+          const others = Array.isArray(traction.others)
+            ? traction.others.map((metric) => ({
+                metricName: metric.metricName,
+                metricValue: metric.metricValue?.toString() || "",
+              }))
+            : []
+
           // Set form values
           form.reset({
             waitlistSignups: traction.waitlistSignups?.toString() || "",
             strategicPartners: traction.strategicPartners?.toString() || "",
-            githubStars: traction.githubStars?.toString() || "",
-            storageCapacity: traction.storageCapacity?.toString() || "",
-            nodeOperators: traction.nodeOperators?.toString() || "",
-            growthMetrics: traction.growthMetrics || "",
+            growthMetrics: growthMetrics,
+            others: others,
           })
+
+          // Also explicitly set the field arrays
+          replaceGrowthMetrics(growthMetrics)
+          replaceOtherMetrics(others)
 
           // Store original data for comparison
           setOriginalTractionData(traction)
@@ -169,10 +252,8 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
         if (
           values.waitlistSignups !== originalTractionData.waitlistSignups?.toString() ||
           values.strategicPartners !== originalTractionData.strategicPartners?.toString() ||
-          values.githubStars !== originalTractionData.githubStars?.toString() ||
-          values.storageCapacity !== originalTractionData.storageCapacity?.toString() ||
-          values.nodeOperators !== originalTractionData.nodeOperators?.toString() ||
-          values.growthMetrics !== originalTractionData.growthMetrics
+          JSON.stringify(values.growthMetrics) !== JSON.stringify(originalTractionData.growthMetrics) ||
+          JSON.stringify(values.others) !== JSON.stringify(originalTractionData.others)
         ) {
           hasChanges = true
         }
@@ -191,14 +272,18 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
         return
       }
 
-      // Prepare data for API submission
+      // Prepare data for API submission - convert string values to numbers
       const apiData = {
         waitlistSignups: values.waitlistSignups || "",
         strategicPartners: values.strategicPartners || "",
-        githubStars: values.githubStars || "",
-        storageCapacity: values.storageCapacity || "",
-        nodeOperators: values.nodeOperators || "",
-        growthMetrics: values.growthMetrics || "",
+        growthMetrics: values.growthMetrics.map((metric) => ({
+          metricName: metric.metricName,
+          metricValue: metric.metricValue ? Number.parseInt(metric.metricValue) : 0,
+        })),
+        others: values.others.map((metric) => ({
+          metricName: metric.metricName,
+          metricValue: metric.metricValue ? Number.parseInt(metric.metricValue) : 0,
+        })),
       }
 
       // Send data to API
@@ -232,6 +317,48 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
       })
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const handleAddGrowthMetric = () => {
+    if (selectedGrowthMetric) {
+      // Check if this metric already exists
+      const exists = growthMetricFields.some((field) => field.metricName === selectedGrowthMetric)
+
+      if (!exists) {
+        appendGrowthMetric({
+          metricName: selectedGrowthMetric,
+          metricValue: "", // Initialize with empty string
+        })
+        setSelectedGrowthMetric("")
+      } else {
+        toast({
+          title: "Metric already added",
+          description: "This growth metric has already been added to the form.",
+          variant: "destructive",
+        })
+      }
+    }
+  }
+
+  const handleAddOtherMetric = () => {
+    if (selectedOtherMetric) {
+      // Check if this metric already exists
+      const exists = otherMetricFields.some((field) => field.metricName === selectedOtherMetric)
+
+      if (!exists) {
+        appendOtherMetric({
+          metricName: selectedOtherMetric,
+          metricValue: "", // Initialize with empty string
+        })
+        setSelectedOtherMetric("")
+      } else {
+        toast({
+          title: "Metric already added",
+          description: "This metric has already been added to the form.",
+          variant: "destructive",
+        })
+      }
     }
   }
 
@@ -291,81 +418,139 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="githubStars"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">GitHub Stars</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 250" className="bg-gray-800 border-gray-700 text-white" {...field} />
-                      </FormControl>
-                      <FormDescription className="text-gray-500">
-                        Number of stars on the project's GitHub repository
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Growth Metrics Dropdown */}
+                <div className="space-y-2">
+                  <FormLabel className="text-white">Growth Metrics</FormLabel>
+                  <div className="flex gap-2">
+                    <Select value={selectedGrowthMetric} onValueChange={setSelectedGrowthMetric}>
+                      <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                        <SelectValue placeholder="Select a metric" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                        {growthMetricOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      onClick={handleAddGrowthMetric}
+                      className="bg-black hover:bg-gray-900 text-white border border-gray-800"
+                      disabled={!selectedGrowthMetric}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                  <FormDescription className="text-gray-500">
+                    Select growth metrics relevant to your startup
+                  </FormDescription>
+                </div>
 
-                <FormField
-                  control={form.control}
-                  name="storageCapacity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Storage Capacity</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., 500 TB"
-                          className="bg-gray-800 border-gray-700 text-white"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-gray-500">
-                        Total storage capacity committed for launch
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Growth Metrics Fields - Only render if there are fields */}
+                {growthMetricFields.length > 0 &&
+                  growthMetricFields.map((field, index) => (
+                    <div key={field.id} className="flex items-end gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`growthMetrics.${index}.metricValue`}
+                        render={({ field: valueField }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel className="text-white">{field.metricName}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                className="bg-gray-800 border-gray-700 text-white"
+                                placeholder="Enter value"
+                                {...valueField}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeGrowthMetric(index)}
+                        className="mb-2"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                      <input
+                        type="hidden"
+                        {...form.register(`growthMetrics.${index}.metricName`)}
+                        value={field.metricName}
+                      />
+                    </div>
+                  ))}
 
-                <FormField
-                  control={form.control}
-                  name="nodeOperators"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Node Operators</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 75" className="bg-gray-800 border-gray-700 text-white" {...field} />
-                      </FormControl>
-                      <FormDescription className="text-gray-500">
-                        Number of pre-registered node operators
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Other Metrics Dropdown */}
+                <div className="space-y-2">
+                  <FormLabel className="text-white">Other Metrics</FormLabel>
+                  <div className="flex gap-2">
+                    <Select value={selectedOtherMetric} onValueChange={setSelectedOtherMetric}>
+                      <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                        <SelectValue placeholder="Select a metric" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                        {otherMetricOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      onClick={handleAddOtherMetric}
+                      className="bg-black hover:bg-gray-900 text-white border border-gray-800"
+                      disabled={!selectedOtherMetric}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                  <FormDescription className="text-gray-500">
+                    Select other metrics relevant to your startup
+                  </FormDescription>
+                </div>
 
-                <FormField
-                  control={form.control}
-                  name="growthMetrics"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Growth Metrics</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Describe growth in key areas such as social media, Discord, Telegram, etc."
-                          className="bg-gray-800 border-gray-700 text-white min-h-[100px]"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-gray-500">
-                        Percentage growth in key areas over a specified period
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Other Metrics Fields - Only render if there are fields */}
+                {otherMetricFields.length > 0 &&
+                  otherMetricFields.map((field, index) => (
+                    <div key={field.id} className="flex items-end gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`others.${index}.metricValue`}
+                        render={({ field: valueField }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel className="text-white">{field.metricName}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                className="bg-gray-800 border-gray-700 text-white"
+                                placeholder="Enter value"
+                                {...valueField}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeOtherMetric(index)}
+                        className="mb-2"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                      <input type="hidden" {...form.register(`others.${index}.metricName`)} value={field.metricName} />
+                    </div>
+                  ))}
               </div>
 
               <div className="flex justify-end">
@@ -385,4 +570,3 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
     </div>
   )
 }
-

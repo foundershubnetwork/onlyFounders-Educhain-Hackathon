@@ -27,7 +27,7 @@ const investorProfileSchema = z.object({
   bio: z
     .string()
     .min(10, { message: "Bio must be at least 10 characters" })
-    .max(500, { message: "Bio must be less than 500 characters" }),
+    .max(150, { message: "Bio must be less than 150 characters" }),
   investorType: z.string().min(1, { message: "Please select your investor type" }),
   experience: z.string().min(1, { message: "Please select your experience level" }),
   location: z.string().min(1, { message: "Please select your country" }),
@@ -524,7 +524,7 @@ export default function InvestorProfileSetupPage() {
                             {...field}
                           />
                         </FormControl>
-                        <FormDescription className="text-gray-500">{field.value.length}/500 characters</FormDescription>
+                        <FormDescription className="text-gray-500">{field.value.length}/150 characters</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -548,7 +548,10 @@ export default function InvestorProfileSetupPage() {
                               <SelectItem value="angel">Angel Investor</SelectItem>
                               <SelectItem value="vc">Venture Capital</SelectItem>
                               <SelectItem value="dao">DAO</SelectItem>
+                              <SelectItem value="family office">Family Office</SelectItem>
                               <SelectItem value="corporate">Corporate Investor</SelectItem>
+                              <SelectItem value="crypto">Crypto Fund</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />

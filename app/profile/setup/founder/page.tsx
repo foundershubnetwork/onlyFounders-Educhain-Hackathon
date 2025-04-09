@@ -26,7 +26,7 @@ const founderProfileSchema = z.object({
   bio: z
     .string()
     .min(10, { message: "Bio must be at least 10 characters" })
-    .max(500, { message: "Bio must be less than 500 characters" }),
+    .max(150, { message: "Bio must be less than 150 characters" }),
   experience: z.string().min(1, { message: "Please select your experience level" }),
   skills: z.string().min(2, { message: "Skills are required" }),
   location: z.string().min(1, { message: "Please select your country" }),
@@ -575,7 +575,7 @@ export default function FounderProfileSetupPage() {
                             />
                           </FormControl>
                           <FormDescription className="text-gray-500">
-                            {field.value.length}/500 characters
+                            {field.value.length}/150 characters
                           </FormDescription>
                           <FormMessage />
                         </FormItem>

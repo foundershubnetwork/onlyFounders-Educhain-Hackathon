@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import NFTSuccessModal from "./nft-success-modal"
 import {AppLayout} from '../../components/layout/app-layout'
+import { useToast } from "@/hooks/use-toast";
 
 // Comprehensive quest data based on the EduChain Hackathon document and JSON data
 const questsData = {
@@ -587,6 +588,7 @@ export default function DetailedQuestPage({ questId }) {
   const [apiError, setApiError] = useState("")
   const [mintModal, setMintModal] = useState(false)
   const [mintData, setMintData] = useState<mintData[]>([])
+  const {toast} = useToast();
 
 
   // Calculate progress percentage based on current stage and question
@@ -1245,7 +1247,7 @@ export default function DetailedQuestPage({ questId }) {
                 <Button
                   onClick={handleSubmitAnswer}
                   disabled={selectedAnswers[currentQuestionIndex] === undefined}
-                  className="bg-gradient-to-r from-[#00CFFF] to-[#00E0FF] hover:from-[#00E0FF] hover:to-[#00CFFF] text-[#0B0E17] font-medium px-6 py-2.5 rounded-xl shadow-[0_0_15px_rgba(0,207,255,0.2)] hover:shadow-[0_0_20px_rgba(0,224,255,0.3)] transition-all duration-300 disabled:opacity-50 disabled:shadow-none disabled:hover:from-[#00CFFF] disabled:hover:to-[#00E0FF]"
+                  className="bg-gradient-to-r from-[#00CFFF] to-[#00E0FF] hover:from-[#070a0a] hover:to-[#00CFFF] text-[#0B0E17] font-medium px-6 py-2.5 rounded-xl shadow-[0_0_15px_rgba(0,207,255,0.2)] hover:shadow-[0_0_20px_rgba(0,224,255,0.3)] transition-all duration-300 disabled:opacity-50 disabled:shadow-none disabled:hover:from-[#00CFFF] disabled:hover:to-[#00E0FF]"
                 >
                   Submit Answer
                 </Button>

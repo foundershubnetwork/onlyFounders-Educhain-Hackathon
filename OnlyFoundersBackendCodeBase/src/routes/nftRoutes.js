@@ -1,67 +1,3 @@
-
-// const express = require("express");
-// const router = express.Router();
-// const { Web3 } = require('web3');
-
-
-// router.post("/mint-nft", async (req, res) => {
-    
-//     console.log("Minting...");
-  
-//     try {
-//       const { userId} = req.user_id;
-//       const tokenURI =  "https://aquamarine-generous-barracuda-163.mypinata.cloud/ipfs/bafkreiackmg56sz2zno3ghks77n7t6q32syhdi4cbz5dhr4ncidjl4ig7y";
-      
-//       const recipient=
-//       console.log(recipient);
-//       if (!recipient || !tokenURI) {
-//         return res.status(400).json({ error: "Recipient address and token URI are required" });
-//       }
-  
-//       const web3 = new Web3('https://rpc.edu-chain.raas.gelato.cloud/fd947a6d7b1b4565b1bb1cab5e4048b5'); // Node RPC Url of Edu-Chain - Removed for security reason.
-  
-//       // Add your private key to the account
-//       const account = web3.eth.accounts.privateKeyToAccount("0x" + process.env.PRIVATE_KEY);
-//       web3.eth.accounts.wallet.add(account);
-//       web3.eth.defaultAccount = account.address;
-  
-//       // Define the contract ABI and address
-//       const contractAddress = "0x01661Dae96e8001c1Cd5d9f969dc6E05e6fb8e1F";
-//       const SimpleNFT = require("../EDU_nft/artifacts/contracts/SimpleNFT.sol/SimpleNFT.json");
-//       const contract = new web3.eth.Contract(SimpleNFT.abi, contractAddress);
-  
-//       // Prepare the mintNFT transaction
-//       const mintFunction = contract.methods.mintNFT(recipient, tokenURI);
-//       const gas = await mintFunction.estimateGas({ from: account.address });
-//       const gasPrice = await web3.eth.getGasPrice();
-//       const data = mintFunction.encodeABI();
-  
-//       const tx = {
-//         from: account.address,
-//         to: contractAddress,
-//         data: data,
-//         gas: gas,
-//         gasPrice: gasPrice,
-//       };
-  
-//       // Sign and send the transaction
-//       const signedTx = await web3.eth.accounts.signTransaction(tx, process.env.PRIVATE_KEY);
-//       const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-  
-//       console.log("NFT minted successfully!", receipt.transactionHash, "recipient", recipient);
-//       res.json({
-//         message: "NFT minted successfully!",
-//         transactionHash: receipt.transactionHash,
-//         recipient: recipient,
-//       });
-//     } catch (error) {
-//       console.error("Error minting NFT:", error);
-//       res.status(500).json({ error: "Error minting NFT" });
-//     }
-//   });
-
-//   module.exports = router;
-
 const express = require("express");
 const router = express.Router();
 const {Web3} = require("web3");
@@ -179,7 +115,7 @@ router.post("/mint-nft", authMiddleware.decodeJWT, async (req, res) => {
       web3.eth.defaultAccount = account.address;
   
       // Contract details
-      const contractAddress = "0x21a6F8157f7Bb86980025282826156aDbf3D91bd";
+      const contractAddress = "0x228aC046276070E68C759482B7cc2038E67ff75B";
       const SimpleNFT = require("../nft/artifacts/contracts/SimpleNFT.sol/SimpleNFT.json");
       const contract = new web3.eth.Contract(SimpleNFT.abi, contractAddress);
   

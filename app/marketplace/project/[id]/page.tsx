@@ -99,6 +99,7 @@ interface Milestone {
 
 interface Startup {
   id: string;
+  founderName: string;
   title: string;
   stage: string;
   tagline: string;
@@ -114,9 +115,12 @@ interface Startup {
   daysLeft: number;
   minInvestment: number;
   website: string;
+  discord: string;
+  medium: string;
   github: string;
   twitter: string;
   whitepaper: string;
+  demoVideo: string;
   team: TeamMember[];
   roadmap: RoadmapItem[];
   tokenomics: Tokenomics;
@@ -135,6 +139,7 @@ interface Startup {
   growthMetrics: string;
   storageCapacity: string;
   tokenPrice: string;
+  others: string;
 }
 
 // API response types
@@ -151,6 +156,7 @@ interface SocialLinks {
   discord?: string;
   medium?: string;
   linkedin?: string;
+  telegram?: string;
 }
 
 interface Traction {
@@ -162,6 +168,7 @@ interface Traction {
   developerInterest: string;
   growthMetrics: string;
   storageCapacity: string;
+  others: string;
 }
 
 interface TokenDistributionAPI {
@@ -215,6 +222,7 @@ interface FAQAPI {
 
 interface StartupAPI {
   _id: string;
+  founderName: string;
   user_id: string;
   startupName: string;
   startupLogo: FileInfo;
@@ -276,6 +284,8 @@ export default function ProjectDetailPage({
   const [updates, setUpdates] = useState<any[]>([]); // Define properly if updates have a structure
   const [loadDeleteMember, setLoadDeleteMember] = useState(false);
 
+
+  //api to fetch updates
   useEffect(() => {
     const fetchUpdates = async () => {
       try {
@@ -311,6 +321,7 @@ export default function ProjectDetailPage({
     fetchUpdates();
   }, [projectId]);
 
+  //api to get projectId
   useEffect(() => {
     const fetchProjectId = async () => {
       try {
@@ -343,6 +354,7 @@ export default function ProjectDetailPage({
     fetchProjectId();
   }, [user]);
 
+  // Fetch startup data based on project ID
   useEffect(() => {
     const fetchStartupData = async () => {
       try {
@@ -379,6 +391,7 @@ export default function ProjectDetailPage({
     fetchStartupData();
   }, [params.id, router, toast, user, loadDeleteMember]);
 
+  //get startup listing
   useEffect(() => {
     const fetchStartups = async () => {
       try {
@@ -412,6 +425,7 @@ export default function ProjectDetailPage({
   const project: Startup = startupData
     ? {
         id: startupData._id,
+        founderName: startupData.founderName,
         stage: startupData.stage,
         title: startupData.startupName,
         verifiedStatus: startupData.verifiedStatus,
@@ -441,7 +455,7 @@ export default function ProjectDetailPage({
         discord: startupData.socialLinks?.discord || "#",
         medium: startupData.socialLinks?.medium || "#",
         whitepaper: startupData.whitepaper_Url || "#",
-        demoVideo: startupData.pitchDemoVideo?.file_url,
+        demoVideo: startupData.pitchDemoVideo_Url,
 
         //traction
         waitlistSignups: startupData.traction.waitlistSignups,
@@ -620,7 +634,7 @@ export default function ProjectDetailPage({
       console.log(JSON.stringify(requestBody));
 
       const response = await axios.delete(
-        "https://onlyfounders.azurewebsites.net/startup/delete-teamMember",
+        "https://onlyfounders.azurewebsites.net/",
         {
           headers: {
             "Content-Type": "application/json",
@@ -710,6 +724,9 @@ export default function ProjectDetailPage({
             </div>
             <h1 className="text-3xl font-bold text-white">{project.title}</h1>
             <p className="text-gray-300 mt-1">{project.tagline}</p>
+            <p className="text-gray-300 mt-1"> Founder: 
+             <a href={`/public-profile/${project.id}`} target="_blank" className="text-blue-600"> {project.founderName}</a>
+            </p>
           </div>
         </div>
       </div>
@@ -1080,32 +1097,8 @@ export default function ProjectDetailPage({
                           <div className="flex-1">
                             <h3 className="flex items-center justify-between text-lg font-medium text-white">
                               <span>{milestone.title}</span>
-                              <div className="flex flex-col justify-end text-center gap-2">
-                                {milestone.completedStatus === "Incomplete" ? (
-                                  <Badge className="bg-red-500">
-                                    Incomplete
-                                  </Badge>
-                                ) : (
-                                  <Badge className="bg-green-500">
-                                    Complete
-                                  </Badge>
-                                )}
-                                {milestone.completedStatus === "Incomplete" && (
-                                  <button
-                                    onClick={() =>
-                                      handleMilestoneComplete(
-                                        milestone._id,
-                                        index
-                                      )
-                                    }
-                                    className="bg-gray-700 text-xs px-2 py-1 rounded-full hover:bg-gray-600 transition-all duration-300"
-                                  >
-                                    Mark as complete
-                                  </button>
-                                )}
-                              </div>
                             </h3>
-                            {milestone.description.map((item, index) => (
+                            {milestone.description?.map((item, index) => (
                               <div className="flex items-center gap-1">
                                 <Check className="mt-1 text-green-500" />
                                 <p key={index} className="text-gray-300 mt-1">

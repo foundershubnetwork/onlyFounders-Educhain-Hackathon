@@ -257,7 +257,7 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
       }
 
       // Check if user is authenticated
-      const userId = user.sub?.substring(14)
+      const userId = user?.sub?.substring(14)
 
       if (!userId) {
         toast({
@@ -308,7 +308,7 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
       if (!hasChanges && originalRoadmapData.length > 0) {
         toast({
           title: "No changes detected",
-          description: "Moving to the next step without submitting.",
+          description: "Moving to the next step.",
         })
         router.push("/startup-setup/tokenomics")
         return
@@ -383,7 +383,7 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
           <Progress
             value={80}
             className="h-2 bg-gray-700"
-            indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
+            // indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
           />
         </div>
         <div className="bg-gray-900 p-6 rounded-lg">

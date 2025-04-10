@@ -254,7 +254,7 @@ export default function TokenomicsForm({ data, updateData, onSubmit }: Tokenomic
       if (!hasChanges && originalTokenomicsData) {
         toast({
           title: "No changes detected",
-          description: "Moving to the marketplace without submitting.",
+          description: "Moving to the marketplace.",
         })
         router.push("/marketplace")
         return

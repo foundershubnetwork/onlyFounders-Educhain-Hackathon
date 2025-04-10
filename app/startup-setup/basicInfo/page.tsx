@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { Progress } from "@/components/ui/progress"
-import axios from "axios";
+import axios from "axios"
 
 const basicInfoSchema = z.object({
   startupName: z.string().min(2, { message: "Startup name must be at least 2 characters" }),
@@ -30,19 +30,19 @@ const basicInfoSchema = z.object({
     .min(10, { message: "Description must be at least 10 characters" })
     .max(1000, { message: "Description must be less than 1000 characters" }),
   stage: z.string().min(1, { message: "Please select your startup stage" }),
-  categories: z.array(z.string()).min(1, { message: "Please select at least one category" }),
+  categories: z.string().min(1, { message: "Please select a category" }),
   blockchainPlatforms: z.array(z.string()).min(1, { message: "Please select at least one blockchain platform" }),
-  website: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
-  twitter: z.string().optional().or(z.literal("")),
-  github: z.string().optional().or(z.literal("")),
-  telegram: z.string().optional().or(z.literal("")),
-  discord: z.string().optional().or(z.literal("")),
-  medium: z.string().optional().or(z.literal("")),
-  whitepaper: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  website: z.string().url().min(1, { message: "Please enter a valid URL" }),
+  twitter: z.string().min(1, { message: "Please enter a valid Twitter handle" }),
+  github: z.string().url().min(1, { message: "Please enter a valid GitHub URL" }),
+  telegram: z.string().min(1, { message: "Please enter a valid Telegram handle" }),
+  discord: z.string().min(1, { message: "Please enter a valid Discord handle" }),
+  medium: z.string().url().min(1, { message: "Please enter a valid Medium URL" }),
+  whitepaper: z.string().url().min(1, { message: "Please enter a valid Whitepaper URL" }),
   pitchDeckFile: z.string().optional().or(z.literal("")),
-  pitchDeckLink: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
-  pitchDeckText: z.string().optional().or(z.literal("")),
-  demoVideo: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  pitchDeckLink: z.string().url().min(1, { message: "Please enter a valid Pitch Deck URL" }),
+  pitchDeckText: z.string().min(1, { message: "Please enter a description for the Pitch Deck" }),
+  demoVideo: z.string().url().min(1, { message: "Please enter a valid Demo Video URL" }),
 })
 
 type BasicInfoValues = z.infer<typeof basicInfoSchema>
@@ -77,6 +77,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
 
   const [projectId, setProjectId] = useState<string>("")
   const { user } = useUser()
+  const [customCategory, setCustomCategory] = useState<string>("")
 
   const form = useForm<BasicInfoValues>({
     resolver: zodResolver(basicInfoSchema),
@@ -85,7 +86,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
       tagline: data?.tagline || "",
       description: data?.description || "",
       stage: data?.stage || "",
-      categories: data?.categories || [],
+      categories: data?.categories?.[0] || "",
       blockchainPlatforms: data?.blockchainPlatforms || [],
       website: data?.website || "",
       twitter: data?.twitter || "",
@@ -103,22 +104,21 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
 
   useEffect(() => {
     const fetchProjectId = async () => {
-      try{
-        if(!user) return
+      try {
+        if (!user) return
         const userId = user?.sub?.substring(14)
-        const response = await fetch("https://onlyfounders.azurewebsites.net/api/startup/get-projectId",{
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/startup/get-projectId", {
           method: "GET",
           headers: {
             user_id: userId,
           },
         })
 
-        if(response.status === 200){
+        if (response.status === 200) {
           const data = await response.json()
           setProjectId(data.projectId)
         }
-      }
-      catch(error){
+      } catch (error) {
         console.error("Error fetching project ID:", error)
         toast({
           title: "Error",
@@ -126,22 +126,22 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
           variant: "destructive",
         })
       }
-    };
+    }
 
-    fetchProjectId();
+    fetchProjectId()
   }, [user])
 
   useEffect(() => {
     // Function to fetch startup data
     const fetchStartupData = async () => {
       try {
-        if (!user || !projectId) return;
-  
-        const userId = user?.sub?.substring(14);
-        const requestBody = { projectId };
-  
-        console.log("The project id is", JSON.stringify({ projectId }));
-  
+        if (!user || !projectId) return
+
+        const userId = user?.sub?.substring(14)
+        const requestBody = { projectId }
+
+        console.log("The project id is", JSON.stringify({ projectId }))
+
         const response = await axios.post(
           "https://onlyfounders.azurewebsites.net/api/startup/view-startup",
           requestBody, // ✅ Correct JSON format
@@ -150,26 +150,26 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
               "Content-Type": "application/json", // ✅ Correct header
               user_id: userId,
             },
-          }
-        );
-  
-        const data = response.data; // ✅ Axios handles JSON parsing automatically
-  
+          },
+        )
+
+        const data = response.data // ✅ Axios handles JSON parsing automatically
+
         if (data && data.startup) {
-          const startup = data.startup;
-  
+          const startup = data.startup
+
           // Extract social links
-          const socialLinks = startup.socialLinks || {};
-  
+          const socialLinks = startup.socialLinks || {}
+
           // Set logo and banner if available
           if (startup.startupLogo?.file_url) {
-            setLogoSrc(startup.startupLogo.file_url);
+            setLogoSrc(startup.startupLogo.file_url)
           }
-  
+
           if (startup.bannerImage?.file_url) {
-            setBannerSrc(startup.bannerImage.file_url);
+            setBannerSrc(startup.bannerImage.file_url)
           }
-  
+
           // Set form values
           form.reset({
             startupName: startup.startupName || "",
@@ -177,10 +177,10 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
             description: startup.description || "",
             stage: startup.stage?.toLowerCase() || "",
             categories: Array.isArray(startup.category)
-              ? startup.category.map((c) => c.toLowerCase())
+              ? startup.category[0]?.toLowerCase() || ""
               : startup.category
-              ? [startup.category.toLowerCase()]
-              : [],
+                ? startup.category.toLowerCase()
+                : "",
             blockchainPlatforms: startup.blockchainPlatforms || [],
             website: socialLinks.website || socialLinks.Website || "",
             twitter: socialLinks.twitter || socialLinks.Twitter || "",
@@ -193,25 +193,23 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
             pitchDeckLink: startup.pitchDeck_Url || "",
             pitchDeckText: startup.pitchDeckText || "",
             demoVideo: startup.pitchDemoVideo_Url || "",
-          });
-  
+          })
+
           // Store original data for comparison on submit
-          setOriginalData(startup);
+          setOriginalData(startup)
         }
       } catch (error) {
-        console.error("Error fetching startup data:", error);
+        console.error("Error fetching startup data:", error)
         toast({
           title: "Error",
           description: "Failed to load startup data. Please refresh the page.",
           variant: "destructive",
-        });
+        })
       }
-    };
-  
-    fetchStartupData();
-  }, [form, projectId]); // ✅ Ensured correct dependencies
-  
+    }
 
+    fetchStartupData()
+  }, [form, projectId]) // ✅ Ensured correct dependencies
 
   const handleSubmit = async (values: BasicInfoValues) => {
     try {
@@ -225,7 +223,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
           description: "Please sign in again to continue.",
           variant: "destructive",
         })
-        router.push("/login")
+        router.push("/api/auth/login")
         return
       }
 
@@ -263,7 +261,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
             : []
 
         if (
-          JSON.stringify(values.categories.sort()) !== JSON.stringify(originalCategories.sort()) ||
+          values.categories !== (originalCategories[0] || "") ||
           JSON.stringify(values.blockchainPlatforms.sort()) !==
             JSON.stringify((originalData.blockchainPlatforms || []).sort())
         ) {
@@ -304,22 +302,15 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
       formData.append("stage", dataToSubmit.stage)
 
       // Add array fields
-      const categoriesToSubmit = hasChanges
-        ? values.categories
+      const categoryToSubmit = hasChanges
+        ? values.categories === "others"
+          ? customCategory
+          : values.categories
         : Array.isArray(originalData.category)
-          ? originalData.category
-          : originalData.category
-            ? [originalData.category]
-            : []
+          ? originalData.category[0] || ""
+          : originalData.category || ""
 
-      // Ensure category is sent as a single value if only one is selected
-      if (categoriesToSubmit.length === 1) {
-        formData.append("category", categoriesToSubmit[0])
-      } else {
-        categoriesToSubmit.forEach((category: string, index: number) => {
-          formData.append(`category[${index}]`, category)
-        })
-      }
+      formData.append("category", categoryToSubmit)
 
       const platformsToSubmit = hasChanges ? values.blockchainPlatforms : originalData.blockchainPlatforms || []
       platformsToSubmit.forEach((platform: string, index: number) => {
@@ -472,6 +463,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
     { id: "did", label: "DID" },
     { id: "edufi", label: "EduFi" },
     { id: "infofi", label: "InfoFi" },
+    { id: "others", label: "Others" },
   ]
 
   const blockchains = [
@@ -486,11 +478,10 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
   ]
 
   const stages = [
-    { id: "angel-round", label: "Angel Round" },
-    { id: "private-round", label: "Private Round" },
-    { id: "public-round", label: "Public Round" },
-    { id: "pre-seed", label: "Pre-seed" },
-    { id: "seed", label: "Seed" },
+    { id: "Ideation", label: "Ideation (Friends & Family Funding)" },
+    { id: "Prototype", label: "Prototype (Angel Funding)" },
+    { id: "MVP", label: "MVP (Pre-Seed Funding)" },
+    { id: "Public Beta", label: "Public Beta (Seed Funding)" },
   ]
 
   return (
@@ -506,7 +497,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
           <Progress
             value={20}
             className="h-2 bg-gray-700"
-            indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
+            // indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
           />
         </div>
         <div className="bg-gray-900 p-6 rounded-lg">
@@ -656,43 +647,48 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
               <FormField
                 control={form.control}
                 name="categories"
-                render={() => (
+                render={({ field }) => (
                   <FormItem>
                     <div className="mb-4">
                       <FormLabel className="text-white">Categories</FormLabel>
                       <FormDescription className="text-gray-500">
-                        Select all categories that apply to your startup
+                        Select a category that applies to your startup
                       </FormDescription>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                       {categories.map((category) => (
-                        <FormField
+                        <FormItem
                           key={category.id}
-                          control={form.control}
-                          name="categories"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={category.id}
-                                className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-3"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(category.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, category.id])
-                                        : field.onChange(field.value?.filter((value) => value !== category.id))
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="text-sm font-normal text-white">{category.label}</FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
+                          className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-3"
+                        >
+                          <FormControl>
+                            <input
+                              type="radio"
+                              className="h-4 w-4 text-primary border-gray-700 bg-gray-800"
+                              checked={field.value === category.id}
+                              onChange={() => {
+                                field.onChange(category.id)
+                                if (category.id !== "others") {
+                                  setCustomCategory("")
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal text-white">{category.label}</FormLabel>
+                        </FormItem>
                       ))}
                     </div>
+                    {field.value === "others" && (
+                      <div className="mt-4">
+                        <FormLabel className="text-white">Specify Category</FormLabel>
+                        <Input
+                          placeholder="Enter your category"
+                          className="bg-gray-800 border-gray-700 text-white mt-1"
+                          value={customCategory}
+                          onChange={(e) => setCustomCategory(e.target.value)}
+                        />
+                      </div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -899,7 +895,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                               onChange={handlePitchDeckChange}
                             />
                             <div className="flex-1 bg-gray-800 border border-gray-700 rounded-md overflow-hidden">
-                            <div className="flex items-centerrounded-md overflow-hidden">
+                              <div className="flex items-centerrounded-md overflow-hidden">
                                 <Input
                                   readOnly
                                   placeholder="Upload pitch deck (PDF)"
@@ -998,4 +994,3 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
     </div>
   )
 }
-

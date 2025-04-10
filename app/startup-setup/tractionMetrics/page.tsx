@@ -266,7 +266,7 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
       if (!hasChanges && originalTractionData) {
         toast({
           title: "No changes detected",
-          description: "Moving to the next step without submitting.",
+          description: "Moving to the next step.",
         })
         router.push("/startup-setup/coreTeam")
         return

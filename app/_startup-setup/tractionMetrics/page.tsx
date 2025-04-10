@@ -1,28 +1,67 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, useFieldArray } from "react-hook-form"
 import * as z from "zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { Progress } from "@/components/ui/progress"
-import { AppLayout } from "@/components/layout/app-layout"
+import axios from "axios"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+const growthMetricOptions = [
+  "Monthly Active Users (MAU)",
+  "Daily Active Users",
+  "User Acquisition Cost",
+  "Average Revenue per user",
+  "Lifetime Value",
+  "Conversion Rate",
+  "Churn Rate",
+  "Network Effects",
+  "Partnership secured",
+  "Spaces spoken on",
+  "Spaces hosted",
+  "Events organized",
+  "Events attended",
+]
+
+const otherMetricOptions = [
+  "Total Value locked (TVL)",
+  "Number of active wallets",
+  "Average order size",
+  "Activation Rate",
+  "Net promoter Score (NPS)",
+  "Revenue",
+  "Cost per Customer Acquisition",
+  "Retention Rate",
+]
+
+// Updated schema to handle numbers properly but store as strings
 const tractionMetricsSchema = z.object({
   waitlistSignups: z.string().optional(),
   strategicPartners: z.string().optional(),
-  githubStars: z.string().optional(),
-  storageCapacity: z.string().optional(),
-  nodeOperators: z.string().optional(),
-  growthMetrics: z.string().optional(),
-  additionalMetrics: z.string().optional(),
+  growthMetrics: z
+    .array(
+      z.object({
+        metricName: z.string(),
+        metricValue: z.string().optional(), // Keep as string for form handling
+      }),
+    )
+    .default([]),
+  others: z
+    .array(
+      z.object({
+        metricName: z.string(),
+        metricValue: z.string().optional(), // Keep as string for form handling
+      }),
+    )
+    .default([]),
 })
 
 type TractionMetricsValues = z.infer<typeof tractionMetricsSchema>
@@ -38,50 +77,213 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const {user} = useUser();
-  
+  const { user } = useUser()
+  const [originalTractionData, setOriginalTractionData] = useState<any>(null)
+  const [projectId, setProjectId] = useState<string | null>(null)
+  const [selectedGrowthMetric, setSelectedGrowthMetric] = useState<string>("")
+  const [selectedOtherMetric, setSelectedOtherMetric] = useState<string>("")
+
+  // Initialize form with empty arrays for growthMetrics and others
   const form = useForm<TractionMetricsValues>({
     resolver: zodResolver(tractionMetricsSchema),
     defaultValues: {
       waitlistSignups: data?.waitlistSignups || "",
       strategicPartners: data?.strategicPartners || "",
-      githubStars: data?.githubStars || "",
-      storageCapacity: data?.storageCapacity || "",
-      nodeOperators: data?.nodeOperators || "",
-      growthMetrics: data?.growthMetrics || "",
-      additionalMetrics: data?.additionalMetrics || "",
+      growthMetrics: [],
+      others: [],
     },
   })
+
+  const {
+    fields: growthMetricFields,
+    append: appendGrowthMetric,
+    remove: removeGrowthMetric,
+    replace: replaceGrowthMetrics,
+  } = useFieldArray({
+    control: form.control,
+    name: "growthMetrics",
+  })
+
+  const {
+    fields: otherMetricFields,
+    append: appendOtherMetric,
+    remove: removeOtherMetric,
+    replace: replaceOtherMetrics,
+  } = useFieldArray({
+    control: form.control,
+    name: "others",
+  })
+
+  // Ensure fields are initialized as empty arrays
+  useEffect(() => {
+    replaceGrowthMetrics([])
+    replaceOtherMetrics([])
+  }, [])
+
+  useEffect(() => {
+    const fetchProjectId = async () => {
+      try {
+        if (!user) return
+        const userId = user?.sub?.substring(14)
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/startup/get-projectId", {
+          method: "GET",
+          headers: {
+            user_id: userId,
+          },
+        })
+
+        if (response.status === 200) {
+          const data = await response.json()
+          setProjectId(data.projectId)
+        }
+      } catch (error) {
+        console.error("Error fetching project ID:", error)
+        toast({
+          title: "Error",
+          description: "Failed to load project ID. Please refresh the page.",
+          variant: "destructive",
+        })
+      }
+    }
+    fetchProjectId()
+  }, [user])
+
+  useEffect(() => {
+    // Function to fetch startup data
+    const fetchStartupData = async () => {
+      try {
+        if (!user || !projectId) return
+        const userId = user?.sub?.substring(14)
+        const requestBody = { projectId }
+        if (!userId) {
+          toast({
+            title: "Authentication error",
+            description: "Please sign in again to continue.",
+            variant: "destructive",
+          })
+          router.push("/api/auth/login")
+          return
+        }
+        const response = await axios.post(
+          "https://onlyfounders.azurewebsites.net/api/startup/view-startup",
+          requestBody,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              user_id: userId,
+            },
+          },
+        )
+
+        const data = response.data
+
+        if (data && data.startup && data.startup.traction) {
+          const traction = data.startup.traction
+
+          // Ensure we're setting arrays properly and converting numbers to strings
+          const growthMetrics = Array.isArray(traction.growthMetrics)
+            ? traction.growthMetrics.map((metric) => ({
+                metricName: metric.metricName,
+                metricValue: metric.metricValue?.toString() || "",
+              }))
+            : []
+
+          const others = Array.isArray(traction.others)
+            ? traction.others.map((metric) => ({
+                metricName: metric.metricName,
+                metricValue: metric.metricValue?.toString() || "",
+              }))
+            : []
+
+          // Set form values
+          form.reset({
+            waitlistSignups: traction.waitlistSignups?.toString() || "",
+            strategicPartners: traction.strategicPartners?.toString() || "",
+            growthMetrics: growthMetrics,
+            others: others,
+          })
+
+          // Also explicitly set the field arrays
+          replaceGrowthMetrics(growthMetrics)
+          replaceOtherMetrics(others)
+
+          // Store original data for comparison
+          setOriginalTractionData(traction)
+        }
+      } catch (error) {
+        console.error("Error fetching startup data:", error)
+        toast({
+          title: "Error",
+          description: "Failed to load traction metrics data. Please refresh the page.",
+          variant: "destructive",
+        })
+      }
+    }
+
+    fetchStartupData()
+  }, [projectId])
 
   const handleSubmit = async (values: TractionMetricsValues) => {
     try {
       setIsSubmitting(true)
 
-      const userId = user.sub?.substring(14);
-            
-                  if (!userId) {
-                    toast({
-                      title: "Authentication error",
-                      description: "Please sign in again to continue.",
-                      variant: "destructive",
-                    })
-                    router.push("/login")
-                    return
-                  }
+      const userId = user?.sub?.substring(14)
+
+      if (!userId) {
+        toast({
+          title: "Authentication error",
+          description: "Please sign in again to continue.",
+          variant: "destructive",
+        })
+        router.push("/api/auth/login")
+        return
+      }
 
       // Update data in parent component if updateData is provided
       if (typeof updateData === "function") {
         updateData(values)
       }
 
-      // Prepare data for API submission
+      // Check if there are changes by comparing with original data
+      let hasChanges = false
+
+      if (originalTractionData) {
+        // Compare fields
+        if (
+          values.waitlistSignups !== originalTractionData.waitlistSignups?.toString() ||
+          values.strategicPartners !== originalTractionData.strategicPartners?.toString() ||
+          JSON.stringify(values.growthMetrics) !== JSON.stringify(originalTractionData.growthMetrics) ||
+          JSON.stringify(values.others) !== JSON.stringify(originalTractionData.others)
+        ) {
+          hasChanges = true
+        }
+      } else {
+        // If we don't have original data, assume changes were made
+        hasChanges = true
+      }
+
+      // If there are no changes and we have original data, we can skip submission
+      if (!hasChanges && originalTractionData) {
+        toast({
+          title: "No changes detected",
+          description: "Moving to the next step without submitting.",
+        })
+        router.push("/startup-setup/coreTeam")
+        return
+      }
+
+      // Prepare data for API submission - convert string values to numbers
       const apiData = {
         waitlistSignups: values.waitlistSignups || "",
         strategicPartners: values.strategicPartners || "",
-        githubStars: values.githubStars || "",
-        storageCapacity: values.storageCapacity || "",
-        nodeOperators: values.nodeOperators || "",
-        growthMetrics: values.growthMetrics || "",
+        growthMetrics: values.growthMetrics.map((metric) => ({
+          metricName: metric.metricName,
+          metricValue: metric.metricValue ? Number.parseInt(metric.metricValue) : 0,
+        })),
+        others: values.others.map((metric) => ({
+          metricName: metric.metricName,
+          metricValue: metric.metricValue ? Number.parseInt(metric.metricValue) : 0,
+        })),
       }
 
       // Send data to API
@@ -105,7 +307,7 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
       })
 
       // Route to next page
-      router.push("/coreTeam")
+      router.push("/startup-setup/coreTeam")
     } catch (error) {
       console.error("Error submitting form:", error)
       toast({
@@ -118,169 +320,253 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
     }
   }
 
+  const handleAddGrowthMetric = () => {
+    if (selectedGrowthMetric) {
+      // Check if this metric already exists
+      const exists = growthMetricFields.some((field) => field.metricName === selectedGrowthMetric)
+
+      if (!exists) {
+        appendGrowthMetric({
+          metricName: selectedGrowthMetric,
+          metricValue: "", // Initialize with empty string
+        })
+        setSelectedGrowthMetric("")
+      } else {
+        toast({
+          title: "Metric already added",
+          description: "This growth metric has already been added to the form.",
+          variant: "destructive",
+        })
+      }
+    }
+  }
+
+  const handleAddOtherMetric = () => {
+    if (selectedOtherMetric) {
+      // Check if this metric already exists
+      const exists = otherMetricFields.some((field) => field.metricName === selectedOtherMetric)
+
+      if (!exists) {
+        appendOtherMetric({
+          metricName: selectedOtherMetric,
+          metricValue: "", // Initialize with empty string
+        })
+        setSelectedOtherMetric("")
+      } else {
+        toast({
+          title: "Metric already added",
+          description: "This metric has already been added to the form.",
+          variant: "destructive",
+        })
+      }
+    }
+  }
+
   return (
     <div className="flex items-center justify-center mx-auto mt-4 py-4">
       <div className="w-full max-w-4xl">
-                      <div className="space-y-2 mb-6">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-400">Startup Setup</span>
-                              <span className="text-white font-medium">Step 2 of 5</span>
-                            </div>
-                            <Progress
-                              value={40}
-                              className="h-2 bg-gray-700"
-                              indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
-                            />
-                      </div>
-                    <div className="bg-gray-900 p-6 rounded-lg">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          <div className="space-y-4">
-            <p className="text-gray-400">
-              Share key metrics and traction indicators to demonstrate your project's progress and potential.
-            </p>
+        <div className="space-y-2 mb-6">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-400">Startup Setup</span>
+            <span className="text-white font-medium">Step 2 of 5</span>
+          </div>
+          <Progress
+            value={40}
+            className="h-2 bg-gray-700"
+            indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
+          />
+        </div>
+        <div className="bg-gray-900 p-6 rounded-lg">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+              <div className="space-y-4">
+                <p className="text-gray-400">
+                  Share key metrics and traction indicators to demonstrate your project's progress and potential.
+                </p>
 
-            <FormField
-              control={form.control}
-              name="waitlistSignups"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Waitlist Signups</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., 5000" className="bg-gray-800 border-gray-700 text-white" {...field} />
-                  </FormControl>
-                  <FormDescription className="text-gray-500">
-                    Number of users who have signed up for early access or updates
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <FormField
+                  control={form.control}
+                  name="waitlistSignups"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white">Waitlist Signups</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 5000" className="bg-gray-800 border-gray-700 text-white" {...field} />
+                      </FormControl>
+                      <FormDescription className="text-gray-500">
+                        Number of users who have signed up for early access or updates
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <FormField
-              control={form.control}
-              name="strategicPartners"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Strategic Partners</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., 12" className="bg-gray-800 border-gray-700 text-white" {...field} />
-                  </FormControl>
-                  <FormDescription className="text-gray-500">
-                    Count of strategic partnerships established
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <FormField
+                  control={form.control}
+                  name="strategicPartners"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white">Strategic Partners</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 12" className="bg-gray-800 border-gray-700 text-white" {...field} />
+                      </FormControl>
+                      <FormDescription className="text-gray-500">
+                        Count of strategic partnerships established
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <FormField
-              control={form.control}
-              name="githubStars"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">GitHub Stars</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., 250" className="bg-gray-800 border-gray-700 text-white" {...field} />
-                  </FormControl>
-                  <FormDescription className="text-gray-500">
-                    Number of stars on the project's GitHub repository
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="storageCapacity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Storage Capacity</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., 500 TB" className="bg-gray-800 border-gray-700 text-white" {...field} />
-                  </FormControl>
-                  <FormDescription className="text-gray-500">
-                    Total storage capacity committed for launch
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="nodeOperators"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Node Operators</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., 75" className="bg-gray-800 border-gray-700 text-white" {...field} />
-                  </FormControl>
-                  <FormDescription className="text-gray-500">Number of pre-registered node operators</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="growthMetrics"
-              render={({ field }) => (
-                <FormItem>
+                {/* Growth Metrics Dropdown */}
+                <div className="space-y-2">
                   <FormLabel className="text-white">Growth Metrics</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Describe growth in key areas such as social media, Discord, Telegram, etc."
-                      className="bg-gray-800 border-gray-700 text-white min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
+                  <div className="flex gap-2">
+                    <Select value={selectedGrowthMetric} onValueChange={setSelectedGrowthMetric}>
+                      <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                        <SelectValue placeholder="Select a metric" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                        {growthMetricOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      onClick={handleAddGrowthMetric}
+                      className="bg-black hover:bg-gray-900 text-white border border-gray-800"
+                      disabled={!selectedGrowthMetric}
+                    >
+                      Add
+                    </Button>
+                  </div>
                   <FormDescription className="text-gray-500">
-                    Percentage growth in key areas over a specified period
+                    Select growth metrics relevant to your startup
                   </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                </div>
 
-            <FormField
-              control={form.control}
-              name="additionalMetrics"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Additional Metrics</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Any other metrics or traction indicators..."
-                      className="bg-gray-800 border-gray-700 text-white min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
+                {/* Growth Metrics Fields - Only render if there are fields */}
+                {growthMetricFields.length > 0 &&
+                  growthMetricFields.map((field, index) => (
+                    <div key={field.id} className="flex items-end gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`growthMetrics.${index}.metricValue`}
+                        render={({ field: valueField }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel className="text-white">{field.metricName}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                className="bg-gray-800 border-gray-700 text-white"
+                                placeholder="Enter value"
+                                {...valueField}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeGrowthMetric(index)}
+                        className="mb-2"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                      <input
+                        type="hidden"
+                        {...form.register(`growthMetrics.${index}.metricName`)}
+                        value={field.metricName}
+                      />
+                    </div>
+                  ))}
+
+                {/* Other Metrics Dropdown */}
+                <div className="space-y-2">
+                  <FormLabel className="text-white">Other Metrics</FormLabel>
+                  <div className="flex gap-2">
+                    <Select value={selectedOtherMetric} onValueChange={setSelectedOtherMetric}>
+                      <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                        <SelectValue placeholder="Select a metric" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                        {otherMetricOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      onClick={handleAddOtherMetric}
+                      className="bg-black hover:bg-gray-900 text-white border border-gray-800"
+                      disabled={!selectedOtherMetric}
+                    >
+                      Add
+                    </Button>
+                  </div>
                   <FormDescription className="text-gray-500">
-                    Any other relevant metrics or traction indicators
+                    Select other metrics relevant to your startup
                   </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                </div>
 
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              className="bg-black hover:bg-gray-900 text-white border border-gray-800"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "Next"}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </div>
-    </div>
+                {/* Other Metrics Fields - Only render if there are fields */}
+                {otherMetricFields.length > 0 &&
+                  otherMetricFields.map((field, index) => (
+                    <div key={field.id} className="flex items-end gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`others.${index}.metricValue`}
+                        render={({ field: valueField }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel className="text-white">{field.metricName}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                className="bg-gray-800 border-gray-700 text-white"
+                                placeholder="Enter value"
+                                {...valueField}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeOtherMetric(index)}
+                        className="mb-2"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                      <input type="hidden" {...form.register(`others.${index}.metricName`)} value={field.metricName} />
+                    </div>
+                  ))}
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  className="bg-black hover:bg-gray-900 text-white border border-gray-800"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Next"}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </div>
     </div>
   )
 }
-

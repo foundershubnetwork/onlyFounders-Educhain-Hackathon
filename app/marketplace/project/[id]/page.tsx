@@ -46,11 +46,15 @@ import {
   Send,
   MessageCircle,
   Book,
-  VideoIcon
+  VideoIcon,
+  PencilIcon,
+  Trash,
 } from "lucide-react";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { headers } from "next/headers";
 
 interface TeamMember {
   name: string;
@@ -268,6 +272,77 @@ export default function ProjectDetailPage({
   const { toast } = useToast();
   const router = useRouter();
   const [daysRemaining, setDaysRemaining] = useState<number | null>();
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [updates, setUpdates] = useState<any[]>([]); // Define properly if updates have a structure
+  const [loadDeleteMember, setLoadDeleteMember] = useState(false);
+
+  useEffect(() => {
+    const fetchUpdates = async () => {
+      try {
+        if (!user || !projectId) return;
+        const userId = user?.sub?.substring(14);
+        const requestBody = { projectId };
+        console.log(requestBody);
+        const response = await axios.post(
+          "https://onlyfounders.azurewebsites.net/api/profile/get-updates",
+          requestBody,
+          {
+            headers: {
+              "Content-Type": "application/json", // ✅ Correct header
+              user_id: userId,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          const data = await response.data;
+          setUpdates(data.updates);
+        }
+      } catch (error) {
+        console.error("Error fetching project ID:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load project ID. Please refresh the page.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchUpdates();
+  }, [projectId]);
+
+  useEffect(() => {
+    const fetchProjectId = async () => {
+      try {
+        if (!user) return;
+        const userId = user?.sub?.substring(14);
+        const response = await fetch(
+          "https://onlyfounders.azurewebsites.net/api/startup/get-projectId",
+          {
+            method: "GET",
+            headers: {
+              user_id: userId,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          const data = await response.json();
+          setProjectId(data.projectId);
+        }
+      } catch (error) {
+        console.error("Error fetching project ID:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load project ID. Please refresh the page.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchProjectId();
+  }, [user]);
+
   useEffect(() => {
     const fetchStartupData = async () => {
       try {
@@ -302,8 +377,7 @@ export default function ProjectDetailPage({
     };
 
     fetchStartupData();
-  }, [params.id, router, toast, user]);
-
+  }, [params.id, router, toast, user, loadDeleteMember]);
 
   useEffect(() => {
     const fetchStartups = async () => {
@@ -366,16 +440,14 @@ export default function ProjectDetailPage({
         telegram: startupData.socialLinks?.telegram || "#",
         discord: startupData.socialLinks?.discord || "#",
         medium: startupData.socialLinks?.medium || "#",
-        whitepaper: startupData.whitepaper.file_url || "#",
+        whitepaper: startupData.whitepaper_Url || "#",
         demoVideo: startupData.pitchDemoVideo?.file_url,
 
         //traction
         waitlistSignups: startupData.traction.waitlistSignups,
         strategicPartners: startupData.traction.strategicPartners,
-        githubStars: startupData.traction.githubStars,
-        nodeOperators: startupData.traction.nodeOperators,
         growthMetrics: startupData.traction.growthMetrics,
-        storageCapacity: startupData.traction.storageCapacity,
+        others: startupData.traction.others,
 
         team:
           startupData.coreTeam?.map((member) => ({
@@ -387,6 +459,7 @@ export default function ProjectDetailPage({
               "/placeholder.svg?height=100&width=100",
             linkedin: member.socialLinks?.linkedin,
             twitter: member.socialLinks?.twitter,
+            _id: member._id,
           })) || [],
         roadmap:
           startupData.roadmap?.map((item) => ({
@@ -400,40 +473,40 @@ export default function ProjectDetailPage({
               tokenName: startupData.tokenomics.tokenName,
               symbol: startupData.tokenomics.symbol,
               totalSupply:
-          startupData.tokenomics.totalSupply?.toLocaleString() || "0",
+                startupData.tokenomics.totalSupply?.toLocaleString() || "0",
               distribution: [
-          {
-            category: "Public Sale",
-            percentage:
-              startupData.tokenomics.tokenDistribution?.publicSale || 0,
-          },
-          {
-            category: "Team & Advisors",
-            percentage:
-              startupData.tokenomics.tokenDistribution?.teamAdvisors || 0,
-          },
-          {
-            category: "Foundation",
-            percentage:
-              startupData.tokenomics.tokenDistribution?.foundation || 0,
-          },
-          {
-            category: "Ecosystem Growth",
-            percentage:
-              startupData.tokenomics.tokenDistribution?.ecosystemGrowth ||
-              0,
-          },
-          {
-            category: "Strategic Partners",
-            percentage:
-              startupData.tokenomics.tokenDistribution
-                ?.strategicPartners || 0,
-          },
-          {
-            category: "Others",
-            percentage:
-              startupData.tokenomics.tokenDistribution?.others || 0,
-          },
+                {
+                  category: "Public Sale",
+                  percentage:
+                    startupData.tokenomics.tokenDistribution?.publicSale || 0,
+                },
+                {
+                  category: "Team & Advisors",
+                  percentage:
+                    startupData.tokenomics.tokenDistribution?.teamAdvisors || 0,
+                },
+                {
+                  category: "Foundation",
+                  percentage:
+                    startupData.tokenomics.tokenDistribution?.foundation || 0,
+                },
+                {
+                  category: "Ecosystem Growth",
+                  percentage:
+                    startupData.tokenomics.tokenDistribution?.ecosystemGrowth ||
+                    0,
+                },
+                {
+                  category: "Strategic Partners",
+                  percentage:
+                    startupData.tokenomics.tokenDistribution
+                      ?.strategicPartners || 0,
+                },
+                {
+                  category: "Others",
+                  percentage:
+                    startupData.tokenomics.tokenDistribution?.others || 0,
+                },
               ].filter((item) => item.percentage > 0),
             }
           : {
@@ -501,13 +574,74 @@ export default function ProjectDetailPage({
         milestones: [],
       };
 
+  const handleDeleteMember = async (memberId) => {
+    try {
+      setLoadDeleteMember(true);
+      if (!user || !projectId) return;
+      const userId = user?.sub?.substring(14);
+      const requestBody = { startupId: projectId, teamMemberId: memberId };
+      console.log(JSON.stringify(requestBody));
+
+      const response = await axios.delete(
+        "https://onlyfounders.azurewebsites.net/api/startup/delete-teamMember",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            user_id: userId,
+          },
+          data: requestBody,
+        }
+      );
+
+      if (response.status === 200) {
+        toast({
+          title: "Success",
+          description: "Team member deleted successfully.",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting team member:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete team member.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadDeleteMember(false);
+    }
+  };
+
+  const handleMilestoneComplete = async (roadmapId, index) => {
+    try {
+      if (!user || !projectId) return;
+      const userId = user?.sub?.substring(14);
+      const requestBody = { startupId: projectId, teamMemberId: memberId };
+      console.log(JSON.stringify(requestBody));
+
+      const response = await axios.delete(
+        "https://onlyfounders.azurewebsites.net/startup/delete-teamMember",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            user_id: userId,
+          },
+          data: requestBody,
+        }
+      );
+    } catch (error) {
+      console.error("Error deleting team member:", error);
+    } finally {
+    }
+  };
+
   const handleInvest = (amount: number) => {
     console.log(`Investing ${amount} USDC in ${project.title}`);
     setShowInvestDialog(false);
     // Here you would typically handle the investment process
   };
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -520,18 +654,28 @@ export default function ProjectDetailPage({
 
   return (
     <div className="space-y-8 p-10">
-      <div className="flex items-center gap-2">
-        <Button
-          asChild
-          variant="ghost"
-          size="icon"
-          className="text-gray-400 hover:text-white"
-        >
-          <Link href="/marketplace">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <span className="text-gray-400">Back to Marketplace</span>
+      <div className="flex items-center justify-between gap-2">
+        <button className="text-sm rounded-md bg-gradient-to-br from-blue-600 to-purple-600 text-white px-3 py-2">
+          <a href="/marketplace" className="flex items-center gap-2">
+            <ArrowLeft />
+            Back to MarketPlace
+          </a>
+        </button>
+
+        <div>
+          {projectId === params.id && (
+            <button className="text-sm rounded-md bg-gradient-to-br from-blue-600 to-purple-600 text-white px-3 py-2">
+              {" "}
+              <a
+                href="/startup-setup/basicInfo"
+                className="flex items-center gap-2"
+                target="_blank"
+              >
+                <PencilIcon /> Edit Startup
+              </a>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="relative rounded-xl overflow-hidden h-[200px] md:h-[300px]">
@@ -718,7 +862,7 @@ export default function ProjectDetailPage({
                           <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
                         </a>
                       </Button>
-                     
+
                       <Button
                         asChild
                         variant="outline"
@@ -745,7 +889,7 @@ export default function ProjectDetailPage({
                           rel="noopener noreferrer"
                         >
                           <VideoIcon className="mr-2 h-4 w-4 text-blue-500" />
-                          Demo Video 
+                          Demo Video
                           <ExternalLink className="ml-auto h-4 w-4 text-gray-500" />
                         </a>
                       </Button>
@@ -764,38 +908,56 @@ export default function ProjectDetailPage({
                   <div className="space-y-4 ">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
-                        <Users className="text-blue-400" size={28}/>
-                        <p className="text-gray-400 text-lg">Waitlist Signups</p>
-                        <span className="text-3xl font-bold">{project.waitlistSignups}</span>
+                        <Users className="text-blue-400" size={28} />
+                        <p className="text-gray-400 text-lg">
+                          Waitlist Signups
+                        </p>
+                        <span className="text-3xl font-bold">
+                          {project.waitlistSignups}
+                        </span>
                       </div>
                       <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
-                      <Globe className="text-violet-500" size={28}/>
-                      <p className="text-gray-400 text-lg">Strategic Partners</p>
-                      <span className="text-3xl font-bold">{project.strategicPartners}</span>
+                        <Globe className="text-violet-500" size={28} />
+                        <p className="text-gray-400 text-lg">
+                          Strategic Partners
+                        </p>
+                        <span className="text-3xl font-bold">
+                          {project.strategicPartners}
+                        </span>
                       </div>
-                      <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
-                      <Github className="text-green-400" size={28}/>
-                      <p className="text-gray-400 text-lg">Github Stars</p>
-                      <span className="text-3xl font-bold">{project.githubStars}</span>
-                      </div>
+                      {/* <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
+                        <Github className="text-green-400" size={28} />
+                        <p className="text-gray-400 text-lg">Github Stars</p>
+                        <span className="text-3xl font-bold">
+                          {project.githubStars}
+                        </span>
+                      </div> */}
                     </div>
 
-                    <CardTitle className="text-xl">Additional Metrics</CardTitle>
+                    <CardTitle className="text-xl">
+                      Additional Metrics
+                    </CardTitle>
                     <div className="flex flex-col gap-1">
-                      <div className="flex items-center justify-between">
-                        <p className="text-gray-400">Storage Capacity</p>
-                        <span>{project.storageCapacity}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <p className="text-gray-400">Node Operators</p>
-                        <span>{project.nodeOperators}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <p className="text-gray-400">Growth Metrics</p>
-                        <span>{project.growthMetrics}</span>
-                      </div>
-                    </div>
+                      {project.growthMetrics?.map((metric, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between"
+                        >
+                          <p className="text-gray-400">{metric.metricName}</p>
+                          <span>{metric.metricValue}</span>
+                        </div>
+                      ))}
 
+                      {project.others?.map((metric, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between"
+                        >
+                          <p className="text-gray-400">{metric.metricName}</p>
+                          <span>{metric.metricValue}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -828,8 +990,14 @@ export default function ProjectDetailPage({
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <h3 className="text-lg font-medium text-white">
+                          <h3 className="flex items-center justify-between gap-40 text-lg font-medium text-white">
                             {member.name}
+                            <button
+                              onClick={() => handleDeleteMember(member._id)}
+                              className="hover:bg-gray-700 rounded-md p-2 transition-all duration-300 cursor-pointer"
+                            >
+                              <Trash width={18} />
+                            </button>
                           </h3>
                           <div className="text-sm text-blue-400 mb-2">
                             {member.role}
@@ -912,24 +1080,39 @@ export default function ProjectDetailPage({
                           <div className="flex-1">
                             <h3 className="flex items-center justify-between text-lg font-medium text-white">
                               <span>{milestone.title}</span>
-                              <div className="">
-                                {milestone.completedStatus === 'Incomplete' ? (
+                              <div className="flex flex-col justify-end text-center gap-2">
+                                {milestone.completedStatus === "Incomplete" ? (
                                   <Badge className="bg-red-500">
                                     Incomplete
                                   </Badge>
-                                ):(<Badge className="bg-green-500">Complete</Badge>)}
-                            </div>
+                                ) : (
+                                  <Badge className="bg-green-500">
+                                    Complete
+                                  </Badge>
+                                )}
+                                {milestone.completedStatus === "Incomplete" && (
+                                  <button
+                                    onClick={() =>
+                                      handleMilestoneComplete(
+                                        milestone._id,
+                                        index
+                                      )
+                                    }
+                                    className="bg-gray-700 text-xs px-2 py-1 rounded-full hover:bg-gray-600 transition-all duration-300"
+                                  >
+                                    Mark as complete
+                                  </button>
+                                )}
+                              </div>
                             </h3>
                             {milestone.description.map((item, index) => (
                               <div className="flex items-center gap-1">
-                                <Check className="mt-1 text-green-500"/>
+                                <Check className="mt-1 text-green-500" />
                                 <p key={index} className="text-gray-300 mt-1">
-                                {item}
+                                  {item}
                                 </p>
                               </div>
                             ))}
-                            
-                            
                           </div>
                         </div>
                       </div>
@@ -983,26 +1166,26 @@ export default function ProjectDetailPage({
                           </div>
                         </div>
                       </div>
-                      
+
                       <div>
-                      <h3 className="text-lg font-medium text-white mb-4">
-                        Token Distribution
-                      </h3>
-                      <div className="space-y-4">
-                        {project.tokenomics.distribution.map((item) => (
-                          <div key={item.category} className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-gray-300">
-                                {item.category}
-                              </span>
-                              <span className="text-white font-medium">
-                                {item.percentage}%
-                              </span>
-                            </div>
-                            <Progress
-                              value={item.percentage}
-                              className="h-2 bg-gray-800"
-                              indicatorClassName={`
+                        <h3 className="text-lg font-medium text-white mb-4">
+                          Token Distribution
+                        </h3>
+                        <div className="space-y-4">
+                          {project.tokenomics.distribution.map((item) => (
+                            <div key={item.category} className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">
+                                  {item.category}
+                                </span>
+                                <span className="text-white font-medium">
+                                  {item.percentage}%
+                                </span>
+                              </div>
+                              <Progress
+                                value={item.percentage}
+                                className="h-2 bg-gray-800"
+                                indicatorClassName={`
                                 ${
                                   item.category === "Public Sale"
                                     ? "bg-blue-600"
@@ -1017,43 +1200,40 @@ export default function ProjectDetailPage({
                                     : "bg-cyan-600"
                                 }
                               `}
-                            />
-                          </div>
-                        ))}
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
-
+                    {/* token utility */}
+                    <div>
+                      <h3 className="text-lg font-medium text-white mb-2">
+                        Token Usecases
+                      </h3>
+                      <ul className="space-y-2">
+                        <li className="flex items-start text-gray-300">
+                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                          <span>Governance rights for protocol decisions</span>
+                        </li>
+                        <li className="flex items-start text-gray-300">
+                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                          <span>Fee discounts for transactions</span>
+                        </li>
+                        <li className="flex items-start text-gray-300">
+                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                          <span>Staking rewards and yield farming</span>
+                        </li>
+                        <li className="flex items-start text-gray-300">
+                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                          <span>Access to premium features</span>
+                        </li>
+                        <li className="flex items-start text-gray-300">
+                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                          <span>Revenue sharing for token holders</span>
+                        </li>
+                      </ul>
                     </div>
-                     {/* token utility */}
-                     <div>
-                        <h3 className="text-lg font-medium text-white mb-2">
-                          Token Usecases
-                        </h3>
-                        <ul className="space-y-2">
-                          <li className="flex items-start text-gray-300">
-                            <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                            <span>
-                              Governance rights for protocol decisions
-                            </span>
-                          </li>
-                          <li className="flex items-start text-gray-300">
-                            <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                            <span>Fee discounts for transactions</span>
-                          </li>
-                          <li className="flex items-start text-gray-300">
-                            <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                            <span>Staking rewards and yield farming</span>
-                          </li>
-                          <li className="flex items-start text-gray-300">
-                            <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                            <span>Access to premium features</span>
-                          </li>
-                          <li className="flex items-start text-gray-300">
-                            <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                            <span>Revenue sharing for token holders</span>
-                          </li>
-                        </ul>
-                      </div>
                   </div>
 
                   <div className="relative h-64 w-full rounded-lg overflow-hidden">
@@ -1080,18 +1260,18 @@ export default function ProjectDetailPage({
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {project.updates.map((update, index) => (
+                    {updates.map((update, index) => (
                       <div key={index} className="space-y-4">
                         <div className="flex items-center justify-between">
                           <h3 className="text-lg font-medium text-white">
-                            {update.title}
+                            {update.title} <Badge>{update.updateType}</Badge>
                           </h3>
                           <Badge
                             variant="outline"
                             className="bg-gray-800/50 text-gray-300 border-gray-700"
                           >
                             <Calendar className="mr-1 h-3 w-3" />
-                            {update.date}
+                            {update.createdAt}
                           </Badge>
                         </div>
 
@@ -1100,16 +1280,19 @@ export default function ProjectDetailPage({
                             <p className="text-gray-300">{update.content}</p>
                           </div>
                           <div className="relative h-40 rounded-lg overflow-hidden">
+                            {/* {updates?.attachments?.map((attachment, index) => (
                             <Image
-                              src={update.image || "/placeholder.svg"}
-                              alt={update.title}
-                              fill
-                              className="object-cover"
-                            />
+                            key={index}
+                            src={attachment.file_url || "/placeholder.svg"}
+                            alt={attachment.file_name}
+                            fill
+                            className="object-cover"
+                          />
+                          ))}   */}
                           </div>
                         </div>
 
-                        {index < project.updates.length - 1 && (
+                        {index < updates.length - 1 && (
                           <Separator className="bg-gray-800" />
                         )}
                       </div>
@@ -1259,9 +1442,11 @@ export default function ProjectDetailPage({
                       <Shield className="h-5 w-5 text-green-500 mr-2" />
                       <span className="text-gray-300">KYC Verified</span>
                     </div>
-                    {project.verifiedStatus === "Unverified" ? <Badge className="bg-red-600">Not Verified</Badge> :  
+                    {project.verifiedStatus === "Unverified" ? (
+                      <Badge className="bg-red-600">Not Verified</Badge>
+                    ) : (
                       <Badge className="bg-green-600">Passed</Badge>
-                    }
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 border border-gray-800">
@@ -1281,7 +1466,7 @@ export default function ProjectDetailPage({
                     </div>
                     <Badge className="bg-amber-600">coming Soon</Badge>
                   </div>
-                </div>  
+                </div>
 
                 <div className="p-4 rounded-lg bg-blue-900/20 border border-blue-800">
                   <div className="flex items-start">

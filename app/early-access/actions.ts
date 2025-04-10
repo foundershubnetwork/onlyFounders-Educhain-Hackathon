@@ -7,6 +7,7 @@ type FormData = {
   name: string;
   email: string;
   xHandle: string;
+  telegram: string;
   founderType: string;
   walletAddress: string;
   role: "Founder" | "Investor";
@@ -51,9 +52,18 @@ function createAdminEmailTemplate(data: FormData) {
       <div class="content">
         <div class="field"><span class="label">Name:</span> ${data.name}</div>
         <div class="field"><span class="label">Email:</span> ${data.email}</div>
-        <div class="field"><span class="label">X Handle:</span> ${data.xHandle || "Not provided"}</div>
-        <div class="field"><span class="label">Founder Type:</span> ${data.founderType}</div>
-        <div class="field"><span class="label">Wallet Address:</span> ${data.walletAddress || "Not provided"}</div>
+        <div class="field"><span class="label">X Handle:</span> ${
+          data.xHandle || "Not provided"
+        }</div>
+        <div class="field"><span class="label">Telegram:</span> ${
+          data.telegram
+        }</div>
+        <div class="field"><span class="label">Founder Type:</span> ${
+          data.founderType
+        }</div>
+        <div class="field"><span class="label">Wallet Address:</span> ${
+          data.walletAddress || "Not provided"
+        }</div>
       </div>
     </body>
     </html>
@@ -173,32 +183,32 @@ function createFounderEmailTemplate(data: FormData) {
                       <tr>
                         <!-- Twitter/X -->
                         <td style="padding: 0 10px;">
-                          <a href="https://x.com/onlyfoundersxyz" style="text-decoration: none;">
-                            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/x-social-media-logo-icon%20%281%29-ATY5Ci79tEPBrkuKkYqYhfsCtUyrW4.svg" alt="Twitter/X" width="45" height="45" style="display: block; border: 0;">
+                          <a href="https://x.com/fhubnetwork" style="text-decoration: none;">
+                            <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/XLogo.png" alt="Twitter/X" width="45" height="45" style="display: block; border: 0;">
                           </a>
                         </td>
                         <!-- LinkedIn -->
                         <td style="padding: 0 10px;">
-                          <a href="#" style="text-decoration: none;">
-                            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/linkedin-app-icon%20%281%29-vtKyCgIfLm8tQU7PVcCqFgGRNKOIzb.svg" alt="LinkedIn" width="45" height="45" style="display: block; border: 0;">
+                          <a href="https://www.linkedin.com/company/foundershubnetwork" style="text-decoration: none;">
+                            <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/linkedin.png" alt="LinkedIn" width="45" height="45" style="display: block; border: 0;">
                           </a>
                         </td>
                         <!-- GitHub -->
                         <td style="padding: 0 10px;">
-                          <a href="#" style="text-decoration: none;">
-                            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/linkedin-app-icon%20%281%29-1-InwOHhSKdWHpLzWVO6RC6XfZPNXT6o.svg" alt="GitHub" width="45" height="45" style="display: block; border: 0;">
+                          <a href="https://github.com/foundershubnetwork" style="text-decoration: none;">
+                            <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/Github.png" alt="GitHub" width="45" height="45" style="display: block; border: 0;">
                           </a>
                         </td>
                         <!-- Telegram -->
                         <td style="padding: 0 10px;">
-                          <a href="https://t.me/onlyfoundersxyz" style="text-decoration: none;">
-                            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/linkedin-app-icon%20%281%29-2-34HjSKOKh6zJmvXgDd28jBfHnDG0gY.svg" alt="Telegram" width="45" height="45" style="display: block; border: 0;">
+                          <a href="https://t.me/+GOCceqwNzhs4YjM9" style="text-decoration: none;">
+                            <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/Telegram.png" alt="Telegram" width="45" height="45" style="display: block; border: 0;">
                           </a>
                         </td>
-                        <!-- Medium -->
+                        <!-- Gitbook -->
                         <td style="padding: 0 10px;">
-                          <a href="#" style="text-decoration: none;">
-                            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/linkedin-app-icon%20%281%29-3-kPfXDvP7jR5Z7um2A64teAPZB6Bkqj.svg" alt="Medium" width="45" height="45" style="display: block; border: 0;">
+                          <a href="https://founders-hub-network.gitbook.io/founders-hub-network-f3ai" style="text-decoration: none;">
+                            <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/Gitbook.png" alt="Gitbook" width="45" height="45" style="display: block; border: 0;">
                           </a>
                         </td>
                       </tr>
@@ -334,31 +344,37 @@ function createInvestorEmailTemplate(data: FormData) {
               <!-- Social Media -->
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 30px;">
                 <tr>
-                  <td align="center">
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
-                      <tr>
+                        <!-- Twitter/X -->
+                        <td style="padding: 0 10px;">
+                          <a href="https://x.com/fhubnetwork" style="text-decoration: none;">
+                            <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/XLogo.png" alt="Twitter/X" width="45" height="45" style="display: block; border: 0;">
+                          </a>
+                        </td>
                         <!-- LinkedIn -->
                         <td style="padding: 0 10px;">
-                          <a href="#" style="text-decoration: none;">
-                            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/linkedin-app-icon%20%281%29-vtKyCgIfLm8tQU7PVcCqFgGRNKOIzb.svg" alt="LinkedIn" width="45" height="45" style="display: block; border: 0;">
+                          <a href="https://www.linkedin.com/company/foundershubnetwork" style="text-decoration: none;">
+                            <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/linkedin.png" alt="LinkedIn" width="45" height="45" style="display: block; border: 0;">
                           </a>
                         </td>
                         <!-- GitHub -->
                         <td style="padding: 0 10px;">
-                          <a href="#" style="text-decoration: none;">
-                            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/linkedin-app-icon%20%281%29-1-InwOHhSKdWHpLzWVO6RC6XfZPNXT6o.svg" alt="GitHub" width="45" height="45" style="display: block; border: 0;">
+                          <a href="https://github.com/foundershubnetwork" style="text-decoration: none;">
+                            <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/Github.png" alt="GitHub" width="45" height="45" style="display: block; border: 0;">
                           </a>
                         </td>
-                        <!-- Medium -->
+                        <!-- Telegram -->
                         <td style="padding: 0 10px;">
-                          <a href="#" style="text-decoration: none;">
-                            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/linkedin-app-icon%20%281%29-3-kPfXDvP7jR5Z7um2A64teAPZB6Bkqj.svg" alt="Medium" width="45" height="45" style="display: block; border: 0;">
+                          <a href="https://t.me/+GOCceqwNzhs4YjM9" style="text-decoration: none;">
+                            <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/Telegram.png" alt="Telegram" width="45" height="45" style="display: block; border: 0;">
+                          </a>
+                        </td>
+                        <!-- Gitbook -->
+                        <td style="padding: 0 10px;">
+                          <a href="https://founders-hub-network.gitbook.io/founders-hub-network-f3ai" style="text-decoration: none;">
+                            <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/Gitbook.png" alt="Gitbook" width="45" height="45" style="display: block; border: 0;">
                           </a>
                         </td>
                       </tr>
-                    </table>
-                  </td>
-                </tr>
               </table>
 
               <!-- Footer -->
@@ -405,13 +421,18 @@ export async function sendConfirmationEmail(data: FormData) {
   return await sendEmail(
     data,
     data.email.trim(),
-    `Welcome to OnlyFounders - ${data.role} Access`,
+    `Welcome to OnlyFounders - ${data.founderType} Access`,
     emailContent
   );
 }
 
 // Generic Email Sending Function
-async function sendEmail(data: FormData, recipient: string, subject: string, htmlContent: string) {
+async function sendEmail(
+  data: FormData,
+  recipient: string,
+  subject: string,
+  htmlContent: string
+) {
   try {
     const connectionString = process.env.AZURE_COMMUNICATION_CONNECTION_STRING;
     const senderEmail = process.env.SENDER_ADDRESS;

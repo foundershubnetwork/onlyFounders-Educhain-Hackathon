@@ -10,7 +10,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Camera, Linkedin, Twitter } from "lucide-react"
+import { ArrowLeft, ArrowRight, Camera, Linkedin, Twitter } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { useUser } from "@auth0/nextjs-auth0/client"
@@ -436,7 +436,8 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
             </div>
 
             <div className="flex justify-between pt-4 border-t border-gray-800">
-              <div></div>
+              <a href="/startup-setup/tractionMetrics" className="px-3 py-1.5 rounded-md bg-black hover:bg-gray-900 transition-all duration-200 border border-gray-800 text-white flex items-center gap-1"
+              ><ArrowLeft className="h-4 w-4"/> Back </a>
               <Button
                 type="button"
                 onClick={handleNext}

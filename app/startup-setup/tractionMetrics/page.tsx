@@ -8,7 +8,7 @@ import * as z from "zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, X } from "lucide-react"
+import { ArrowLeft, ArrowRight, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { Progress } from "@/components/ui/progress"
@@ -553,7 +553,9 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
                   ))}
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-between items-center">
+                <a href="/startup-setup/basicInfo" className="px-3 py-1.5 rounded-md bg-black hover:bg-gray-900 transition-all duration-200 border border-gray-800 text-white flex items-center gap-1"
+                ><ArrowLeft className="h-4 w-4"/> Back </a>
                 <Button
                   type="submit"
                   className="bg-black hover:bg-gray-900 text-white border border-gray-800"

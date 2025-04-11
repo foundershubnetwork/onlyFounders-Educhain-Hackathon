@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, CheckCircle, Rocket } from "lucide-react"
+import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, CheckCircle, Rocket, Heart } from "lucide-react"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import {useToast} from '../../hooks/use-toast'
 
@@ -351,11 +351,13 @@ export default function MarketplacePage() {
                           />
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex justify-between items-center gap-2">
+                            <div className="flex items-center gap-2">
                             <CardTitle className="text-xl text-white">{startup.startupName}</CardTitle>
                             {startup.verifiedStatus === "Verified" && (
                               <CheckCircle className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                            )}
+                            )}</div>
+                            <Heart className="h-8 w-8 bg-slate-800 p-2 rounded-full hover:bg-slate-700 transition-all duration-200 cursor-pointer flex-shrink-0" />
                           </div>
                           <CardDescription className="text-gray-400">{startup.tagline}</CardDescription>
                         </div>
@@ -382,7 +384,7 @@ export default function MarketplacePage() {
                           <div className="text-white font-medium">{startup.founderName}</div>
                         </div>
                         <div className="space-y-1">
-                          <div className="text-sm text-gray-400">Platform</div>
+                          <div className="text-sm text-gray-400">Blockchain</div>
                           <div className="text-white font-medium">{startup.blockchainPlatform}</div>
                         </div>
                         <div className="space-y-1">
@@ -525,16 +527,18 @@ export default function MarketplacePage() {
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <CardTitle className="text-lg text-white">{startup.startupName}</CardTitle>
-                              {startup.verifiedStatus === "Verified" && (
-                                <CheckCircle className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
                               <Badge className="bg-purple-600 text-xs">{startup.startupStage}</Badge>
                               <Badge variant="outline" className="bg-gray-800/50 text-xs text-gray-300 border-gray-700">
                                 {startup.category}
                               </Badge>
+                            </div>
+                            <div className="flex justify-between items-center gap-2">
+                              <div className="flex items-center gap-2">
+                              <CardTitle className="text-lg text-white">{startup.startupName}</CardTitle>
+                              {startup.verifiedStatus === "Verified" && (
+                                <CheckCircle className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                              )}</div>
+                              <Heart className="h-8 w-8 bg-slate-800 p-2 rounded-full hover:bg-slate-700 transition-all duration-200 cursor-pointer flex-shrink-0" />
                             </div>
                           </div>
                         </div>

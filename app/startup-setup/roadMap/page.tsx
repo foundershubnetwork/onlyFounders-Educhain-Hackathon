@@ -8,7 +8,7 @@ import * as z from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Check, Plus, Trash } from "lucide-react"
+import { ArrowLeft, ArrowRight, Check, Plus, Trash } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -539,7 +539,8 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
             </div>
 
             <div className="flex justify-between pt-4 border-t border-gray-800">
-              <div></div>
+              <a href="/startup-setup/coreTeam" className="px-3 py-1.5 rounded-md bg-black hover:bg-gray-900 transition-all duration-200 border border-gray-800 text-white flex items-center gap-1"
+              ><ArrowLeft className="h-4 w-4"/> Back </a>
               <Button
                 type="button"
                 onClick={handleNext}

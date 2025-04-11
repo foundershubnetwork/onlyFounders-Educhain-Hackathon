@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Camera, Globe, Github, Twitter } from "lucide-react"
+import { ArrowRight, Camera, Globe, Github, Twitter, ArrowLeft, Cross } from "lucide-react"
+import { TbCancel } from "react-icons/tb";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/hooks/use-toast"
@@ -977,7 +978,9 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                 </div>
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-between items-center">
+                <a href="/marketplace" className="px-3 py-1.5 rounded-md bg-black hover:bg-gray-900 transition-all duration-200 border border-gray-800 text-white flex items-center gap-1"
+                >Cancel <TbCancel className="h-4 w-4"/></a>
                 <Button
                   type="submit"
                   className="bg-black hover:bg-gray-900 text-white border border-gray-800"

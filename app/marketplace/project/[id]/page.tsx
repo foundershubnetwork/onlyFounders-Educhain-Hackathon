@@ -49,12 +49,15 @@ import {
   VideoIcon,
   PencilIcon,
   Trash,
+  Heart,
 } from "lucide-react";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { headers } from "next/headers";
+import dynamic from "next/dynamic";
+import { FaPeopleGroup } from "react-icons/fa6";
 
 interface TeamMember {
   name: string;
@@ -283,7 +286,9 @@ export default function ProjectDetailPage({
   const [projectId, setProjectId] = useState<string | null>(null);
   const [updates, setUpdates] = useState<any[]>([]); // Define properly if updates have a structure
   const [loadDeleteMember, setLoadDeleteMember] = useState(false);
-
+  const TokenomicsPieChart = dynamic(() => import("./TokenomicsPieChart"), {
+    ssr: false,
+  });
 
   //api to fetch updates
   useEffect(() => {
@@ -700,6 +705,7 @@ export default function ProjectDetailPage({
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+        <div className="absolute flex items-center gap-3 top-5 right-5 cursor-pointer hover:bg-slate-700 transition-all duration-200 bg-slate-800 px-3 py-1.5 rounded-md"><Heart/> Upvote</div>
         <div className="absolute bottom-0 left-0 p-6 flex items-end gap-4">
           <div className="h-20 w-20 rounded-xl overflow-hidden relative bg-gray-800 border-4 border-gray-800">
             <Image
@@ -724,21 +730,31 @@ export default function ProjectDetailPage({
             </div>
             <h1 className="text-3xl font-bold text-white">{project.title}</h1>
             <p className="text-gray-300 mt-1">{project.tagline}</p>
-            <p className="text-gray-300 mt-1"> Founder: 
-             <a href={`/public-profile/${project.id}`} target="_blank" className="text-blue-600"> {project.founderName}</a>
+            <p className="text-gray-300 mt-1">
+              {" "}
+              Founder:
+              <a
+                href={`/public-profile/${project.id}`}
+                target="_blank"
+                className="text-blue-600"
+              >
+                {" "}
+                {project.founderName}
+              </a>
             </p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
+        <div className="items-center lg:col-span-2">
           <Tabs
             defaultValue="overview"
             value={activeTab}
             onValueChange={setActiveTab}
             className="space-y-6"
           >
+            <div className="flex justify-center md:justify-start items-center md:items-start">
             <TabsList className="bg-gray-900 border border-gray-800 p-1">
               <TabsTrigger
                 value="overview"
@@ -771,6 +787,7 @@ export default function ProjectDetailPage({
                 Updates
               </TabsTrigger>
             </TabsList>
+            </div>
 
             <TabsContent value="overview" className="space-y-6">
               <Card className="bg-gray-900 border-gray-800">
@@ -942,13 +959,13 @@ export default function ProjectDetailPage({
                           {project.strategicPartners}
                         </span>
                       </div>
-                      {/* <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
-                        <Github className="text-green-400" size={28} />
-                        <p className="text-gray-400 text-lg">Github Stars</p>
+                      <div className="flex flex-col justify-center items-center gap-1 bg-slate-800 rounded-md border border-gray-700 p-5">
+                        <FaPeopleGroup className="text-green-400" size={28} />
+                        <p className="text-gray-400 text-lg">Community Size</p>
                         <span className="text-3xl font-bold">
-                          {project.githubStars}
+                          --
                         </span>
-                      </div> */}
+                      </div>
                     </div>
 
                     <CardTitle className="text-xl">
@@ -1007,15 +1024,20 @@ export default function ProjectDetailPage({
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <h3 className="flex items-center justify-between gap-40 text-lg font-medium text-white">
-                            {member.name}
-                            <button
-                              onClick={() => handleDeleteMember(member._id)}
-                              className="hover:bg-gray-700 rounded-md p-2 transition-all duration-300 cursor-pointer"
-                            >
-                              <Trash width={18} />
-                            </button>
-                          </h3>
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="text-lg font-medium text-white">
+                              {member.name}
+                              
+                            </h3>
+                              {projectId === params.id && (
+                                <button
+                                  onClick={() => handleDeleteMember(member._id)}
+                                  className="hover:bg-gray-700 rounded-md p-2 transition-all duration-300 cursor-pointer"
+                                >
+                                  <Trash width={18} />
+                                </button>
+                              )}
+                          </div>
                           <div className="text-sm text-blue-400 mb-2">
                             {member.role}
                           </div>
@@ -1160,7 +1182,7 @@ export default function ProjectDetailPage({
                         </div>
                       </div>
 
-                      <div>
+                      <div className="mt-10">
                         <h3 className="text-lg font-medium text-white mb-4">
                           Token Distribution
                         </h3>
@@ -1178,21 +1200,21 @@ export default function ProjectDetailPage({
                               <Progress
                                 value={item.percentage}
                                 className="h-2 bg-gray-800"
-                                indicatorClassName={`
-                                ${
-                                  item.category === "Public Sale"
-                                    ? "bg-blue-600"
-                                    : item.category === "Team & Advisors"
-                                    ? "bg-purple-600"
-                                    : item.category === "Treasury"
-                                    ? "bg-amber-600"
-                                    : item.category === "Treasury"
-                                    ? "bg-amber-600"
-                                    : item.category === "Ecosystem Growth"
-                                    ? "bg-green-600"
-                                    : "bg-cyan-600"
-                                }
-                              `}
+                                indicatorClassName={` 
+                                    ${
+                                      item.category === "Public Sale"
+                                        ? "bg-blue-600"
+                                        : item.category === "Team & Advisors"
+                                        ? "bg-purple-600"
+                                        : item.category === "Foundation"
+                                        ? "bg-amber-600"
+                                        : item.category === "Ecosystem Growth"
+                                        ? "bg-green-600"
+                                        : item.category === "Strategic Partners"
+                                        ? "bg-cyan-600"
+                                        : "bg-rose-600"
+                                    }
+                                  `}
                               />
                             </div>
                           ))}
@@ -1226,16 +1248,10 @@ export default function ProjectDetailPage({
                           <span>Revenue sharing for token holders</span>
                         </li>
                       </ul>
+                      <TokenomicsPieChart
+                        data={project.tokenomics.distribution}
+                      />
                     </div>
-                  </div>
-
-                  <div className="relative h-64 w-full rounded-lg overflow-hidden">
-                    <Image
-                      src="/placeholder.svg?height=300&width=800"
-                      alt="Token distribution chart"
-                      fill
-                      className="object-cover"
-                    />
                   </div>
                 </CardContent>
               </Card>
@@ -1399,7 +1415,7 @@ export default function ProjectDetailPage({
                   ) : (
                     <>
                       <Bookmark className="mr-2 h-4 w-4" />
-                      Bookmark
+                      Add to Watchlist
                     </>
                   )}
                 </Button>

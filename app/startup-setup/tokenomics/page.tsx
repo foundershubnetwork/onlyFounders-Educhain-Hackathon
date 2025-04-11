@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Plus, Trash } from "lucide-react"
+import { ArrowLeft, ArrowRight, Plus, Trash } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import { useUser } from "@auth0/nextjs-auth0/client"
@@ -689,7 +689,9 @@ export default function TokenomicsForm({ data, updateData, onSubmit }: Tokenomic
                 </div>
               </div>
 
-              <div className="flex justify-end pt-6 mt-6 border-t border-gray-800">
+              <div className="flex justify-between pt-6 mt-6 border-t border-gray-800">
+                <a href="/startup-setup/roadMap" className="px-3 py-1.5 rounded-md bg-black hover:bg-gray-900 transition-all duration-200 border border-gray-800 text-white flex items-center gap-1"
+                ><ArrowLeft className="h-4 w-4"/> Back </a>
                 <Button
                   type="submit"
                   className="bg-black hover:bg-gray-900 text-white border border-gray-800"

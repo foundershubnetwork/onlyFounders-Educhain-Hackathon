@@ -11,9 +11,10 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, CheckCircle, Rocket, Heart } from "lucide-react"
+import { Bookmark, Filter, Search, TrendingUp, Users, Calendar, ArrowUpRight, CheckCircle, Rocket, Heart, Router } from "lucide-react"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import {useToast} from '../../hooks/use-toast'
+import { useRouter } from "next/navigation"
 
 // Define the startup interface based on the updated API response
 interface Startup {
@@ -45,7 +46,11 @@ export default function MarketplacePage() {
   const [isRoleLoading, setIsRoleLoading] = useState(false)
   const { user, isLoading: isUserLoading } = useUser()
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [hasUpvoted, setHasUpvoted] = useState(false);
+  const [hasStartup, setHasStartup] = useState(false);
+  const [startupLoading, setStartupLoading] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
   useEffect(() => {
     const checkLoggedIn = async () => {
@@ -58,6 +63,39 @@ export default function MarketplacePage() {
     }
   
    checkLoggedIn();
+  }, [isLoading, user])
+
+  useEffect(() => {
+    const checkStartup = async () => {
+      try{
+        setStartupLoading(true)
+
+        if(!user || isUserLoading) return
+        const userID = user.sub?.substring(14)
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/startup/check-startup", {
+          method: "GET",
+          headers: {
+            user_id: userID,
+          },
+        })
+
+        if (response.status === 200) {
+          const data = await response.json()
+          if (data.status) {
+            setHasStartup(true)
+          }
+        }
+      }
+
+      catch(err){
+        console.error("Error checking startup:", err)
+      }
+      finally{
+        setStartupLoading(false)
+      }
+    }
+  
+   checkStartup();
   }, [isLoading, user])
 
   // Fetch user role from API
@@ -192,12 +230,12 @@ export default function MarketplacePage() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white">Startup Marketplace</h1>
-            <p className="text-gray-400">Discover and invest in promising blockchain projects</p>
+            <p className="text-gray-400">Discover and invest in promising blockchain Startups</p>
           </div>
 
           <div className="gap-4">
             <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-              <Link href="/startup-setup/basicInfo">Create a Project</Link>
+              <Link href="/startup-setup/basicInfo">{hasStartup? "Edit your Startup" : "Create a Startup"} </Link>
             </Button>
           </div>  
         </div>
@@ -357,7 +395,7 @@ export default function MarketplacePage() {
                             {startup.verifiedStatus === "Verified" && (
                               <CheckCircle className="h-5 w-5 text-blue-500 flex-shrink-0" />
                             )}</div>
-                            <Heart className="h-8 w-8 bg-slate-800 p-2 rounded-full hover:bg-slate-700 transition-all duration-200 cursor-pointer flex-shrink-0" />
+                            {/* <Heart fill={hasUpvoted? "red" : "none"} stroke={hasUpvoted? "red" : "white"} className="h-8 w-8 bg-slate-800 p-2 rounded-full hover:bg-slate-700 transition-all duration-200 cursor-pointer flex-shrink-0" /> */}
                           </div>
                           <CardDescription className="text-gray-400">{startup.tagline}</CardDescription>
                         </div>
@@ -366,7 +404,7 @@ export default function MarketplacePage() {
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-400">Raised</span>
+                          <span className="text-gray-400">Yet to raise</span>
                           <span className="text-white font-medium">
                             ${startup.totalRaised.toLocaleString()} / ${startup.goal?.toLocaleString() || "N/A"}
                           </span>
@@ -406,7 +444,7 @@ export default function MarketplacePage() {
                       > 
                         <Button onClick={() => {
                           if (isLoggedIn) {
-                            window.open(`/marketplace/project/${startup.startup_id}`, "_blank")
+                            router.push(`/marketplace/project/${startup.startup_id}`)
                           } else {
                             toast({
                               title: "Message",
@@ -538,7 +576,7 @@ export default function MarketplacePage() {
                               {startup.verifiedStatus === "Verified" && (
                                 <CheckCircle className="h-4 w-4 text-blue-500 flex-shrink-0" />
                               )}</div>
-                              <Heart className="h-8 w-8 bg-slate-800 p-2 rounded-full hover:bg-slate-700 transition-all duration-200 cursor-pointer flex-shrink-0" />
+                              {/* <Heart className="h-8 w-8 bg-slate-800 p-2 rounded-full hover:bg-slate-700 transition-all duration-200 cursor-pointer flex-shrink-0" /> */}
                             </div>
                           </div>
                         </div>
@@ -548,7 +586,7 @@ export default function MarketplacePage() {
 
                         <div className="space-y-1">
                           <div className="flex justify-between text-xs">
-                            <span className="text-gray-400">Raised</span>
+                            <span className="text-gray-400">Yet to raise</span>
                             <span className="text-white">
                               ${startup.totalRaised.toLocaleString()} / ${startup.goal?.toLocaleString() || "N/A"}
                             </span>
@@ -582,7 +620,7 @@ export default function MarketplacePage() {
                         >
                           <Button onClick={() => {
                           if (isLoggedIn) {
-                            window.open(`/marketplace/project/${startup.startup_id}`, "_blank")
+                            router.push(`/marketplace/project/${startup.startup_id}`)
                           } else {
                             toast({
                               title: "Message",

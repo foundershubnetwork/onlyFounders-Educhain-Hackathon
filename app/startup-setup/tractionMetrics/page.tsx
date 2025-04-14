@@ -46,6 +46,7 @@ const otherMetricOptions = [
 const tractionMetricsSchema = z.object({
   waitlistSignups: z.string().optional(),
   strategicPartners: z.string().optional(),
+  communitySize: z.string().optional(),
   growthMetrics: z
     .array(
       z.object({
@@ -89,6 +90,7 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
     defaultValues: {
       waitlistSignups: data?.waitlistSignups || "",
       strategicPartners: data?.strategicPartners || "",
+      communitySize: data?.communitySize || "",
       growthMetrics: [],
       others: [],
     },
@@ -199,6 +201,7 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
           form.reset({
             waitlistSignups: traction.waitlistSignups?.toString() || "",
             strategicPartners: traction.strategicPartners?.toString() || "",
+            communitySize: traction.communitySize?.toString() || "",
             growthMetrics: growthMetrics,
             others: others,
           })
@@ -252,6 +255,7 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
         if (
           values.waitlistSignups !== originalTractionData.waitlistSignups?.toString() ||
           values.strategicPartners !== originalTractionData.strategicPartners?.toString() ||
+          values.communitySize !== originalTractionData.communitySize?.toString() ||
           JSON.stringify(values.growthMetrics) !== JSON.stringify(originalTractionData.growthMetrics) ||
           JSON.stringify(values.others) !== JSON.stringify(originalTractionData.others)
         ) {
@@ -276,6 +280,7 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
       const apiData = {
         waitlistSignups: values.waitlistSignups || "",
         strategicPartners: values.strategicPartners || "",
+        communitySize: values.communitySize || "",
         growthMetrics: values.growthMetrics.map((metric) => ({
           metricName: metric.metricName,
           metricValue: metric.metricValue ? Number.parseInt(metric.metricValue) : 0,
@@ -386,6 +391,8 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
 
                 <FormField
                   control={form.control}
+                  required
+                  rules={{ required: "This field is required" }}
                   name="waitlistSignups"
                   render={({ field }) => (
                     <FormItem>
@@ -404,6 +411,8 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
                 <FormField
                   control={form.control}
                   name="strategicPartners"
+                  required
+                  rules={{ required: "This field is required" }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-white">Strategic Partners</FormLabel>
@@ -412,6 +421,25 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
                       </FormControl>
                       <FormDescription className="text-gray-500">
                         Count of strategic partnerships established
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="communitySize"
+                  required
+                  rules={{ required: "This field is required" }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white">Community Size</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 12" className="bg-gray-800 border-gray-700 text-white" {...field} />
+                      </FormControl>
+                      <FormDescription className="text-gray-500">
+                        Number of Community members
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

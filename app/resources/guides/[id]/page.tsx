@@ -2,219 +2,188 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
+import { useParams } from "next/navigation"
 import Link from "next/link"
-import { PageHeader } from "@/components/page-header"
-import { TableOfContents } from "@/components/table-of-contents"
-import { Button } from "@/components/ui/button"
+import { ArrowLeft, Clock, ThumbsUp, Share2, Bookmark } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, BookOpen, Clock, Download, ThumbsUp, Share2, Bookmark } from "lucide-react"
-import RelatedGuides from "@/components/related-guides"
+import { Button } from "@/components/ui/button"
+import { useUser } from "@auth0/nextjs-auth0/client"
 
-export default function GuideDetailPage({ params }: { params: { id: string } }) {
+interface BlogImage {
+  file_name: string
+  file_url: string
+  _id: string
+}
+
+interface Blog {
+  _id: string
+  user_id: string
+  title: string
+  headerImage: BlogImage
+  description: string
+  categories: string[]
+  content: string
+  upvote: number
+  upvotedBy: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+interface ApiResponse {
+  message: string
+  blog: Blog
+}
+
+export default function BlogDetail() {
+  const params = useParams()
+  const blogId = params.id as string
+
+  const [blog, setBlog] = useState<Blog | null>(null)
+  const [isBlogLoading, setIsBlogLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [hasLiked, setHasLiked] = useState(false)
-  const [likes, setLikes] = useState(42)
-
-  // Mock guide data
-  const guide = {
-    id: params.id,
-    title: "How to Structure Your Startup for Web3 Fundraising",
-    excerpt:
-      "Learn the essential steps to prepare your startup for a successful fundraising round in the Web3 ecosystem.",
-    coverImage: "/placeholder.svg?height=400&width=800",
-    readTime: 12,
-    author: {
-      name: "Alex Johnson",
-      avatar: "/placeholder.svg?height=80&width=80",
-      role: "Investment Advisor",
-      verified: true,
-    },
-    category: "Fundraising",
-    difficulty: "Beginner",
-    publishedDate: "November 10, 2023",
-    updatedDate: "November 15, 2023",
-    content: `
-      <p>Fundraising in the Web3 space presents unique challenges and opportunities compared to traditional startup funding. This comprehensive guide will walk you through the essential steps to structure your startup for a successful Web3 fundraising round.</p>
-
-      <h2>Understanding Web3 Fundraising Models</h2>
-      
-      <p>Before diving into the structuring process, it's important to understand the various fundraising models available in the Web3 ecosystem:</p>
-      
-      <ul>
-        <li><strong>Token Sales:</strong> Offering utility or governance tokens to investors</li>
-        <li><strong>Equity Fundraising:</strong> Traditional equity investment with blockchain-based cap tables</li>
-        <li><strong>Hybrid Models:</strong> Combining token and equity components</li>
-        <li><strong>DAO-based Funding:</strong> Raising from decentralized autonomous organizations</li>
-        <li><strong>NFT-based Fundraising:</strong> Using NFTs to represent investment shares or benefits</li>
-      </ul>
-      
-      <p>Each model has its own regulatory considerations, investor expectations, and structural requirements. Your choice should align with your project's goals, timeline, and target investor base.</p>
-
-      <h2>Legal Structure and Jurisdiction</h2>
-      
-      <p>Selecting the right legal structure and jurisdiction is crucial for Web3 startups. Consider the following factors:</p>
-      
-      <h3>Entity Types</h3>
-      
-      <ul>
-        <li><strong>Foundation:</strong> Common for protocol-focused projects seeking decentralization</li>
-        <li><strong>Corporation:</strong> Traditional structure with clear equity distribution</li>
-        <li><strong>LLC:</strong> Flexible structure with pass-through taxation</li>
-        <li><strong>DAO LLC:</strong> Legal wrapper for DAOs (available in Wyoming and other jurisdictions)</li>
-      </ul>
-      
-      <h3>Jurisdiction Considerations</h3>
-      
-      <p>When selecting a jurisdiction, evaluate:</p>
-      
-      <ul>
-        <li>Regulatory clarity regarding digital assets</li>
-        <li>Tax implications for the entity and token holders</li>
-        <li>Banking access and financial services availability</li>
-        <li>Investor perception and comfort</li>
-        <li>Long-term operational requirements</li>
-      </ul>
-      
-      <p>Popular jurisdictions for Web3 projects include Switzerland, Singapore, the Cayman Islands, and increasingly, Dubai and Portugal. Each offers different advantages and considerations.</p>
-
-      <h2>Tokenomics Design</h2>
-      
-      <p>If your fundraising strategy involves tokens, designing a sustainable tokenomics model is essential. Key components include:</p>
-      
-      <h3>Token Utility and Value Accrual</h3>
-      
-      <p>Clearly define how your token creates and captures value:</p>
-      
-      <ul>
-        <li>Access to platform features or services</li>
-        <li>Governance rights over protocol decisions</li>
-        <li>Staking rewards and yield generation</li>
-        <li>Fee sharing or buyback-and-burn mechanisms</li>
-        <li>Work or participation incentives</li>
-      </ul>
-    `,
-    downloads: [
-      {
-        title: "Web3 Fundraising Checklist",
-        description: "A comprehensive checklist to prepare for your fundraising round",
-        fileType: "PDF",
-        fileSize: "1.2 MB",
-        url: "#",
-      },
-      {
-        title: "Tokenomics Template",
-        description: "Excel template for modeling token distribution and vesting",
-        fileType: "XLSX",
-        fileSize: "850 KB",
-        url: "#",
-      },
-    ],
-    relatedGuides: [
-      {
-        id: "2",
-        title: "Tokenomics Design for Early-Stage Startups",
-        excerpt:
-          "A comprehensive guide to designing effective tokenomics that attract investors and build a sustainable ecosystem.",
-        coverImage: "/placeholder.svg?height=200&width=400",
-        readTime: 18,
-        author: {
-          name: "Sarah Chen",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-        category: "Tokenomics",
-        difficulty: "Intermediate",
-      },
-      {
-        id: "3",
-        title: "Legal Considerations for Web3 Fundraising",
-        excerpt: "Navigate the complex regulatory landscape of token sales and blockchain-based fundraising.",
-        coverImage: "/placeholder.svg?height=200&width=400",
-        readTime: 15,
-        author: {
-          name: "Michael Rodriguez",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-        category: "Legal",
-        difficulty: "Intermediate",
-      },
-    ],
-  }
-
-  // Generate table of contents from content
-  const [tableOfContents, setTableOfContents] = useState<{ id: string; title: string }[]>([])
+  const [likes, setLikes] = useState(0)
+  const [likeLoading, setLikeLoading] = useState(false)
+  const {user, isLoading} = useUser()
 
   useEffect(() => {
-    // Extract headings from content
-    const headingRegex = /<h2>(.*?)<\/h2>/g
-    const headings: { id: string; title: string }[] = []
-    let match
+    const fetchBlog = async () => {
+      try {
+        if(!user || isLoading) {
+          return
+        }
 
-    while ((match = headingRegex.exec(guide.content)) !== null) {
-      const title = match[1]
-      const id = title.toLowerCase().replace(/\s+/g, "-")
-      headings.push({ id, title })
+        const userId = user.sub?.substring(14);
+
+        setIsBlogLoading(true)
+        const response = await fetch(`https://onlyfounders.azurewebsites.net/api/blog/get-blog-by-id/${blogId}`, {
+          method: "GET",
+          headers: {
+            user_id: userId,
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch blog: ${response.status}`)
+        }
+
+        const data: ApiResponse = await response.json()
+        setBlog(data.blog)
+        // setLikes(data.blog.upvote)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred while fetching the blog")
+        console.error(err)
+      } finally {
+        setIsBlogLoading(false)
+      }
     }
 
-    setTableOfContents(headings)
-  }, [guide.content])
+    if (blogId) {
+      fetchBlog()
+    }
+  }, [blogId])
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked)
   }
 
-  const handleLike = () => {
-    if (!hasLiked) {
-      setLikes(likes + 1)
-      setHasLiked(true)
-    } else {
-      setLikes(likes - 1)
-      setHasLiked(false)
+  const handleLike = async () => {
+    try{
+      if (!user || isLoading) {
+        return
+      }
+      const userId = user.sub?.substring(14);
+      setLikeLoading(true)
+      const response = await fetch(`https://onlyfounders.azurewebsites.net/api/blog/upvote-blog/${blogId}`, {
+        method: "POST",
+        headers:{
+          user_id: userId,
+        }
+      })
+
+      if (response.status === 200) {
+        const data = await response.json()
+        setHasLiked(!hasLiked)
+      }
+    }
+
+    catch (err) {
+      console.error(err)
+    }
+
+    finally {
+      setLikeLoading(false)
     }
   }
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "Beginner":
-        return "bg-green-600"
-      case "Intermediate":
-        return "bg-yellow-600"
-      case "Advanced":
-        return "bg-red-600"
-      default:
-        return "bg-blue-600"
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      alert("Blog URL copied to clipboard!")
+    } catch (err) {
+      console.error("Failed to copy URL:", err)
     }
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  }
+
+  if (isBlogLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-pulse text-gray-400">Loading blog...</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !blog) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-red-500">{error || "Blog not found"}</div>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center gap-2 mb-6">
         <Button asChild variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-          <Link href="/resources/guides">
+          <Link href="/resources?tab=blogs">
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </Button>
-        <span className="text-gray-400">Back to Guides</span>
+        <span className="text-gray-400">Back to Blogs</span>
       </div>
 
-      <PageHeader title={guide.title} description={guide.excerpt} />
+      <div className="space-y-4">
+        <h1 className="text-3xl font-bold text-white">{blog.title}</h1>
+        <p className="text-gray-400 max-w-3xl">{blog.description}</p>
+      </div>
 
-      <div className="relative rounded-xl overflow-hidden h-[300px] my-8">
-        <Image src={guide.coverImage || "/placeholder.svg"} alt={guide.title} fill className="object-cover" />
+      <div className="relative rounded-xl overflow-hidden h-[250px] my-8">
+        <Image src={blog.headerImage.file_url || "/placeholder.svg"} alt={blog.title} fill className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
         <div className="absolute bottom-0 left-0 p-6">
           <div className="flex flex-wrap gap-2 mb-2">
-            <Badge className="bg-blue-600">{guide.category}</Badge>
-            <Badge className={getDifficultyColor(guide.difficulty)}>{guide.difficulty}</Badge>
+            {blog.categories.length > 0 && <Badge className="bg-blue-600">{blog.categories[0]}</Badge>}
           </div>
           <div className="flex items-center text-gray-300 text-sm">
             <Clock className="h-4 w-4 mr-1" />
-            <span>{guide.readTime} min read</span>
-            <span className="mx-2">•</span>
-            <span>Published: {guide.publishedDate}</span>
-            {guide.updatedDate && (
+            <span>Published: {formatDate(blog.createdAt)}</span>
+            {blog.updatedAt !== blog.createdAt && (
               <>
                 <span className="mx-2">•</span>
-                <span>Updated: {guide.updatedDate}</span>
+                <span>Updated: {formatDate(blog.updatedAt)}</span>
               </>
             )}
           </div>
@@ -223,62 +192,9 @@ export default function GuideDetailPage({ params }: { params: { id: string } }) 
 
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-3/4">
-          <div className="flex items-center mb-6 space-x-4">
-            <div className="relative h-12 w-12">
-              <Image
-                src={guide.author.avatar || "/placeholder.svg"}
-                alt={guide.author.name}
-                fill
-                className="rounded-full object-cover"
-              />
-            </div>
-            <div>
-              <div className="flex items-center">
-                <h3 className="font-medium text-white">{guide.author.name}</h3>
-                {guide.author.verified && (
-                  <Badge variant="outline" className="ml-2 bg-blue-900/20 text-blue-400 border-blue-800">
-                    Verified
-                  </Badge>
-                )}
-              </div>
-              <p className="text-gray-400">{guide.author.role}</p>
-            </div>
-          </div>
-
-          <div className="prose prose-invert max-w-none mb-12" dangerouslySetInnerHTML={{ __html: guide.content }} />
-
-          {guide.downloads && guide.downloads.length > 0 && (
-            <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-8">
-              <h3 className="text-xl font-bold text-white mb-4">Resources & Downloads</h3>
-              <div className="space-y-4">
-                {guide.downloads.map((download, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="bg-blue-600 p-2 rounded">
-                        <Download className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-white">{download.title}</h4>
-                        <p className="text-gray-400 text-sm">{download.description}</p>
-                        <div className="flex items-center mt-1 text-xs text-gray-500">
-                          <span>{download.fileType}</span>
-                          <span className="mx-2">•</span>
-                          <span>{download.fileSize}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <Button asChild className="bg-blue-600 hover:bg-blue-700">
-                      <a href={download.url} download>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                      </a>
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
+        <div className="rounded-md bg-gray-900 p-6 mb-10">
+          <div className="prose prose-invert max-w-none mb-12" dangerouslySetInnerHTML={{ __html: blog.content }} />
+        </div>
           <div className="flex items-center justify-between border-t border-gray-800 pt-6 mb-12">
             <div className="flex items-center space-x-4">
               <Button
@@ -286,20 +202,21 @@ export default function GuideDetailPage({ params }: { params: { id: string } }) 
                 className={`flex items-center space-x-2 ${hasLiked ? "text-blue-400" : "text-gray-400 hover:text-blue-400"}`}
                 onClick={handleLike}
               >
-                <ThumbsUp className="h-5 w-5" fill={hasLiked ? "currentColor" : "none"} />
-                <span>{likes} Likes</span>
+                {likeLoading ? (
+                  <div>
+                    loading...
+                  </div>
+                ):(
+                  <div className="flex items-center space-x-2">
+                  <ThumbsUp className="h-5 w-5" fill={hasLiked ? "currentColor" : "none"} />
+                    <span>{hasLiked? "Liked": "Like"}</span>
+                  </div>
+                )}
+                
               </Button>
-              <Button variant="ghost" className="flex items-center space-x-2 text-gray-400 hover:text-blue-400">
+              <Button onClick={() => {handleShare()}} variant="ghost" className="flex items-center space-x-2 text-gray-400 hover:text-blue-400">
                 <Share2 className="h-5 w-5" />
                 <span>Share</span>
-              </Button>
-              <Button
-                variant="ghost"
-                className={`flex items-center space-x-2 ${isBookmarked ? "text-blue-400" : "text-gray-400 hover:text-blue-400"}`}
-                onClick={handleBookmark}
-              >
-                <Bookmark className="h-5 w-5" fill={isBookmarked ? "currentColor" : "none"} />
-                <span>{isBookmarked ? "Saved" : "Save"}</span>
               </Button>
             </div>
           </div>
@@ -307,26 +224,23 @@ export default function GuideDetailPage({ params }: { params: { id: string } }) 
 
         <div className="md:w-1/4">
           <div className="sticky top-24">
-            <TableOfContents items={tableOfContents} />
-
-            <div className="mt-8 p-6 bg-gray-900 rounded-lg">
-              <h3 className="text-xl font-bold mb-4">Join Optimus AI</h3>
-              <p className="text-gray-400 mb-4">
-                Get access to premium guides, tools, and resources for Web3 fundraising.
-              </p>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                <BookOpen className="mr-2 h-4 w-4" />
-                Access Premium Content
-              </Button>
+            <div className="p-6 bg-gray-900 rounded-lg">
+              <h3 className="text-xl font-bold mb-4">Categories</h3>
+              <div className="space-y-2">
+                {blog.categories.map((category) => (
+                  <Badge
+                    key={category}
+                    variant="outline"
+                    className="mr-2 mb-2 bg-gray-800 border-gray-700 text-gray-400"
+                  >
+                    {category}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div className="mt-16">
-        <RelatedGuides guides={guide.relatedGuides} currentGuideId={guide.id} />
-      </div>
     </div>
   )
 }
-

@@ -352,7 +352,7 @@ export function AppLayout({
                     )}
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer">
+                {/* <DropdownMenuItem asChild className="cursor-pointer">
                   <Link href="/">
                     <Wallet className="mr-2 h-4 w-4" />
                     Investor Dashboard
@@ -370,7 +370,7 @@ export function AppLayout({
                     Settings
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-gray-800" />
+                <DropdownMenuSeparator className="bg-gray-800" /> */}
                 <a href="/api/auth/logout">
                   <DropdownMenuItem className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
@@ -779,11 +779,7 @@ export function AppLayout({
                             Login
                           </Button>
                         </a>
-                        <a href="/early-access">
-                          <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                            Early Access
-                          </Button>
-                        </a>
+            
                       </div>
                     )}
 

@@ -165,6 +165,7 @@ interface SocialLinks {
 interface Traction {
   waitlistSignups: number;
   strategicPartners: number;
+  communitySize: number;
   githubStars: number;
   nodeOperators: number;
   _id: string;
@@ -279,52 +280,54 @@ export default function ProjectDetailPage({
   const [showInvestDialog, setShowInvestDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [startupData, setStartupData] = useState<StartupAPI | null>(null);
-  const { user } = useUser();
+  const { user, isLoading} = useUser();
   const { toast } = useToast();
   const router = useRouter();
   const [daysRemaining, setDaysRemaining] = useState<number | null>();
   const [projectId, setProjectId] = useState<string | null>(null);
   const [updates, setUpdates] = useState<any[]>([]); // Define properly if updates have a structure
   const [loadDeleteMember, setLoadDeleteMember] = useState(false);
+  const [hasUpvoted, setHasUpvoted] = useState(false);
+  const [upvoteLoading, setUpvoteLoading] = useState(false);
   const TokenomicsPieChart = dynamic(() => import("./TokenomicsPieChart"), {
     ssr: false,
   });
 
   //api to fetch updates
-  useEffect(() => {
-    const fetchUpdates = async () => {
-      try {
-        if (!user || !projectId) return;
-        const userId = user?.sub?.substring(14);
-        const requestBody = { projectId };
-        console.log(requestBody);
-        const response = await axios.post(
-          "https://onlyfounders.azurewebsites.net/api/profile/get-updates",
-          requestBody,
-          {
-            headers: {
-              "Content-Type": "application/json", // ✅ Correct header
-              user_id: userId,
-            },
-          }
-        );
+  // useEffect(() => {
+  //   const fetchUpdates = async () => {
+  //     try {
+  //       if (!user || !projectId) return;
+  //       const userId = user?.sub?.substring(14);
+  //       const requestBody = { projectId };
+  //       console.log(requestBody);
+  //       const response = await axios.post(
+  //         "https://onlyfounders.azurewebsites.net/api/profile/get-updates",
+  //         requestBody,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json", // ✅ Correct header
+  //             user_id: userId,
+  //           },
+  //         }
+  //       );
 
-        if (response.status === 200) {
-          const data = await response.data;
-          setUpdates(data.updates);
-        }
-      } catch (error) {
-        console.error("Error fetching project ID:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load project ID. Please refresh the page.",
-          variant: "destructive",
-        });
-      }
-    };
+  //       if (response.status === 200) {
+  //         const data = await response.data;
+  //         setUpdates(data.updates);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching project ID:", error);
+  //       toast({
+  //         title: "Error",
+  //         description: "Failed to load project ID. Please refresh the page.",
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   };
 
-    fetchUpdates();
-  }, [projectId]);
+  //   fetchUpdates();
+  // }, [projectId]);
 
   //api to get projectId
   useEffect(() => {
@@ -465,6 +468,7 @@ export default function ProjectDetailPage({
         //traction
         waitlistSignups: startupData.traction.waitlistSignups,
         strategicPartners: startupData.traction.strategicPartners,
+        communitySize: startupData.traction.communitySize,
         growthMetrics: startupData.traction.growthMetrics,
         others: startupData.traction.others,
 
@@ -631,6 +635,35 @@ export default function ProjectDetailPage({
     }
   };
 
+  const handleUpvoteStatus = async () => {
+    try{
+      if (!user || isLoading) {
+        return
+      }
+      const userId = user.sub?.substring(14);
+      setUpvoteLoading(true)
+      const response = await fetch(`https://onlyfounders.azurewebsites.net/api/startup/upvote-startup/${projectId}`, {
+        method: "POST",
+        headers:{
+          user_id: userId,
+        }
+      })
+
+      if (response.status === 200) {
+        const data = await response.json()
+        setHasUpvoted(!hasUpvoted)
+      }
+    }
+
+    catch (err) {
+      console.error(err)
+    }
+
+    finally {
+      setUpvoteLoading(false)
+    }
+  }
+
   const handleMilestoneComplete = async (roadmapId, index) => {
     try {
       if (!user || !projectId) return;
@@ -705,7 +738,12 @@ export default function ProjectDetailPage({
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-        <div className="absolute flex items-center gap-3 top-5 right-5 cursor-pointer hover:bg-slate-700 transition-all duration-200 bg-slate-800 px-3 py-1.5 rounded-md"><Heart/> Upvote</div>
+        <button onClick={() => {handleUpvoteStatus()}} className="absolute flex items-center gap-3 top-5 right-5 cursor-pointer hover:bg-slate-700 transition-all duration-200 bg-slate-800 px-3 py-1.5 rounded-md">
+          
+          <Heart fill={hasUpvoted? "red": "none"} stroke={hasUpvoted? "red":"white"} />
+           {upvoteLoading? "loading.." : hasUpvoted? "Upvoted" : "Upvote"}
+           </button> 
+
         <div className="absolute bottom-0 left-0 p-6 flex items-end gap-4">
           <div className="h-20 w-20 rounded-xl overflow-hidden relative bg-gray-800 border-4 border-gray-800">
             <Image
@@ -735,7 +773,6 @@ export default function ProjectDetailPage({
               Founder:
               <a
                 href={`/public-profile/${project.id}`}
-                target="_blank"
                 className="text-blue-600"
               >
                 {" "}
@@ -963,7 +1000,7 @@ export default function ProjectDetailPage({
                         <FaPeopleGroup className="text-green-400" size={28} />
                         <p className="text-gray-400 text-lg">Community Size</p>
                         <span className="text-3xl font-bold">
-                          --
+                          {project.communitySize}
                         </span>
                       </div>
                     </div>

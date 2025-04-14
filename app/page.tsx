@@ -479,7 +479,7 @@ export default function HomePage() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-cyan-400">
-                            {item.totalRaised} USDC raised
+                            Yet to raise
                           </span>
                           <span className="text-white">
                             {item.goal

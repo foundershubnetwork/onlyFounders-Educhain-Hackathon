@@ -4,10 +4,11 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Clock, ThumbsUp, Share2, Bookmark } from "lucide-react"
+import { ArrowLeft, Clock, ThumbsUp, Share2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useUser } from "@auth0/nextjs-auth0/client"
+import { AppLayout } from "@/components/layout/app-layout"
 
 interface BlogImage {
   file_name: string
@@ -45,18 +46,18 @@ export default function BlogDetail() {
   const [hasLiked, setHasLiked] = useState(false)
   const [likes, setLikes] = useState(0)
   const [likeLoading, setLikeLoading] = useState(false)
-  const {user, isLoading} = useUser()
+  const { user, isLoading } = useUser()
 
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        if(!user || isLoading) {
+        setIsBlogLoading(true)
+        if (!user || isLoading) {
           return
         }
 
-        const userId = user.sub?.substring(14);
+        const userId = user.sub?.substring(14)
 
-        setIsBlogLoading(true)
         const response = await fetch(`https://onlyfounders.azurewebsites.net/api/blog/get-blog-by-id/${blogId}`, {
           method: "GET",
           headers: {
@@ -70,7 +71,8 @@ export default function BlogDetail() {
 
         const data: ApiResponse = await response.json()
         setBlog(data.blog)
-        // setLikes(data.blog.upvote)
+        setLikes(data.blog.upvote || 0)
+        setHasLiked(data.blog.upvotedBy?.includes(userId) || false)
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred while fetching the blog")
         console.error(err)
@@ -79,40 +81,36 @@ export default function BlogDetail() {
       }
     }
 
-    if (blogId) {
-      fetchBlog()
-    }
-  }, [blogId])
+    fetchBlog()
+  }, [blogId, user, isLoading])
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked)
   }
 
   const handleLike = async () => {
-    try{
+    try {
       if (!user || isLoading) {
         return
       }
-      const userId = user.sub?.substring(14);
+      const userId = user.sub?.substring(14)
       setLikeLoading(true)
       const response = await fetch(`https://onlyfounders.azurewebsites.net/api/blog/upvote-blog/${blogId}`, {
         method: "POST",
-        headers:{
+        headers: {
           user_id: userId,
-        }
+        },
       })
 
       if (response.status === 200) {
         const data = await response.json()
         setHasLiked(!hasLiked)
+        // Update likes count based on whether we're liking or unliking
+        setLikes((prev) => (hasLiked ? prev - 1 : prev + 1))
       }
-    }
-
-    catch (err) {
+    } catch (err) {
       console.error(err)
-    }
-
-    finally {
+    } finally {
       setLikeLoading(false)
     }
   }
@@ -137,18 +135,52 @@ export default function BlogDetail() {
   if (isBlogLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-pulse text-gray-400">Loading blog...</div>
+        <div className="flex items-center gap-2 mb-6">
+          <div className="h-10 w-10 rounded-full bg-gray-800 animate-pulse"></div>
+          <div className="h-4 w-32 bg-gray-800 animate-pulse rounded"></div>
         </div>
-      </div>
-    )
-  }
 
-  if (error || !blog) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center items-center h-64">
-          <div className="text-red-500">{error || "Blog not found"}</div>
+        <div className="space-y-4">
+          <div className="h-10 w-3/4 bg-gray-800 animate-pulse rounded"></div>
+          <div className="h-4 w-2/3 bg-gray-800 animate-pulse rounded"></div>
+          <div className="h-4 w-1/2 bg-gray-800 animate-pulse rounded"></div>
+        </div>
+
+        <div className="relative rounded-xl overflow-hidden h-[250px] my-8 bg-gray-800 animate-pulse"></div>
+
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="md:w-3/4">
+            <div className="rounded-md bg-gray-900 p-6 mb-10">
+              <div className="space-y-4">
+                <div className="h-4 w-full bg-gray-800 animate-pulse rounded"></div>
+                <div className="h-4 w-full bg-gray-800 animate-pulse rounded"></div>
+                <div className="h-4 w-3/4 bg-gray-800 animate-pulse rounded"></div>
+                <div className="h-4 w-full bg-gray-800 animate-pulse rounded"></div>
+                <div className="h-4 w-5/6 bg-gray-800 animate-pulse rounded"></div>
+                <div className="h-4 w-full bg-gray-800 animate-pulse rounded"></div>
+                <div className="h-4 w-2/3 bg-gray-800 animate-pulse rounded"></div>
+              </div>
+            </div>
+            <div className="flex items-center justify-between border-t border-gray-800 pt-6 mb-12">
+              <div className="flex items-center space-x-4">
+                <div className="h-10 w-20 bg-gray-800 animate-pulse rounded"></div>
+                <div className="h-10 w-20 bg-gray-800 animate-pulse rounded"></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="md:w-1/4">
+            <div className="sticky top-24">
+              <div className="p-6 bg-gray-900 rounded-lg">
+                <div className="h-6 w-32 bg-gray-800 animate-pulse rounded mb-4"></div>
+                <div className="flex flex-wrap gap-2">
+                  <div className="h-6 w-20 bg-gray-800 animate-pulse rounded"></div>
+                  <div className="h-6 w-24 bg-gray-800 animate-pulse rounded"></div>
+                  <div className="h-6 w-16 bg-gray-800 animate-pulse rounded"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -166,59 +198,64 @@ export default function BlogDetail() {
       </div>
 
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold text-white">{blog.title}</h1>
-        <p className="text-gray-400 max-w-3xl">{blog.description}</p>
+        <h1 className="text-3xl font-bold text-white">{blog?.title}</h1>
+        <p className="text-gray-400 max-w-3xl">{blog?.description}</p>
       </div>
 
       <div className="relative rounded-xl overflow-hidden h-[250px] my-8">
-        <Image src={blog.headerImage.file_url || "/placeholder.svg"} alt={blog.title} fill className="object-cover" />
+        <Image src={blog?.headerImage.file_url || "/placeholder.svg"} alt={blog?.title} fill className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
         <div className="absolute bottom-0 left-0 p-6">
           <div className="flex flex-wrap gap-2 mb-2">
-            {blog.categories.length > 0 && <Badge className="bg-blue-600">{blog.categories[0]}</Badge>}
+            {blog?.categories.length > 0 && <Badge className="bg-blue-600">{blog?.categories[0]}</Badge>}
           </div>
           <div className="flex items-center text-gray-300 text-sm">
             <Clock className="h-4 w-4 mr-1" />
-            <span>Published: {formatDate(blog.createdAt)}</span>
-            {blog.updatedAt !== blog.createdAt && (
+            <span>Published: {formatDate(blog?.createdAt)}</span>
+            {blog?.updatedAt !== blog?.createdAt && (
               <>
                 <span className="mx-2">•</span>
-                <span>Updated: {formatDate(blog.updatedAt)}</span>
+                <span>Updated: {formatDate(blog?.updatedAt)}</span>
               </>
             )}
           </div>
         </div>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="md:w-3/4">
-        <div className="rounded-md bg-gray-900 p-6 mb-10">
-          <div className="prose prose-invert max-w-none mb-12" dangerouslySetInnerHTML={{ __html: blog.content }} />
-        </div>
-          <div className="flex items-center justify-between border-t border-gray-800 pt-6 mb-12">
-            <div className="flex items-center space-x-4">
+        <div className="absolute bottom-0 right-0 p-4"> 
+        <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"
                 className={`flex items-center space-x-2 ${hasLiked ? "text-blue-400" : "text-gray-400 hover:text-blue-400"}`}
                 onClick={handleLike}
               >
                 {likeLoading ? (
-                  <div>
-                    loading...
-                  </div>
-                ):(
+                  <div>loading...</div>
+                ) : (
                   <div className="flex items-center space-x-2">
-                  <ThumbsUp className="h-5 w-5" fill={hasLiked ? "currentColor" : "none"} />
-                    <span>{hasLiked? "Liked": "Like"}</span>
+                    <ThumbsUp className="h-5 w-5" fill={hasLiked ? "currentColor" : "none"} />
+                    <span>{hasLiked ? "Liked" : "Like"}</span>
                   </div>
                 )}
-                
               </Button>
-              <Button onClick={() => {handleShare()}} variant="ghost" className="flex items-center space-x-2 text-gray-400 hover:text-blue-400">
+              <Button
+                onClick={() => {
+                  handleShare()
+                }}
+                variant="ghost"
+                className="flex items-center space-x-2 text-gray-400 hover:text-blue-400"
+              >
                 <Share2 className="h-5 w-5" />
                 <span>Share</span>
               </Button>
             </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="md:w-3/4">
+          <div className="rounded-md bg-gray-900 p-6 mb-10">
+            <div className="prose prose-invert max-w-none mb-12" dangerouslySetInnerHTML={{ __html: blog?.content }} />
+          </div>
+          <div className="flex items-center justify-between border-t border-gray-800 pt-6 mb-12">
           </div>
         </div>
 
@@ -227,7 +264,7 @@ export default function BlogDetail() {
             <div className="p-6 bg-gray-900 rounded-lg">
               <h3 className="text-xl font-bold mb-4">Categories</h3>
               <div className="space-y-2">
-                {blog.categories.map((category) => (
+                {blog?.categories.map((category) => (
                   <Badge
                     key={category}
                     variant="outline"

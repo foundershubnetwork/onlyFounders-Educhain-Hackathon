@@ -48,6 +48,10 @@ export default function FounderProfileSetupPage() {
   // Add a new state to store the original data from the API
   const [originalData, setOriginalData] = useState<any>(null)
 
+  // Add a new state for banner image
+  const [bannerSrc, setBannerSrc] = useState<string>("/placeholder.svg?height=300&width=1000")
+  const [bannerFile, setBannerFile] = useState<File | null>(null)
+
   const form = useForm<FounderProfileValues>({
     resolver: zodResolver(founderProfileSchema),
     defaultValues: {
@@ -318,6 +322,12 @@ export default function FounderProfileSetupPage() {
           setAvatarSrc(data.profilePic.file_url)
         }
 
+        // Update the fetchProfileData useEffect to set banner if available
+        // Inside the fetchProfileData function, after setting avatar:
+        if (data.bannerImage?.file_url) {
+          setBannerSrc(data.bannerImage.file_url)
+        }
+
         // Parse skills array to comma-separated string
         const skillsString = data.founderData?.skills?.join(", ") || ""
 
@@ -369,7 +379,7 @@ export default function FounderProfileSetupPage() {
       // Create FormData object
       const formData = new FormData()
 
-      // Check if data has changed
+      // Update the hasChanges check in onSubmit function to include bannerFile
       const hasChanges =
         !originalData ||
         originalData.username !== data.fullName ||
@@ -382,7 +392,8 @@ export default function FounderProfileSetupPage() {
         originalData.founderData?.socialLinks?.Twitter !== data.twitter ||
         originalData.founderData?.socialLinks?.LinkedIn !== data.linkedin ||
         originalData.founderData?.socialLinks?.github !== data.github ||
-        avatarFile !== null
+        avatarFile !== null ||
+        bannerFile !== null
 
       // Add profile data
       formData.append("professionalTitle", data.title)
@@ -393,6 +404,12 @@ export default function FounderProfileSetupPage() {
       // Add profile picture if available and changed
       if (avatarFile) {
         formData.append("profile_pic_file", avatarFile)
+      }
+
+      // Update the formData in onSubmit to include banner image
+      // After adding profile picture:
+      if (bannerFile) {
+        formData.append("bannerImage", bannerFile)
       }
 
       // Parse skills into array
@@ -465,8 +482,26 @@ export default function FounderProfileSetupPage() {
     }
   }
 
+  // Add a handler for banner image change
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Save file for upload
+      setBannerFile(file)
+
+      // Preview image
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setBannerSrc(e.target.result as string)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   return (
-    <AppLayout>
+    <AppLayout className="">
       <div className="px-2 md:px-0 max-w-4xl mx-auto py-12">
         <div className="space-y-6">
           <div className="space-y-2">
@@ -497,10 +532,12 @@ export default function FounderProfileSetupPage() {
               <CardContent>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    {/* Add banner image upload UI after the avatar section */}
+                    {/* Replace the existing avatar div with this updated version that includes banner: */}
                     <div className="flex flex-col items-center mb-6">
                       <div className="relative mb-4">
                         <Avatar className="h-24 w-24 border-2 border-gray-800">
-                          <AvatarImage src={avatarSrc} alt="Profile" />
+                          <AvatarImage src={avatarSrc || "/placeholder.svg"} alt="Profile" />
                           <AvatarFallback className="bg-gray-800 text-gray-400">
                             <Building className="h-12 w-12" />
                           </AvatarFallback>
@@ -521,6 +558,32 @@ export default function FounderProfileSetupPage() {
                         />
                       </div>
                       <p className="text-sm text-gray-400">Upload a professional profile picture</p>
+
+                      <div className="w-full mt-6">
+                        <p className="text-sm text-gray-400 mb-2">Banner Image</p>
+                        <div className="relative w-full h-32 bg-gray-800 rounded-lg overflow-hidden mb-2">
+                          <img
+                            src={bannerSrc || "/placeholder.svg"}
+                            alt="Banner"
+                            className="w-full h-full object-cover"
+                          />
+                          <label
+                            htmlFor="banner-upload"
+                            className="absolute bottom-2 right-2 p-1 rounded-full bg-gray-800 border border-gray-700 cursor-pointer"
+                          >
+                            <Camera className="h-4 w-4 text-gray-400" />
+                            <span className="sr-only">Upload banner</span>
+                          </label>
+                          <input
+                            id="banner-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleBannerChange}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500">Recommended size: 1000x300 pixels</p>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -772,4 +835,3 @@ export default function FounderProfileSetupPage() {
     </AppLayout>
   )
 }
-

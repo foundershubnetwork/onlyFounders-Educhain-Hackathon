@@ -53,7 +53,7 @@ export default function ResourcesPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState(tabParam || "ai-agents");
+  const [activeTab, setActiveTab] = useState(tabParam || "blogs");
   const [grantsFilter, setGrantsFilter] = useState("all");
   const [blogs, setBlogs] = useState<any>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -114,37 +114,6 @@ export default function ResourcesPage() {
     router.push(`/resources?tab=${value}`);
   };
 
-  const guides = [
-    {
-      id: "guide-1",
-      title: "Web3 Investment Fundamentals",
-      description:
-        "Learn the basics of investing in Web3 projects, understanding tokenomics, and evaluating project potential.",
-      image:
-        "/placeholder.svg?height=200&width=400&text=Investment+Fundamentals",
-      category: "Beginner",
-      readTime: "15 min",
-    },
-    {
-      id: "guide-2",
-      title: "Due Diligence Checklist",
-      description:
-        "A comprehensive checklist for conducting thorough due diligence on Web3 projects before investing.",
-      image: "/placeholder.svg?height=200&width=400&text=Due+Diligence",
-      category: "Intermediate",
-      readTime: "20 min",
-    },
-    {
-      id: "guide-3",
-      title: "Smart Contract Security",
-      description:
-        "Understanding smart contract vulnerabilities and how to assess the security of a project's code.",
-      image:
-        "/placeholder.svg?height=200&width=400&text=Smart+Contract+Security",
-      category: "Advanced",
-      readTime: "25 min",
-    },
-  ];
 
   const videos = [
     {
@@ -302,45 +271,6 @@ export default function ResourcesPage() {
       : grants.filter((grant) => grant.provider === grantsFilter);
 
   return (
-    <AppLayout className="z-50">
-      {/* Coming Soon Overlay */}
-      {/* <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md">
-        <Card className="w-full max-w-md mx-4 border-purple-800/30 shadow-xl rounded-2xl relative overflow-hidden">
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-40"
-            style={{ backgroundImage: "url('/coming-soon-card.gif')" }}
-          />
-
-          <CardHeader className="pb-2 text-center relative z-10">
-            <div className="mx-auto flex items-center justify-center mb-4">
-              <Image
-                src="/favicon.svg"
-                alt="OnlyFounders"
-                width={75}
-                height={75}
-              />
-            </div>
-            <CardTitle className="text-2xl md:text-3xl font-bold text-white">
-              Coming Soon!
-            </CardTitle>
-            <CardDescription className="text-white text-lg">
-              We're building something amazing
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-6 text-center relative z-10">
-            <p className="text-gray-300">
-            A shared hub for insights, tools, and content to help founders, investors, and communities grow together.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button className="border-purple-800/30 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Link href="/">Return to Home</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div> */}
-
       <div className="w-screen overflow-x-hidden container mx-auto py-8 space-y-12">
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-white mb-4">
@@ -537,19 +467,12 @@ export default function ResourcesPage() {
         </Card>
 
         <Tabs
-          defaultValue="ai-agents"
+          defaultValue="blogs"
           value={activeTab}
           onValueChange={handleTabChange}
           className="space-y-8"
         >
           <TabsList className="bg-gray-900 border border-gray-800 p-1 flex flex-nowrap justify-center">
-            <TabsTrigger
-              value="ai-agents"
-              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
-            >
-              <Brain className="mr-2 h-4 w-4 hidden lg:block" />
-              AI Agents
-            </TabsTrigger>
             <TabsTrigger
               value="blogs"
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
@@ -558,19 +481,28 @@ export default function ResourcesPage() {
               Blogs
             </TabsTrigger>
             <TabsTrigger
-              value="videos"
-              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
-            >
-              <Video className="mr-2 h-4 w-4 hidden lg:block" />
-              Videos
-            </TabsTrigger>
-            <TabsTrigger
               value="tools"
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
             >
               <Zap className="mr-2 h-4 w-4 hidden lg:block" />
               Tools
             </TabsTrigger>
+            <TabsTrigger
+              value="ai-agents"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+            >
+              <Brain className="mr-2 h-4 w-4 hidden lg:block" />
+              AI Agents
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="videos"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+            >
+              <Video className="mr-2 h-4 w-4 hidden lg:block" />
+              Videos
+            </TabsTrigger>
+
             <TabsTrigger
               value="grants"
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
@@ -586,16 +518,7 @@ export default function ResourcesPage() {
 
           <TabsContent id="blogs" value="blogs">
             <div className="space-y-8">
-              <div>
-                <h2 className="text-3xl font-bold text-white mb-4">
-                  Investment Blogs
-                </h2>
-                <p className="text-gray-400 max-w-3xl">
-                  Comprehensive guides to help you navigate the complexities of
-                  Web3 investments and project evaluation.
-                </p>
-              </div>
-
+            
               {/* Category Filter */}
               <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-wrap gap-2">
@@ -794,16 +717,7 @@ export default function ResourcesPage() {
 
           <TabsContent id="tools" value="tools">
             <div className="space-y-8">
-              <div>
-                <h2 className="text-3xl font-bold text-white mb-4">
-                  Investment Tools
-                </h2>
-                <p className="text-gray-400 max-w-3xl">
-                  Powerful tools to help you analyze, track, and optimize your
-                  Web3 investments.
-                </p>
-              </div>
-
+              
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {tools.map((tool) => (
                   <Card
@@ -1097,6 +1011,5 @@ export default function ResourcesPage() {
           </CardContent>
         </Card>
       </div>
-    </AppLayout>
   );
 }

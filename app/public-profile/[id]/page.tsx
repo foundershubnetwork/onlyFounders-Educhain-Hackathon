@@ -110,11 +110,12 @@ export default function FounderProfilePage({
             years: "",
           },
           profileImage: founderData.profilePic?.file_url || "",
-          bannerImage: "",
+          bannerImage: founderData.bannerImage?.file_url || "",
           socialLinks: {
             Twitter: founderData.founderData?.socialLinks?.Twitter || "",
             LinkedIn: founderData.founderData?.socialLinks?.LinkedIn || "",
             github: founderData.founderData?.socialLinks?.github || "",
+            website: founderData.founderData?.socialLinks?.website || "",
           },
           username: founderData.username,
           professionalTitle: founderData.professionalTitle,
@@ -205,7 +206,11 @@ export default function FounderProfilePage({
 
   return (
     <div className="w-full max-w-4xl mx-auto p-10">
-      <div className="h-48 w-full bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-lg" />
+       <img
+        src={profile.bannerImage}
+        alt="Profile banner"
+        className="h-48 w-full object-cover rounded-t-lg"
+      />
       <div className="bg-[#121026] p-6 rounded-b-lg relative">
         <div className="flex justify-between items-start">
           <div className="flex items-start gap-4">

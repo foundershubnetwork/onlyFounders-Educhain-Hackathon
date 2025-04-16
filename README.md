@@ -2,7 +2,7 @@
 
 # [Technical Documentation ](https://www.notion.so/foundershub/OnlyFounders-x-EDU-Chain-Technical-Documentation-1cff8b9deb7980868618ff51b04d6367?pvs=4) - Read our full technical documentation, justification, APIs, and flows here.
 
-## Ecosystem Impact and Integration
+## Ecosystem Impact and Integration.
 
 OnlyFounders is a permissionless platform revolutionizing early-stage startup funding and education through blockchain technology, offering:
 

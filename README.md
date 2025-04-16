@@ -1,4 +1,4 @@
-# OnlyFounders Hackathon Submission Assessment.
+# OnlyFounders Hackathon Submission Assessment
 
 # [Technical Documentation ](https://www.notion.so/foundershub/OnlyFounders-x-EDU-Chain-Technical-Documentation-1cff8b9deb7980868618ff51b04d6367?pvs=4) - Read our full technical documentation, justification, APIs, and flows here.
 

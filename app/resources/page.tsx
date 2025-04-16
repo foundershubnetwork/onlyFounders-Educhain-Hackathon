@@ -28,6 +28,7 @@ import {
   Search,
   Users,
   Rocket,
+  ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,60 +41,79 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NextSeo } from "next-seo";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 export default function ResourcesPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState(tabParam || "ai-agents");
+  const [activeTab, setActiveTab] = useState(tabParam || "blogs");
   const [grantsFilter, setGrantsFilter] = useState("all");
+  const [blogs, setBlogs] = useState<any>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { user, isLoading } = useUser();
+
+  // Filter blogs based on selected category
+  const filteredBlogs = selectedCategory
+    ? blogs.filter((blog) => blog.categories.includes(selectedCategory))
+    : blogs;
+  const allCategories = [
+    "Networking",
+    "Marketing & Growth",
+    "Business Development",
+    "Fund Raising",
+    "Go-to-Market",
+    "Tokenomics",
+    "Community",
+    "User Engagement",
+    "Legal and Regulations",
+    "Industry Insights",
+    "Best Practices",
+    "Case Studies",
+    "Product Development",
+    "Mental Health",
+  ];
 
   useEffect(() => {
     if (
       tabParam &&
-      ["ai-agents", "guides", "videos", "tools", "grants"].includes(tabParam)
+      ["ai-agents", "blogs", "videos", "tools", "grants"].includes(tabParam)
     ) {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await fetch(
+          "https://onlyfounders.azurewebsites.net/api/blog/get-all-blogs"
+        );
+
+        if (response.status === 200) {
+          const data = await response.json();
+          setBlogs(data.blogs);
+          console.log("Fetched blog ID", blogs._id);
+        }
+      } catch (error) {
+        console.log("Error fetching blogs:", error);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     router.push(`/resources?tab=${value}`);
   };
 
-  const guides = [
-    {
-      id: "guide-1",
-      title: "Web3 Investment Fundamentals",
-      description:
-        "Learn the basics of investing in Web3 projects, understanding tokenomics, and evaluating project potential.",
-      image:
-        "/placeholder.svg?height=200&width=400&text=Investment+Fundamentals",
-      category: "Beginner",
-      readTime: "15 min",
-    },
-    {
-      id: "guide-2",
-      title: "Due Diligence Checklist",
-      description:
-        "A comprehensive checklist for conducting thorough due diligence on Web3 projects before investing.",
-      image: "/placeholder.svg?height=200&width=400&text=Due+Diligence",
-      category: "Intermediate",
-      readTime: "20 min",
-    },
-    {
-      id: "guide-3",
-      title: "Smart Contract Security",
-      description:
-        "Understanding smart contract vulnerabilities and how to assess the security of a project's code.",
-      image:
-        "/placeholder.svg?height=200&width=400&text=Smart+Contract+Security",
-      category: "Advanced",
-      readTime: "25 min",
-    },
-  ];
 
   const videos = [
     {
@@ -128,27 +148,39 @@ export default function ResourcesPage() {
   const tools = [
     {
       id: "tool-1",
-      title: "Tokenomics Calculator",
+      title: "Cap Table Calculator",
       description:
         "Simulate different tokenomic models and their impact on project sustainability and investor returns.",
-      image: "/placeholder.svg?height=200&width=400&text=Tokenomics+Calculator",
+      image: "/resources-tool1.jpg",
       category: "Analysis",
+      redirectlink: "https://v0-web3-cap-table-calculator.vercel.app/",
     },
     {
       id: "tool-2",
-      title: "Investment Portfolio Tracker",
+      title: "AccountaBuddy",
       description:
         "Track your Web3 investments across multiple chains and platforms in one dashboard.",
-      image: "/placeholder.svg?height=200&width=400&text=Portfolio+Tracker",
+      image: "/resources-tool2.jpg",
       category: "Management",
+      redirectlink: "https://v0-bet-on-yourself.vercel.app/",
     },
     {
       id: "tool-3",
-      title: "Smart Contract Analyzer",
+      title: "Startup Evaluator",
       description:
         "Analyze smart contracts for common vulnerabilities and best practices.",
-      image: "/placeholder.svg?height=200&width=400&text=Contract+Analyzer",
+      image: "/resources-tool3.jpg",
       category: "Security",
+      redirectlink: "https://v0-web3-valuation-app-jpvkyq.vercel.app/",
+    },
+    {
+      id: "tool-3",
+      title: "Founder GPT",
+      description:
+        "Your AI-powered assistant for all aspects of building and growing your startup.",
+      image: "/resources-tool4.jpg",
+      category: "Security",
+      redirectlink: "https://v0-founder-gpt-chat-interface-6yakhw.vercel.app/",
     },
   ];
 
@@ -239,60 +271,20 @@ export default function ResourcesPage() {
       : grants.filter((grant) => grant.provider === grantsFilter);
 
   return (
-    <AppLayout className="z-50">
-      {/* Coming Soon Overlay */}
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md">
-        <Card className="w-full max-w-md mx-4 border-purple-800/30 shadow-xl rounded-2xl relative overflow-hidden">
-          {/* Background Image with 75% Opacity */}
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-40"
-            style={{ backgroundImage: "url('/coming-soon-card.gif')" }}
-          />
-
-          <CardHeader className="pb-2 text-center relative z-10">
-            <div className="mx-auto flex items-center justify-center mb-4">
-              <Image
-                src="/favicon.svg"
-                alt="OnlyFounders"
-                width={75}
-                height={75}
-              />
-            </div>
-            <CardTitle className="text-2xl md:text-3xl font-bold text-white">
-              Coming Soon!
-            </CardTitle>
-            <CardDescription className="text-white text-lg">
-              We're building something amazing
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-6 text-center relative z-10">
-            <p className="text-gray-300">
-            A shared hub for insights, tools, and content to help founders, investors, and communities grow together.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button className="border-purple-800/30 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Link href="/">Return to Home</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       <div className="w-screen overflow-x-hidden container mx-auto py-8 space-y-12">
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-white mb-4">
             {activeTab === "ai-agents"
-              ? "Optimus AI AI Agents"
-              : activeTab === "guides"
-              ? "Optimus AI Investment Guides"
+              ? "OnlyFounders AI Agents"
+              : activeTab === "blogs"
+              ? "OnlyFounders Blogs"
               : activeTab === "videos"
-              ? "Optimus AI Video Masterclasses"
+              ? "OnlyFounders Video Masterclasses"
               : activeTab === "tools"
-              ? "Optimus AI Investment Tools"
+              ? "OnlyFounders Investment Tools"
               : activeTab === "grants"
-              ? "Optimus AI Grants & Funding"
-              : "Optimus AI Resources"}
+              ? "OnlyFounders Grants & Funding"
+              : "OnlyFounders Resources"}
           </h1>
           <p className="text-gray-400">
             Explore our comprehensive library of resources designed to help both
@@ -305,7 +297,7 @@ export default function ResourcesPage() {
           className={`overflow-hidden border-0 shadow-lg transition-all duration-500 ${
             activeTab === "ai-agents"
               ? "bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border-blue-800/50"
-              : activeTab === "guides"
+              : activeTab === "blogs"
               ? "bg-gradient-to-r from-emerald-900/30 to-teal-900/30 border-emerald-800/50"
               : activeTab === "videos"
               ? "bg-gradient-to-r from-red-900/30 to-orange-900/30 border-red-800/50"
@@ -323,7 +315,7 @@ export default function ResourcesPage() {
                   className={`mb-4 ${
                     activeTab === "ai-agents"
                       ? "bg-blue-600"
-                      : activeTab === "guides"
+                      : activeTab === "blogs"
                       ? "bg-emerald-600"
                       : activeTab === "videos"
                       ? "bg-red-600"
@@ -337,7 +329,7 @@ export default function ResourcesPage() {
                   {activeTab === "ai-agents" && (
                     <Brain className="mr-1 h-3 w-3" />
                   )}
-                  {activeTab === "guides" && (
+                  {activeTab === "blogs" && (
                     <BookOpen className="mr-1 h-3 w-3" />
                   )}
                   {activeTab === "videos" && <Video className="mr-1 h-3 w-3" />}
@@ -360,28 +352,28 @@ export default function ResourcesPage() {
                       asChild
                       className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                     >
-                      <Link href="#ai-agents-section">
-                        Explore AI Agents <Brain className="ml-2 h-4 w-4" />
+                      <Link href="">
+                        Coming Soon.. <Brain className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
                   </>
                 )}
 
-                {activeTab === "guides" && (
+                {activeTab === "blogs" && (
                   <>
                     <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                      Expert Investment Guides
+                      OnlyFounders Blogs
                     </h2>
                     <p className="text-gray-300 mb-6">
-                      Access comprehensive guides written by industry experts to
+                      Access comprehensive blogs written by industry experts to
                       help you navigate the complexities of Web3 investments.
                     </p>
                     <Button
                       asChild
                       className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
                     >
-                      <Link href="#guides-section">
-                        Browse Guides <BookOpen className="ml-2 h-4 w-4" />
+                      <Link href="#blogs">
+                        Browse Blogs <BookOpen className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
                   </>
@@ -400,8 +392,8 @@ export default function ResourcesPage() {
                       asChild
                       className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
                     >
-                      <Link href="#videos-section">
-                        Watch Videos <Video className="ml-2 h-4 w-4" />
+                      <Link href="">
+                        Coming Soon.. <Video className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
                   </>
@@ -420,7 +412,7 @@ export default function ResourcesPage() {
                       asChild
                       className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                     >
-                      <Link href="#tools-section">
+                      <Link href="#tools">
                         Try Our Tools <Zap className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
@@ -441,8 +433,8 @@ export default function ResourcesPage() {
                       asChild
                       className="bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700"
                     >
-                      <Link href="#grants-section">
-                        Explore Grants <Award className="ml-2 h-4 w-4" />
+                      <Link href="">
+                        Coming Soon.. <Award className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
                   </>
@@ -452,15 +444,15 @@ export default function ResourcesPage() {
                 <Image
                   src={
                     activeTab === "ai-agents"
-                      ? "/placeholder.svg?height=300&width=400&text=AI+Agents"
-                      : activeTab === "guides"
-                      ? "/placeholder.svg?height=300&width=400&text=Investment+Guides"
+                      ? "/ai-agent.jpg"
+                      : activeTab === "blogs"
+                      ? "/blogs.jpg"
                       : activeTab === "videos"
-                      ? "/placeholder.svg?height=300&width=400&text=Video+Masterclasses"
+                      ? "/videos.jpg"
                       : activeTab === "tools"
-                      ? "/placeholder.svg?height=300&width=400&text=Analysis+Tools"
+                      ? "/resources-tools-card.jpg"
                       : activeTab === "grants"
-                      ? "/placeholder.svg?height=300&width=400&text=Grants+Program"
+                      ? "/grant.jpg"
                       : "/placeholder.svg?height=300&width=400&text=Resources"
                   }
                   alt={`${
@@ -475,45 +467,47 @@ export default function ResourcesPage() {
         </Card>
 
         <Tabs
-          defaultValue="ai-agents"
+          defaultValue="blogs"
           value={activeTab}
           onValueChange={handleTabChange}
           className="space-y-8"
         >
-          <TabsList className="bg-gray-900 border border-gray-800 p-1 flex flex-wrap justify-center">
+          <TabsList className="bg-gray-900 border border-gray-800 p-1 flex flex-nowrap justify-center">
             <TabsTrigger
-              value="ai-agents"
+              value="blogs"
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
             >
-              <Brain className="mr-2 h-4 w-4" />
-              AI Agents
-            </TabsTrigger>
-            <TabsTrigger
-              value="guides"
-              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
-            >
-              <BookOpen className="mr-2 h-4 w-4" />
-              Guides
-            </TabsTrigger>
-            <TabsTrigger
-              value="videos"
-              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
-            >
-              <Video className="mr-2 h-4 w-4" />
-              Videos
+              <BookOpen className="mr-2 h-4 w-4 hidden lg:block" />
+              Blogs
             </TabsTrigger>
             <TabsTrigger
               value="tools"
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
             >
-              <Zap className="mr-2 h-4 w-4" />
+              <Zap className="mr-2 h-4 w-4 hidden lg:block" />
               Tools
             </TabsTrigger>
+            <TabsTrigger
+              value="ai-agents"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+            >
+              <Brain className="mr-2 h-4 w-4 hidden lg:block" />
+              AI Agents
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="videos"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+            >
+              <Video className="mr-2 h-4 w-4 hidden lg:block" />
+              Videos
+            </TabsTrigger>
+
             <TabsTrigger
               value="grants"
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
             >
-              <Award className="mr-2 h-4 w-4" />
+              <Award className="mr-2 h-4 w-4 hidden lg:block" />
               Grants
             </TabsTrigger>
           </TabsList>
@@ -522,28 +516,55 @@ export default function ResourcesPage() {
             <AIAgents />
           </TabsContent>
 
-          <TabsContent value="guides">
+          <TabsContent id="blogs" value="blogs">
             <div className="space-y-8">
-              <div>
-                <h2 className="text-3xl font-bold text-white mb-4">
-                  Investment Guides
-                </h2>
-                <p className="text-gray-400 max-w-3xl">
-                  Comprehensive guides to help you navigate the complexities of
-                  Web3 investments and project evaluation.
-                </p>
+            
+              {/* Category Filter */}
+              <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant={selectedCategory === null ? "default" : "outline"}
+                    size="sm"
+                    className={
+                      selectedCategory === null
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                        : "bg-gray-800 text-gray-300 hover:text-white"
+                    }
+                    onClick={() => setSelectedCategory(null)}
+                  >
+                    All
+                  </Button>
+
+                  {allCategories.map((category) => (
+                    <Button
+                      key={category}
+                      variant={
+                        selectedCategory === category ? "default" : "outline"
+                      }
+                      size="sm"
+                      className={
+                        selectedCategory === category
+                          ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                          : "bg-gray-800 text-gray-300 hover:text-white"
+                      }
+                      onClick={() => setSelectedCategory(category)}
+                    >
+                      {category}
+                    </Button>
+                  ))}
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {guides.map((guide) => (
+                {filteredBlogs.map((blog) => (
                   <Card
-                    key={guide.id}
+                    key={blog._id}
                     className="bg-gray-900 border-gray-800 overflow-hidden flex flex-col hover:border-blue-600 transition-colors"
                   >
                     <div className="relative h-48 w-full">
                       <Image
-                        src={guide.image || "/placeholder.svg"}
-                        alt={guide.title}
+                        src={blog.headerImage.file_url || "/placeholder.svg"}
+                        alt={blog.title}
                         fill
                         className="object-cover"
                       />
@@ -551,49 +572,68 @@ export default function ResourcesPage() {
                       <div className="absolute top-4 left-4">
                         <Badge className="bg-blue-600">
                           <BookOpen className="mr-1 h-3 w-3" />
-                          Guide
+                          Blog
                         </Badge>
                       </div>
                     </div>
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <CardTitle className="text-xl text-white">
-                          {guide.title}
+                          {blog.title}
                         </CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent className="flex-grow">
                       <CardDescription className="text-gray-400 mb-4">
-                        {guide.description}
+                        {blog.description}
                       </CardDescription>
-                      <div className="flex items-center justify-between">
-                        <Badge
-                          variant="outline"
-                          className="bg-gray-800 border-gray-700 text-gray-400"
-                        >
-                          {guide.category}
-                        </Badge>
-                        <span className="text-xs text-gray-400">
-                          {guide.readTime} read
-                        </span>
+                      <div className="flex items-center">
+                        {blog.categories && blog.categories.length > 0 && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="bg-gray-800 border-gray-700 text-gray-400 hover:text-white flex items-center gap-1"
+                              >
+                                {blog.categories[0]}
+                                {blog.categories.length > 1 && (
+                                  <ChevronDown className="h-4 w-4 opacity-70" />
+                                )}
+                              </Button>
+                            </DropdownMenuTrigger>
+                            {blog.categories.length > 1 && (
+                              <DropdownMenuContent className="bg-gray-800 border-gray-700 px-2 py-1 rounded-md">
+                                {blog.categories.slice(1).map((category) => (
+                                  <DropdownMenuItem
+                                    key={category}
+                                    className="text-gray-300 hover:text-white focus:text-white focus:bg-gray-700 rounded-md px-2 cursor-pointer"
+                                  >
+                                    {category}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            )}
+                          </DropdownMenu>
+                        )}
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                        Read Guide
+                      <Button
+                        onClick={() => {
+                          if (!user) {
+                            alert("Please login to read the blog");
+                            return;
+                          }
+                          router.push(`/resources/guides/${blog._id}`);
+                        }}
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                      >
+                        Read Blog
                       </Button>
                     </CardFooter>
                   </Card>
                 ))}
-              </div>
-
-              <div className="flex justify-center">
-                <Button
-                  variant="outline"
-                  className="text-white border-gray-700 bg-gray-900 hover:bg-gray-800"
-                >
-                  View All Guides
-                </Button>
               </div>
             </div>
           </TabsContent>
@@ -601,16 +641,16 @@ export default function ResourcesPage() {
           <TabsContent value="videos">
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl font-bold text-white mb-4">
-                  Educational Videos
+                <h2 className="text-center text-3xl font-bold text-white mb-4 mt-12">
+                  Coming Soon ...
                 </h2>
-                <p className="text-gray-400 max-w-3xl">
+                {/* <p className="text-gray-400 max-w-3xl">
                   Watch expert-led videos on Web3 investment strategies,
                   tokenomics, and project evaluation.
-                </p>
+                </p> */}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {videos.map((video) => (
                   <Card
                     key={video.id}
@@ -662,31 +702,22 @@ export default function ResourcesPage() {
                     </CardFooter>
                   </Card>
                 ))}
-              </div>
+              </div> */}
 
-              <div className="flex justify-center">
+              {/* <div className="flex justify-center">
                 <Button
                   variant="outline"
                   className="text-white border-gray-700 bg-gray-900 hover:bg-gray-800"
                 >
                   View All Videos
                 </Button>
-              </div>
+              </div> */}
             </div>
           </TabsContent>
 
-          <TabsContent value="tools">
+          <TabsContent id="tools" value="tools">
             <div className="space-y-8">
-              <div>
-                <h2 className="text-3xl font-bold text-white mb-4">
-                  Investment Tools
-                </h2>
-                <p className="text-gray-400 max-w-3xl">
-                  Powerful tools to help you analyze, track, and optimize your
-                  Web3 investments.
-                </p>
-              </div>
-
+              
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {tools.map((tool) => (
                   <Card
@@ -727,9 +758,11 @@ export default function ResourcesPage() {
                       </Badge>
                     </CardContent>
                     <CardFooter>
-                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                        Launch Tool
-                      </Button>
+                      <a href={tool.redirectlink} target="_blank">
+                        <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                          Launch Tool
+                        </Button>
+                      </a>
                     </CardFooter>
                   </Card>
                 ))}
@@ -749,16 +782,16 @@ export default function ResourcesPage() {
           <TabsContent value="grants" id="grants-section">
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl font-bold text-white mb-4">
-                  Available Grants
+                <h2 className="text-center text-3xl font-bold text-white mt-12 mb-4">
+                  Coming Soon ...
                 </h2>
-                <p className="text-gray-400 max-w-3xl">
+                {/* <p className="text-gray-400 max-w-3xl">
                   Explore available grants and funding opportunities for your
                   Web3 project.
-                </p>
+                </p> */}
               </div>
 
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <div className="bg-gray-900 border border-gray-800 p-1 rounded-md">
                   <div className="flex space-x-1">
                     <Button
@@ -832,9 +865,9 @@ export default function ResourcesPage() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
+              </div> */}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredGrants.map((grant) => (
                   <Card
                     key={grant.id}
@@ -901,9 +934,9 @@ export default function ResourcesPage() {
                     </CardContent>
                   </Card>
                 ))}
-              </div>
+              </div> */}
 
-              {filteredGrants.length === 0 && (
+              {/* {filteredGrants.length === 0 && (
                 <div className="text-center py-12">
                   <p className="text-xl font-medium text-white mb-2">
                     No grants found
@@ -915,9 +948,9 @@ export default function ResourcesPage() {
                     View All Grants
                   </Button>
                 </div>
-              )}
+              )} */}
 
-              <Card className="bg-gradient-to-br from-amber-900/20 to-yellow-900/20 border-gray-800">
+              {/* <Card className="bg-gradient-to-br from-amber-900/20 to-yellow-900/20 border-gray-800">
                 <CardContent className="p-8">
                   <div className="flex flex-col md:flex-row items-center gap-8">
                     <div className="flex-1">
@@ -944,7 +977,7 @@ export default function ResourcesPage() {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
           </TabsContent>
         </Tabs>
@@ -968,7 +1001,7 @@ export default function ResourcesPage() {
               </div>
               <div className="relative h-48 w-full md:w-1/3 rounded-lg overflow-hidden">
                 <Image
-                  src="/placeholder.svg?height=200&width=300&text=Custom+Resources"
+                  src="/resources-footer.jpg"
                   alt="Custom Resources"
                   fill
                   className="object-cover"
@@ -978,6 +1011,5 @@ export default function ResourcesPage() {
           </CardContent>
         </Card>
       </div>
-    </AppLayout>
   );
 }

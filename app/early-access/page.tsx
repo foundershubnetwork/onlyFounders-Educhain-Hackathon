@@ -209,7 +209,6 @@ export default function Home() {
               <input
                 type="text"
                 name="xHandle"
-                required
                 value={formData.xHandle}
                 onChange={handleChange}
                 placeholder="X Handle (For The Spicy Takes)"
@@ -219,7 +218,6 @@ export default function Home() {
               <input
                 type="text"
                 name="telegram"
-                required
                 value={formData.telegram}
                 onChange={handleChange}
                 placeholder="Telegram Handle (Join Us)"
@@ -259,7 +257,6 @@ export default function Home() {
               <input
                 type="text"
                 name="walletAddress"
-                required
                 value={formData.walletAddress}
                 onChange={handleChange}
                 placeholder="Wallet Address (Where The Magic Happens)"

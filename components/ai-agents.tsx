@@ -94,15 +94,16 @@ export function AIAgents() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-bold text-white mb-4">AI Agents Marketplace</h2>
-        <p className="text-[#A3A8AF] max-w-3xl">
+      <div className="flex flex-col items-center justify-center">
+        {/* <h2 className="text-3xl font-bold text-white mb-4">AI Agents Marketplace</h2> */}
+        <h2 className="text-3xl font-bold text-white mb-4 mt-12">Coming Soon...</h2>
+        {/* <p className="text-[#A3A8AF] max-w-3xl text-center">
           Leverage the power of AI to enhance your investment strategy, streamline founder workflows, and accelerate
           your learning in the Web3 space.
-        </p>
+        </p> */}
       </div>
 
-      <Tabs defaultValue="investment" className="space-y-6">
+      {/* <Tabs defaultValue="investment" className="space-y-6">
         <TabsList className="bg-[#1F2A3D] p-1 rounded-lg">
           <TabsTrigger value="investment" className="data-[state=active]:bg-black data-[state=active]:text-white">
             <BarChart className="mr-2 h-4 w-4" />
@@ -252,9 +253,9 @@ export function AIAgents() {
             ))}
           </div>
         </TabsContent>
-      </Tabs>
+      </Tabs> */}
 
-      <div className="bg-[#1F2A3D] border border-[#313E54] rounded-lg p-6">
+      {/* <div className="bg-[#1F2A3D] border border-[#313E54] rounded-lg p-6">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
           <div className="p-3 rounded-full bg-[#29305F]">
             <Brain className="h-6 w-6 text-white" />
@@ -270,7 +271,7 @@ export function AIAgents() {
             Request Custom Agent
           </Button>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

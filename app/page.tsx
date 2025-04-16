@@ -20,8 +20,6 @@ import { featureCards } from "@/data/featureCards";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import AnimatedButton from "@/components/animatedButton";
-import { NextSeo } from "next-seo";
 
 
 export default function HomePage() {
@@ -152,10 +150,9 @@ export default function HomePage() {
               {/* Desktop buttons */}
               <div className="hidden md:flex flex-col md:flex-row items-center gap-4 pt-4">
                 <Link href="/marketplace" className="w-72 md:w-auto">
-                  {/* <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-6 text-lg">
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-6 text-lg">
                     Explore Startups <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button> */}
-                  <AnimatedButton title="Explore Startups  →"/>     
+                  </Button>
                 </Link>
                 <Link
                   href="api/auth/login"
@@ -163,7 +160,7 @@ export default function HomePage() {
                 >
                   <Button
                     variant="outline"
-                    className="w-full border-purple-900 text-white hover:bg-purple-900/30 px-6 py-5 text-lg"
+                    className="w-full border-purple-900 text-white hover:bg-purple-900/30 px-8 py-6 text-lg"
                   >
                     Start Fundraising
                   </Button>
@@ -482,7 +479,7 @@ export default function HomePage() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-cyan-400">
-                            {item.totalRaised} USDC raised
+                            Yet to raise
                           </span>
                           <span className="text-white">
                             {item.goal
@@ -559,11 +556,9 @@ export default function HomePage() {
                 </p>
                 <div className="flex gap-4">
                   <Link href="/marketplace" className="w-72 md:w-auto">
-                    {/* <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                       Explore Startups <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button> */}
-
-                    <AnimatedButton title="Explore Startups  →"/>                  
+                    </Button>
                   </Link>
                   <Link href="/" className="w-72 md:w-auto">
                     <Button

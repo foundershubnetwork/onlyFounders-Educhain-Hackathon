@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { FaXTwitter } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
-import { NextSeo } from "next-seo";
 
 export default function AboutPage() {
   const [aboutOpen, setAboutOpen] = useState(false);

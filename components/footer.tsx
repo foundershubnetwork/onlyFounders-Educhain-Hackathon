@@ -74,7 +74,7 @@ export function Footer() {
                 rel="noopener noreferrer"
               >
                 <Image
-                  src="/Telegram.svg"
+                  src="/telegram.svg"
                   alt="Telegram"
                   width={30}
                   height={30}
@@ -104,7 +104,7 @@ export function Footer() {
                 rel="noopener noreferrer"
               >
                 <Image
-                  src="/Mail.svg"
+                  src="/mail.svg"
                   alt="mail"
                   width={30}
                   height={30}

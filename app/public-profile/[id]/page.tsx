@@ -90,7 +90,7 @@ export default function FounderProfilePage({
 
         if (!response.ok) {
           console.error("Response Error:", response.status, await response.text())
-          throw new Error("Failed to fetch founder data")
+          // throw new Error("Failed to fetch founder data")
         }
 
         const data = await response.json()

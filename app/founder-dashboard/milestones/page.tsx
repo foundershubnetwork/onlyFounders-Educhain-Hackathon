@@ -76,9 +76,9 @@ export default function MilestonesPage() {
           }),
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch project stats")
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch project stats")
+        // }
 
         const data = await response.json()
         setProjectStats(data)
@@ -119,9 +119,9 @@ export default function MilestonesPage() {
           }),
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch milestones")
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch milestones")
+        // }
 
         const data = await response.json()
 

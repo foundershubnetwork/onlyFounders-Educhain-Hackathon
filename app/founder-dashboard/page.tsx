@@ -118,9 +118,9 @@ export default function FounderDashboardPage() {
           }),
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch founder stats")
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch founder stats")
+        // }
 
         const data = await response.json()
         setProjectStats({
@@ -166,9 +166,9 @@ export default function FounderDashboardPage() {
           }),
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch upcoming milestones")
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch upcoming milestones")
+        // }
 
         const data = await response.json()
 

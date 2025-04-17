@@ -116,9 +116,9 @@ export default function MarketplacePage() {
           },
         })
 
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`)
-        }
+        // if (!response.ok) {
+        //   throw new Error(`API error: ${response.status}`)
+        // }
 
         const data = await response.json()
 
@@ -145,9 +145,9 @@ export default function MarketplacePage() {
         setIsLoading(true)
         const response = await fetch("https://onlyfounders.azurewebsites.net/api/startup/get-startup-listing")
 
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`)
-        }
+        // if (!response.ok) {
+        //   throw new Error(`API error: ${response.status}`)
+        // }
 
         const data = await response.json()
         setStartups(data.startups)

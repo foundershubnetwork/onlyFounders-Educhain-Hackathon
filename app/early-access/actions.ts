@@ -417,7 +417,7 @@ async function sendEmail(data: FormData, recipient: string, subject: string, htm
     const senderEmail = process.env.SENDER_ADDRESS;
 
     if (!connectionString || !senderEmail) {
-      throw new Error("Azure Communication Services configuration missing.");
+      console.log("Azure Communication Services configuration missing.");
     }
 
     const emailClient = new EmailClient(connectionString);

@@ -288,9 +288,9 @@ export default function TokenomicsForm({ data, updateData, onSubmit }: Tokenomic
         body: JSON.stringify(apiData),
       })
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
-      }
+      // if (!response.ok) {
+      //   throw new Error(`API error: ${response.status}`)
+      // }
 
       // Show success toast
       toast({

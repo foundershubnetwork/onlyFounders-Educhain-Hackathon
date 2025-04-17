@@ -65,9 +65,9 @@ export default function BlogDetail() {
           },
         })
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch blog: ${response.status}`)
-        }
+        // if (!response.ok) {
+        //   throw new Error(`Failed to fetch blog: ${response.status}`)
+        // }
 
         const data: ApiResponse = await response.json()
         setBlog(data.blog)

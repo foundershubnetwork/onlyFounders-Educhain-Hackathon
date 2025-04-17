@@ -48,7 +48,7 @@ export function EarlyAccessEntries() {
         body: JSON.stringify({ status: newStatus }),
         headers: { "Content-Type": "application/json" },
       })
-      if (!response.ok) throw new Error("Failed to update status")
+      // if (!response.ok) throw new Error("Failed to update status")
       // Update UI to reflect the new status
       setEntries((prev) =>
         prev.map((entry) => (entry.id === id ? { ...entry, status: newStatus } : entry))

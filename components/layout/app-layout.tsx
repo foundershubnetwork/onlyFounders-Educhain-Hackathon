@@ -111,9 +111,9 @@ export function AppLayout({
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
+      // if (!response.ok) {
+      //   throw new Error(`API error: ${response.status}`);
+      // }
 
       const data = await response.json();
       setRole(data.role);

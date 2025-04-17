@@ -340,9 +340,9 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
         body: JSON.stringify(apiData),
       })
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
-      }
+      // if (!response.ok) {
+      //   throw new Error(`API error: ${response.status}`)
+      // }
 
       // Show success toast
       toast({

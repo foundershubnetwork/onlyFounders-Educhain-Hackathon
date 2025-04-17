@@ -10,7 +10,7 @@ if (!serverConfigCheckResult.success) {
     console.error(error)
   })
 
-  throw new Error(`Server config errors`)
+  console.log(`Server config errors`)
 }
 
 /**

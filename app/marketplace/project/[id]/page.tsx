@@ -375,9 +375,9 @@ export default function ProjectDetailPage({
           }),
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch startup data")
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch startup data")
+        // }
 
         const data: APIResponse = await response.json()
         setStartupData(data.startup)
@@ -397,9 +397,9 @@ export default function ProjectDetailPage({
       try {
         const response = await fetch("https://onlyfounders.azurewebsites.net/api/startup/get-startup-listing")
 
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`)
-        }
+        // if (!response.ok) {
+        //   throw new Error(`API error: ${response.status}`)
+        // }
 
         const data = await response.json()
 

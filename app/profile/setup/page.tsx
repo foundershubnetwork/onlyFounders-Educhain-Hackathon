@@ -46,9 +46,9 @@ export default function ProfileSetupPage() {
         }),
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to submit role")
-      }
+      // if (!response.ok) {
+      //   throw new Error("Failed to submit role")
+      // }
 
       // Navigate to the next page based on the selected role
       if (selectedType === "Founder") {

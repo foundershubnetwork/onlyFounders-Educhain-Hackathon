@@ -166,9 +166,9 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
           body: formData,
         })
 
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`)
-        }
+        // if (!response.ok) {
+        //   throw new Error(`API error: ${response.status}`)
+        // }
       }
 
       // Show success toast

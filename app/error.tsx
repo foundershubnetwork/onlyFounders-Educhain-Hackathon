@@ -1,15 +1,16 @@
-'use client'
+// app/error.tsx
+'use client';
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect } from 'react';
+// import { useRouter } from 'next/navigation';
 
-export default function Error() {
-  const router = useRouter()
-
+export default function Error({ error, reset }: { error: Error; reset: () => void }) {
+  
+  // const router = useRouter();
   useEffect(() => {
-    // redirect to home after error
-    router.push('/')
-  }, [])
+    // router.push('/')
+    reset()
+  }, [error]);
 
-  return null // or loading spinner
+  return null;
 }

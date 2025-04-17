@@ -65,9 +65,9 @@ export default function HomePage() {
             }
           );
     
-          if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-          }
+          // if (!response.ok) {
+          //   throw new Error(`API error: ${response.status}`);
+          // }
     
           const data = await response.json();
           setOnboardingStatus(data.status);
@@ -96,9 +96,11 @@ export default function HomePage() {
         const response = await fetch(
           "https://onlyfounders.azurewebsites.net/api/startup/get-featured-projects"
         );
-        if (!response.ok) {
-          throw new Error("Failed to fetch projects");
-        }
+
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch projects");
+        // }
+
         const data = await response.json();
 
         if (Array.isArray(data.startups)) {

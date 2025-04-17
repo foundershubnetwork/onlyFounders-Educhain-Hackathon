@@ -25,16 +25,19 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.onlyfounders.xyz"),
   title: "OnlyFounders - Web3 Fundraising Platform",
+  icons: {
+    icon: 'https://f3ai.blob.core.windows.net/frontend-picture-storage/favicon.svg', // or relative: '/favicon.ico'
+  },
   description: "AI-powered Web3 fundraising platform connecting innovative blockchain projects with global investors",
   openGraph: {
     title: "Welcome to OnlyFounders",
     description: "Discover amazing experiences and quests.",
     images: [
       {
-        url: "/founders-verida-mobile.png",
+        url: "/home.jpg",
         width: 1200,
         height: 630,
-        alt: "Home Preview",
+        alt: "OnlyFounders Preview",
       },
     ],
   },

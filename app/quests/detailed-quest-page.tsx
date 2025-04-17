@@ -1448,7 +1448,7 @@ export default function DetailedQuestPage({ questId }) {
                 <Button
                   variant="outline"
                   className="border-[#15847D]/30 text-[#8C9BA8] hover:text-[#F5F7FA] hover:border-[#00E0FF]/50 hover:bg-[#00E0FF]/5 transition-all duration-200 rounded-xl px-6"
-                  onClick={() => router.push("/")}
+                  onClick={() => router.push("/quests")}
                 >
                   Back to Quests
                 </Button>
@@ -1466,7 +1466,7 @@ export default function DetailedQuestPage({ questId }) {
                 onClose={() => setMintModal(false)}
                 onExplore={() => {
                   setMintModal(false)
-                  window.open(`https://educhain.blockscout.com/tx/${mintData.transactionHash}`, '_blank'); // Adjust this path to your NFT collection page
+                  window.open(`https://educhain.blockscout.com/tx/${mintData.transactionHash}`, '_blank'); 
                 }}
                 nftData={mintData}
               />

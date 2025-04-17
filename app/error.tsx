@@ -9,13 +9,8 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
   // const router = useRouter();
   useEffect(() => {
     // router.push('/')
-    // reset()
+    reset()
   }, [error]);
 
-  return (
-    <div>
-      Error
-      <button onClick={()=> reset()} >Try Again</button>
-    </div>
-  )
+  return null;
 }

@@ -48,6 +48,7 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import {useToast} from '../../hooks/use-toast'
 
 export default function ResourcesPage() {
   const searchParams = useSearchParams();
@@ -58,6 +59,9 @@ export default function ResourcesPage() {
   const [blogs, setBlogs] = useState<any>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { user, isLoading } = useUser();
+  const { toast } = useToast()
+
+
 
   // Filter blogs based on selected category
   const filteredBlogs = selectedCategory
@@ -622,7 +626,11 @@ export default function ResourcesPage() {
                       <Button
                         onClick={() => {
                           if (!user) {
-                            alert("Please login to read the blog");
+                            toast({
+                              title: "Message",
+                              description: "Please login to view deailed blog",
+                              variant: "destructive",
+                            })
                             return;
                           }
                           router.push(`/resources/guides/${blog._id}`);

@@ -54,6 +54,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <link rel="icon" href="https://f3ai.blob.core.windows.net/frontend-picture-storage/favicon.svg" />
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-R97GNL407V"

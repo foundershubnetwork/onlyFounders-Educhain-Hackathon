@@ -16,6 +16,18 @@ export function Footer() {
                 height={60}
                 className="rounded-md"
               />
+              <a
+                    href="https://www.producthunt.com/posts/onlyfounders?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-onlyfounders"
+                    target="_blank" rel="noopener noreferrer" 
+                  >
+                    <Image
+                      src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=947289&theme=dark&t=1743218613734"
+                      alt="OnlyFounders - Permissionless&#0032;Fundraising&#0032;for&#0032;Early&#0045;stage&#0032;founders&#0032;in&#0032;Web3 | Product Hunt"
+                      width={180}
+                      height={54}
+                      className=""
+                    />
+                  </a>
             </div>
             <p className="text-gray-400 text-sm">
               AI-powered Web3 fundraising platform connecting <br /> innovative

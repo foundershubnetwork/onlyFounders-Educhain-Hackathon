@@ -178,9 +178,9 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
         body: formData, // Do not set Content-Type manually for FormData
       })
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
-      }
+      // if (!response.ok) {
+      //   throw new Error(`API error: ${response.status}`)
+      // }
 
       // Show success toast
       toast({

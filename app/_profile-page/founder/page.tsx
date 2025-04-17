@@ -85,7 +85,7 @@ export default function FounderProfilePage() {
   
         if (!response.ok) {
           console.error("Response Error:", response.status, await response.text());
-          throw new Error("Failed to fetch profile data");
+          // throw new Error("Failed to fetch profile data");
         }
   
         const data = await response.json();
@@ -165,9 +165,9 @@ export default function FounderProfilePage() {
         body: formData,
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to update profile")
-      }
+      // if (!response.ok) {
+      //   throw new Error("Failed to update profile")
+      // }
 
       setProfile(editedProfile)
       setIsEditing(false)

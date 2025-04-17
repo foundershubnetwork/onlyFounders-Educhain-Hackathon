@@ -110,9 +110,9 @@ export default function ServiceProviderProfilePage() {
             user_id: String(userId), // Ensure it's a string
           },
         })
-        if (!response.ok) {
-          throw new Error("Failed to fetch profile data")
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch profile data")
+        // }
         const data = await response.json()
         console.log("Fetched profile data:", data) // Log the data structure
 
@@ -200,9 +200,9 @@ export default function ServiceProviderProfilePage() {
         body: formData
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to update profile")
-      }
+      // if (!response.ok) {
+      //   throw new Error("Failed to update profile")
+      // }
 
       setProfile(editedProfile)
       setIsEditing(false)

@@ -318,9 +318,9 @@ export default function ServiceProviderProfileSetupPage() {
               },
             });
       
-            if (!response.ok) {
-              throw new Error("Failed to fetch onboarding status");
-            }
+            // if (!response.ok) {
+            //   throw new Error("Failed to fetch onboarding status");
+            // }
       
             const data = await response.json();
             setOnboardingStatus(data.status);

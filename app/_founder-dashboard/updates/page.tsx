@@ -122,9 +122,9 @@ export default function UpdatesPage() {
         body: formDataToSend,
       });
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
+      // if (!response.ok) {
+      //   throw new Error(`Error: ${response.status}`);
+      // }
 
       const result = await response.json();
 

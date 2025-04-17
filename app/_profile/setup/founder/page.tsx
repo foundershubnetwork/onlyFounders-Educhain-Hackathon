@@ -272,9 +272,9 @@ export default function FounderProfileSetupPage() {
           },
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch onboarding status")
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch onboarding status")
+        // }
 
         const data = await response.json()
         setOnboardingStatus(data.status)
@@ -306,9 +306,9 @@ export default function FounderProfileSetupPage() {
           },
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch profile data")
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch profile data")
+        // }
 
         const data = await response.json()
         setOriginalData(data)
@@ -426,7 +426,7 @@ export default function FounderProfileSetupPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null)
-        throw new Error(errorData?.message || "Failed to submit profile")
+        // throw new Error(errorData?.message || "Failed to submit profile")
       }
 
       toast({

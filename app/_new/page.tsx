@@ -84,9 +84,10 @@ export default function ProfilePage() {
           },
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch profile data");
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch profile data");
+        // }
+
         const data = await response.json();
         setProfileData(data);
         setFormData(data);
@@ -248,9 +249,9 @@ export default function ProfilePage() {
         body: formDataToSend,
       });
   
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
+      // if (!response.ok) {
+      //   throw new Error("Failed to update profile");
+      // }
   
       const updatedData = await response.json();
       setProfileData(updatedData);

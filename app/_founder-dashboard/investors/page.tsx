@@ -72,9 +72,9 @@ export default function InvestorsPage() {
           }),
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch project stats")
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch project stats")
+        // }
 
         const data = await response.json()
         setProjectStats(data)

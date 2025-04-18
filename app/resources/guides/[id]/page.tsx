@@ -8,7 +8,7 @@ import { ArrowLeft, Clock, ThumbsUp, Share2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useUser } from "@auth0/nextjs-auth0/client"
-import { AppLayout } from "@/components/layout/app-layout"
+import {useToast} from '../../../../hooks/use-toast'
 
 interface BlogImage {
   file_name: string
@@ -47,6 +47,7 @@ export default function BlogDetail() {
   const [likes, setLikes] = useState(0)
   const [likeLoading, setLikeLoading] = useState(false)
   const { user, isLoading } = useUser()
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -118,7 +119,11 @@ export default function BlogDetail() {
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href)
-      alert("Blog URL copied to clipboard!")
+      toast({
+        title: "Message",
+        description: "Blog URL copied to clipboard!",
+        variant: "default",
+      })
     } catch (err) {
       console.error("Failed to copy URL:", err)
     }

@@ -849,13 +849,13 @@ export default function ProjectDetailPage({
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black to-transparent"></div>
         <button
           onClick={() => {
             handleUpvoteStatus();
           }}
           disabled={upvoteLoading}
-          className={`absolute flex items-center gap-1 top-5 right-5 cursor-pointer hover:bg-slate-700 transition-all duration-200 bg-slate-800 px-3 py-1.5 rounded-md ${
+          className={`absolute flex z-30 items-center gap-1 top-5 right-5 cursor-pointer hover:bg-slate-700 transition-all duration-200 bg-slate-800 px-3 py-1.5 rounded-md ${
             upvoteLoading ? "opacity-70" : ""
           }`}
         >
@@ -867,7 +867,7 @@ export default function ProjectDetailPage({
           {upvoteLoading ? "Loading..." : hasUpvoted ? "Upvoted" : "Upvote"}
         </button>
 
-        <div className="absolute bottom-0 left-0 p-6 flex items-end gap-4">
+        <div className="absolute z-20 bottom-0 left-0 p-6 flex items-end gap-4">
           <div className="h-20 w-20 rounded-xl overflow-hidden relative bg-gray-800 border-4 border-gray-800">
             <Image
               src={project.logo || "/placeholder.svg"}
@@ -1596,7 +1596,7 @@ export default function ProjectDetailPage({
                     Share
                   </Button>
                   </a>
-                  <a href="https://t.me/username" target="_blank" rel="noopener noreferrer">
+                  <a href={project.telegram} target="_blank" rel="noopener noreferrer">
                   <Button
                     variant="outline"
                     className="flex-1 border-gray-800 text-white"

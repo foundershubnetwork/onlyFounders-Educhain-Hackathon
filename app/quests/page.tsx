@@ -611,18 +611,30 @@ export default function QuestsPage() {
           <TabsList className="bg-gray-900 border border-gray-800">
             <TabsTrigger
               value="EDUChain Quests"
-              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+              className="flex items-center gap-2 data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
             >
-              <Brain className="mr-2 h-4 w-4" />
-              Quests Powered By EDU Chain
+              {/* <Brain className="mr-2 h-4 w-4" /> */}
+              <Image
+                src='/edu-icon.svg'
+                alt="Verida Icon"
+                height={20}
+                width={20}
+              />
+              Quests Powered By EDU <span className="hidden md:block">Chain</span> 
             </TabsTrigger>
 
             <TabsTrigger
               value="Verida Quests"
-              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+              className="flex items-center gap-2 data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
             >
-              <Brain className="mr-2 h-4 w-4" />
-              Quests Powered By Verida
+              {/* <Brain className="mr-2 h-4 w-4" /> */}
+              <Image
+                src='/verida-icon.svg'
+                alt="Verida Icon"
+                height={20}
+                width={20}
+              />
+              Verida Quests
             </TabsTrigger>
           </TabsList>
         </div>

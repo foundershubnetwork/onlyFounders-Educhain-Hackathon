@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, ArrowRight, Building, Camera, Facebook, Globe, Instagram, Linkedin, Twitter } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
+import { AppLayout } from "@/components/layout/app-layout"
 
 const serviceProviderProfileSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -536,6 +537,7 @@ export default function ServiceProviderProfileSetupPage() {
   }
 
   return (
+    <AppLayout className="">
     <div className="max-w-4xl mx-auto py-12 px-4">
       <div className="space-y-6">
         <div className="space-y-2">
@@ -1089,5 +1091,6 @@ export default function ServiceProviderProfileSetupPage() {
         </div>
       </div>
     </div>
+    </AppLayout>
   )
 }

@@ -4,7 +4,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
 
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
 import { WagmiConfig } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -56,6 +56,12 @@ const Providers = ({ children } :  { children: React.ReactNode }) => {
     <QueryClientProvider client={new QueryClient()}>
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider
+        theme={darkTheme({
+          accentColor: '#6b46c1',
+          accentColorForeground: 'white',
+          borderRadius: 'large',
+          overlayBlur: 'small',
+        })}
         chains={chains}>
         {children}
       </RainbowKitProvider>

@@ -625,14 +625,6 @@ export default function ResourcesPage() {
                     <CardFooter>
                       <Button
                         onClick={() => {
-                          if (!user) {
-                            toast({
-                              title: "Message",
-                              description: "Please login to view deailed blog",
-                              variant: "destructive",
-                            })
-                            return;
-                          }
                           router.push(`/resources/guides/${blog._id}`);
                         }}
                         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
@@ -1003,9 +995,11 @@ export default function ResourcesPage() {
                   founder looking to educate your community or an investor
                   seeking specialized analysis tools, we've got you covered.
                 </p>
+                <a href="https://discord.gg/xyKaHgyz5w" target="_blank">
                 <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                   Contact Us
                 </Button>
+                </a>
               </div>
               <div className="relative h-48 w-full md:w-1/3 rounded-lg overflow-hidden">
                 <Image

@@ -11,8 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Camera, Globe, Github, Twitter, ArrowLeft, Cross } from "lucide-react"
-import { TbCancel } from "react-icons/tb";
+import { ArrowRight, Camera, Globe, Github, Twitter } from "lucide-react"
+import { TbCancel } from "react-icons/tb"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/hooks/use-toast"
@@ -79,6 +79,18 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
   const [projectId, setProjectId] = useState<string>("")
   const { user } = useUser()
   const [customCategory, setCustomCategory] = useState<string>("")
+  const [customBlockchains, setCustomBlockchains] = useState<string[]>([])
+  const [newCustomBlockchain, setNewCustomBlockchain] = useState<string>("")
+
+  // Define standard blockchain options
+  const blockchains = [
+    { id: "solana", label: "Solana" },
+    { id: "ethereum", label: "Ethereum" },
+    { id: "others", label: "Others" },
+  ]
+
+  // Get standard blockchain IDs for later comparison
+  const standardBlockchainIds = blockchains.map((b) => b.id).filter((id) => id !== "others")
 
   const form = useForm<BasicInfoValues>({
     resolver: zodResolver(basicInfoSchema),
@@ -156,7 +168,6 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
 
         const data = response.data // ✅ Axios handles JSON parsing automatically
 
-
         if (data && data.startup) {
           const startup = data.startup
           console.log(startup.wpaperurl)
@@ -172,6 +183,21 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
             setBannerSrc(startup.bannerImage.file_url)
           }
 
+          // Process blockchain platforms to identify custom ones
+          const blockchainPlatforms = startup.blockchainPlatforms || []
+          const customPlatforms = blockchainPlatforms.filter(
+            (platform: string) => !standardBlockchainIds.includes(platform),
+          )
+
+          // If there are custom platforms, add "others" to the platforms list if not already there
+          const updatedPlatforms = [...blockchainPlatforms]
+          if (customPlatforms.length > 0 && !updatedPlatforms.includes("others")) {
+            updatedPlatforms.push("others")
+          }
+
+          // Set custom blockchains state
+          setCustomBlockchains(customPlatforms)
+
           // Set form values
           form.reset({
             startupName: startup.startupName || "",
@@ -183,7 +209,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
               : startup.category
                 ? startup.category.toLowerCase()
                 : "",
-            blockchainPlatforms: startup.blockchainPlatforms || [],
+            blockchainPlatforms: updatedPlatforms,
             website: socialLinks.website || socialLinks.Website || "",
             twitter: socialLinks.twitter || socialLinks.Twitter || "",
             github: socialLinks.github || socialLinks.Github || "",
@@ -468,17 +494,6 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
     { id: "others", label: "Others" },
   ]
 
-  const blockchains = [
-    { id: "skale", label: "SKALE" },
-    { id: "icp", label: "ICP" },
-    { id: "mega-eth", label: "MEGA ETH" },
-    { id: "soon", label: "SOON" },
-    { id: "abstract", label: "Abstract" },
-    { id: "bitcoin", label: "Bitcoin" },
-    { id: "iotex", label: "IoTeX" },
-    { id: "multi-chain", label: "Multi-chain" },
-  ]
-
   const stages = [
     { id: "Ideation", label: "Ideation (Friends & Family Funding)" },
     { id: "Prototype", label: "Prototype (Angel Funding)" },
@@ -530,7 +545,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                   <div className="flex flex-col items-center mb-4">
                     <div className="relative mb-2">
                       <Avatar className="h-24 w-24 border-2 border-gray-800">
-                        <AvatarImage src={logoSrc} alt="Logo" />
+                        <AvatarImage src={logoSrc || "/placeholder.svg"} alt="Logo" />
                         <AvatarFallback className="bg-gray-800 text-gray-400">Logo</AvatarFallback>
                       </Avatar>
                       <label
@@ -699,46 +714,144 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
               <FormField
                 control={form.control}
                 name="blockchainPlatforms"
-                render={() => (
-                  <FormItem>
-                    <div className="mb-4">
-                      <FormLabel className="text-white">Blockchain Platforms</FormLabel>
-                      <FormDescription className="text-gray-500">
-                        Select all blockchain platforms your project is built on
-                      </FormDescription>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {blockchains.map((blockchain) => (
-                        <FormField
-                          key={blockchain.id}
-                          control={form.control}
-                          name="blockchainPlatforms"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={blockchain.id}
-                                className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-3"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(blockchain.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, blockchain.id])
-                                        : field.onChange(field.value?.filter((value) => value !== blockchain.id))
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="text-sm font-normal text-white">{blockchain.label}</FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  return (
+                    <FormItem>
+                      <div className="mb-4">
+                        <FormLabel className="text-white">Blockchain Platforms</FormLabel>
+                        <FormDescription className="text-gray-500">
+                          Select all blockchain platforms your project is built on
+                        </FormDescription>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {blockchains.map((blockchain) => (
+                          <FormField
+                            key={blockchain.id}
+                            control={form.control}
+                            name="blockchainPlatforms"
+                            render={({ field }) => {
+                              return (
+                                <FormItem
+                                  key={blockchain.id}
+                                  className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-3"
+                                >
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={
+                                        blockchain.id === "others"
+                                          ? customBlockchains.length > 0 || field.value?.includes("others")
+                                          : field.value?.includes(blockchain.id)
+                                      }
+                                      onCheckedChange={(checked) => {
+                                        if (blockchain.id === "others") {
+                                          if (checked) {
+                                            // If checking "Others", add it to the array and show the input
+                                            field.onChange([...field.value, "others"])
+                                          } else {
+                                            // If unchecking "Others", remove all custom blockchains
+                                            setCustomBlockchains([])
+                                            const filteredValues = field.value?.filter(
+                                              (value) => value !== "others" && !customBlockchains.includes(value),
+                                            )
+                                            field.onChange(filteredValues)
+                                          }
+                                        } else {
+                                          return checked
+                                            ? field.onChange([...field.value, blockchain.id])
+                                            : field.onChange(field.value?.filter((value) => value !== blockchain.id))
+                                        }
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="text-sm font-normal text-white">{blockchain.label}</FormLabel>
+                                </FormItem>
+                              )
+                            }}
+                          />
+                        ))}
+                      </div>
+
+                      {/* Custom blockchain input section */}
+                      {form.watch("blockchainPlatforms")?.includes("others") || customBlockchains.length > 0 ? (
+                        <div className="mt-4 space-y-4">
+                          <div className="space-y-2">
+                            {customBlockchains.map((blockchain, index) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <Input
+                                  value={blockchain}
+                                  readOnly
+                                  className="bg-gray-800 border-gray-700 text-white flex-1"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  className="border-gray-700 text-white h-10 w-10"
+                                  onClick={() => {
+                                    const newCustomBlockchains = [...customBlockchains]
+                                    newCustomBlockchains.splice(index, 1)
+                                    setCustomBlockchains(newCustomBlockchains)
+
+                                    // Update the form value
+                                    const currentValues = form.getValues("blockchainPlatforms")
+                                    form.setValue(
+                                      "blockchainPlatforms",
+                                      currentValues.filter((v) => v !== blockchain),
+                                    )
+
+                                    // If no custom blockchains left, remove "others" from the selection
+                                    if (newCustomBlockchains.length === 0) {
+                                      form.setValue(
+                                        "blockchainPlatforms",
+                                        currentValues.filter((v) => v !== "others"),
+                                      )
+                                    }
+                                  }}
+                                >
+                                  <TbCancel className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Input
+                              placeholder="Enter blockchain platform"
+                              className="bg-gray-800 border-gray-700 text-white flex-1"
+                              value={newCustomBlockchain}
+                              onChange={(e) => setNewCustomBlockchain(e.target.value)}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="border-gray-700 text-white"
+                              onClick={() => {
+                                if (newCustomBlockchain.trim()) {
+                                  // Add to custom blockchains
+                                  setCustomBlockchains([...customBlockchains, newCustomBlockchain])
+
+                                  // Add to form values
+                                  const currentValues = form.getValues("blockchainPlatforms")
+                                  if (!currentValues.includes("others")) {
+                                    form.setValue("blockchainPlatforms", [...currentValues, "others"])
+                                  }
+                                  form.setValue("blockchainPlatforms", [...currentValues, newCustomBlockchain])
+
+                                  // Clear input
+                                  setNewCustomBlockchain("")
+                                }
+                              }}
+                            >
+                              Add
+                            </Button>
+                          </div>
+                        </div>
+                      ) : null}
+
+                      <FormMessage />
+                    </FormItem>
+                  )
+                }}
               />
 
               <div className="space-y-4">
@@ -980,8 +1093,12 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
               </div>
 
               <div className="flex justify-between items-center">
-                <a href="/marketplace" className="px-3 py-1.5 rounded-md bg-black hover:bg-gray-900 transition-all duration-200 border border-gray-800 text-white flex items-center gap-1"
-                >Cancel <TbCancel className="h-4 w-4"/></a>
+                <a
+                  href="/marketplace"
+                  className="px-3 py-1.5 rounded-md bg-black hover:bg-gray-900 transition-all duration-200 border border-gray-800 text-white flex items-center gap-1"
+                >
+                  Cancel <TbCancel className="h-4 w-4" />
+                </a>
                 <Button
                   type="submit"
                   className="bg-black hover:bg-gray-900 text-white border border-gray-800"

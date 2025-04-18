@@ -1,102 +1,111 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { MapPin, Globe, Twitter, Linkedin, Github } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MapPin, Globe, Twitter, Linkedin, Github } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 interface FounderProfile {
-  id: string
-  name: string
-  role: string
-  jobTitle: string
-  location: string
-  website: string
-  about: string
+  id: string;
+  name: string;
+  role: string;
+  jobTitle: string;
+  location: string;
+  website: string;
+  about: string;
   web3Experience: {
-    level: string
-    years: string
-  }
-  profileImage: string
-  bannerImage: string
+    level: string;
+    years: string;
+  };
+  profileImage: string;
+  bannerImage: string;
   socialLinks: {
-    Twitter: string
-    LinkedIn: string
-    github: string
-    website: string
-  }
-  username: string
-  professionalTitle: string
-  bio: string
+    Twitter: string;
+    LinkedIn: string;
+    github: string;
+    website: string;
+  };
+  username: string;
+  professionalTitle: string;
+  bio: string;
   founderData: {
     socialLinks: {
-      website: string
-      Twitter: string
-      LinkedIn: string
-      github: string
-    }
-    skills: string[]
-    experienceLevel: string
-  }
+      website: string;
+      Twitter: string;
+      LinkedIn: string;
+      github: string;
+    };
+    skills: string[];
+    experienceLevel: string;
+  };
   profilePic: {
-    file_url: string
-  }
-  status: string
+    file_url: string;
+  };
+  status: string;
 }
 
 export default function FounderProfilePage({
-    params,
-  }: {
-    params: { id: string };
-  }) {
-  const [profile, setProfile] = useState<FounderProfile | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const { toast } = useToast()
-  const router = useRouter()
-  const { user, isUserLoading } = useUser();  
+  params,
+}: {
+  params: { id: string };
+}) {
+  const [profile, setProfile] = useState<FounderProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+  const router = useRouter();
+  const { user, isUserLoading } = useUser();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        setIsLoading(true)
+        setIsLoading(true);
 
-        if(!user) {
-            return
+        if (!user) {
+          return;
         }
-    
-        const userId = user?.sub?.split("|")[1]
-        const projectId = params.id
-        
+
+        const userId = user?.sub?.split("|")[1];
+        const projectId = params.id;
+
         if (!projectId) {
           toast({
             title: "Error",
             description: "Project ID is required",
             variant: "destructive",
-          })
-          return
+          });
+          return;
         }
 
-        const response = await fetch("https://onlyfounders.azurewebsites.net/api/startup/view-founder", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            user_id: userId,
-          },
-          body: JSON.stringify({ projectId }),
-        })
+        const response = await fetch(
+          "https://onlyfounders.azurewebsites.net/api/startup/view-founder",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              user_id: userId,
+            },
+            body: JSON.stringify({ projectId }),
+          }
+        );
 
         if (!response.ok) {
-          console.error("Response Error:", response.status, await response.text())
+          console.error(
+            "Response Error:",
+            response.status,
+            await response.text()
+          );
           // throw new Error("Failed to fetch founder data")
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
         // Map API response to profile structure
-        const founderData = data.founder
+        const founderData = data.founder;
         setProfile({
           id: founderData._id,
           name: founderData.username,
@@ -132,23 +141,23 @@ export default function FounderProfilePage({
           },
           profilePic: founderData.profilePic || { file_url: "" },
           status: founderData.status,
-        })
+        });
       } catch (error) {
-        console.error("Error fetching profile:", error)
+        console.error("Error fetching profile:", error);
         toast({
           title: "Error",
           description: "Failed to load founder data",
           variant: "destructive",
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchProfile()
-  }, [user])
+    fetchProfile();
+  }, [user]);
 
-  if (isLoading  || isUserLoading) {
+  if (isLoading || isUserLoading) {
     return (
       <div className="w-full max-w-4xl mx-auto p-10">
         <Skeleton className="h-48 w-full rounded-md bg-blue-600" />
@@ -197,16 +206,24 @@ export default function FounderProfilePage({
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!profile) {
-    return
+    return;
   }
 
   return (
     <div className="w-full max-w-4xl mx-auto p-10">
-       <img
+      <Button
+        variant={"outline"}
+        className="mb-4 flex items-center gap-1"
+        onClick={() => router.push("/")}
+      >
+        <ArrowLeft /> Back to Home
+      </Button>
+
+      <img
         src={profile.bannerImage}
         alt="Profile banner"
         className="h-48 w-full object-cover rounded-t-lg"
@@ -216,23 +233,35 @@ export default function FounderProfilePage({
           <div className="flex items-start gap-4">
             <div className="h-20 w-20 md:h-24 md:w-24 rounded-full -mt-12 border-4 border-[#121026] bg-gray-300 overflow-hidden">
               <img
-                src={profile.profilePic.file_url || "/placeholder.svg?height=96&width=96" || "/placeholder.svg"}
+                src={
+                  profile.profilePic.file_url ||
+                  "/placeholder.svg?height=96&width=96" ||
+                  "/placeholder.svg"
+                }
                 alt={profile.username}
                 className="h-full w-full object-cover"
               />
             </div>
             <div className="space-y-1 mt-2">
-              <h1 className="text-white font-bold text-lg md:text-2xl">{profile.username}</h1>
+              <h1 className="text-white font-bold text-lg md:text-2xl">
+                {profile.username}
+              </h1>
               <div className="flex items-center gap-2">
-                <p className="text-gray-300 text-sm md:text-lg">{profile.professionalTitle}</p>
+                <p className="text-gray-300 text-sm md:text-lg">
+                  {profile.professionalTitle}
+                </p>
                 <span className="text-gray-300">•</span>
-                <span className="text-gray-300 bg-[#1e1a3c] px-2 py-0.5 rounded text-sm">{profile.role}</span>
+                <span className="text-gray-300 bg-[#1e1a3c] px-2 py-0.5 rounded text-sm">
+                  {profile.role}
+                </span>
               </div>
               <div className="mt-1">
                 <Badge
                   variant="outline"
                   className={`text-white border-none px-2 py-0.5 rounded ${
-                    profile.status === "Verified" ? "bg-green-700" : "bg-yellow-700"
+                    profile.status === "Verified"
+                      ? "bg-green-700"
+                      : "bg-yellow-700"
                   }`}
                 >
                   {profile.status}
@@ -311,31 +340,39 @@ export default function FounderProfilePage({
 
           {profile.founderData?.experienceLevel && (
             <div>
-              <h2 className="text-white text-lg font-semibold mb-2">Web3 Experience</h2>
-              <Badge variant="outline" className="bg-[#3d3654] text-white border-none px-4 py-2 rounded-full">
+              <h2 className="text-white text-lg font-semibold mb-2">
+                Web3 Experience
+              </h2>
+              <Badge
+                variant="outline"
+                className="bg-[#3d3654] text-white border-none px-4 py-2 rounded-full"
+              >
                 {profile.founderData.experienceLevel}
               </Badge>
             </div>
           )}
 
-          {profile.founderData?.skills && profile.founderData.skills.length > 0 && (
-            <div>
-              <h2 className="text-white text-lg font-semibold mb-2">Skills & Expertise</h2>
-              <div className="flex flex-wrap gap-2">
-                {profile.founderData.skills.map((skill, index) => (
-                  <Badge
-                    key={index}
-                    variant="outline"
-                    className="bg-[#3d3654] text-white border-none px-4 py-2 rounded-full"
-                  >
-                    {skill}
-                  </Badge>
-                ))}
+          {profile.founderData?.skills &&
+            profile.founderData.skills.length > 0 && (
+              <div>
+                <h2 className="text-white text-lg font-semibold mb-2">
+                  Skills & Expertise
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {profile.founderData.skills.map((skill, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="bg-[#3d3654] text-white border-none px-4 py-2 rounded-full"
+                    >
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
     </div>
-  )
+  );
 }

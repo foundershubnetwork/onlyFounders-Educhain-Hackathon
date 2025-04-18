@@ -402,12 +402,31 @@ export function AppLayout({
         </div>
 
         {user ? (
-          <ConnectButton
-            accountStatus={{
-              smallScreen: "avatar",
-              largeScreen: "full",
-            }}
-          />
+          <ConnectButton.Custom>
+          {({ account, openConnectModal, openAccountModal, mounted }) => {
+            const connected = mounted && account;
+            return (
+              <button
+                onClick={
+                  connected ? openAccountModal : openConnectModal
+                }
+                className="flex items-center justify-center rounded-md w-full bg-gradient-to-r px-2 py-1.5 from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              >
+                <Wallet className="mr-2 h-4 w-4" />
+                <span className="block md:hidden">
+                  {connected
+                    ? "Connected"
+                    : "Connect"}
+                </span>
+                <span className="hidden md:block">
+                  {connected
+                    ? "Wallet Connected"
+                    : "Connect Wallet"}
+                </span>
+              </button>
+            );
+          }}
+        </ConnectButton.Custom>
         ) : null}
       </>
     );
@@ -761,12 +780,12 @@ export function AppLayout({
                     ) : user ? (
                       <div className="w-full">
                         <ConnectButton.Custom>
-                          {({ account, openConnectModal, mounted }) => {
+                          {({ account, openConnectModal, openAccountModal, mounted }) => {
                             const connected = mounted && account;
                             return (
                               <Button
                                 onClick={
-                                  connected ? undefined : openConnectModal
+                                  connected ? openAccountModal : openConnectModal
                                 }
                                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                               >

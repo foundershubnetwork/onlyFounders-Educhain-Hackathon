@@ -264,7 +264,7 @@ export default function InvestorProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-4xl mx-auto">
+      <div className="w-full max-w-4xl mx-auto my-12">
         <Skeleton className="h-48 w-full rounded-md bg-blue-600" />
         <div className="bg-[#121026] p-6 rounded-b-lg relative">
           <div className="flex justify-between items-start">
@@ -326,7 +326,7 @@ export default function InvestorProfilePage() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto my-12">
       <img
         src={profile.bannerImage?.file_url || "/placeholder.svg?height=192&width=896&query=profile banner"}
         alt="Profile banner"

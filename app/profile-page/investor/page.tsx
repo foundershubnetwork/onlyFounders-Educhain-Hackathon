@@ -48,7 +48,9 @@ interface InvestorProfile {
   investmentInterests: string[]
   investmentInterest: string
   profileImage: string
-  bannerImage: string
+  bannerImage: {
+    file_url: string
+  }
   
 }
 
@@ -325,7 +327,11 @@ export default function InvestorProfilePage() {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="h-48 w-full bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-lg" />
+      <img
+        src={profile.bannerImage?.file_url || "/placeholder.svg?height=192&width=896&query=profile banner"}
+        alt="Profile banner"
+        className="h-48 w-full object-cover rounded-t-lg"
+      />
       <div className="bg-[#121026] p-6 rounded-b-lg relative">
         <div className="flex justify-between items-start">
           <div className="flex items-start gap-4">

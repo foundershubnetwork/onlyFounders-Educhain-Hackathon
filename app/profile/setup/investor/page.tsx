@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Camera, Check, Linkedin, Twitter, User, Wallet } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useUser } from "@auth0/nextjs-auth0/client"
 import { AppLayout } from "@/components/layout/app-layout"
 
 const investorProfileSchema = z.object({
@@ -46,8 +46,11 @@ export default function InvestorProfileSetupPage() {
   const [avatarSrc, setAvatarSrc] = useState<string>("/placeholder.svg?height=100&width=100")
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { user, isLoading } = useUser();
+  const { user, isLoading } = useUser()
   const [onboardingStatus, setOnboardingStatus] = useState<boolean>()
+
+  const [bannerSrc, setBannerSrc] = useState<string>("/placeholder.svg?height=300&width=1000")
+  const [bannerFile, setBannerFile] = useState<File | null>(null)
 
   const interestOptions = [
     { id: "defi", label: "DeFi" },
@@ -276,45 +279,144 @@ export default function InvestorProfileSetupPage() {
     },
   })
 
- 
   useEffect(() => {
-      const getOnboardingStatus = async () => {
-        try {
-          const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-onboarding-status", {
-            method: "GET",
-            headers: {
-              user_id: user?.sub?.substring(14),
-            },
-          });
-    
-          // if (!response.ok) {
-          //   throw new Error("Failed to fetch onboarding status");
-          // }
-    
-          const data = await response.json();
-          setOnboardingStatus(data.status);
-        } catch (error) {
-          console.error("Error fetching onboarding status:", error);
-          toast({
-            title: "Failed to fetch onboarding status",
-            description: "Please try again later.",
-            variant: "destructive",
-          });
-        }
-      };
-    
-      if (user) {
-        getOnboardingStatus();
-      }
-    }, [user]);
+    const getOnboardingStatus = async () => {
+      try {
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-onboarding-status", {
+          method: "GET",
+          headers: {
+            user_id: user?.sub?.substring(14),
+          },
+        })
 
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch onboarding status");
+        // }
+
+        const data = await response.json()
+        setOnboardingStatus(data.status)
+      } catch (error) {
+        console.error("Error fetching onboarding status:", error)
+        toast({
+          title: "Failed to fetch onboarding status",
+          description: "Please try again later.",
+          variant: "destructive",
+        })
+      }
+    }
+
+    if (user) {
+      getOnboardingStatus()
+    }
+  }, [user])
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Save file for upload
+      setAvatarFile(file)
+
+      // Preview image
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setAvatarSrc(e.target.result as string)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Add the handleBannerChange function after the handleAvatarChange function
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Save file for upload
+      setBannerFile(file)
+
+      // Preview image
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setBannerSrc(e.target.result as string)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Add a new useEffect hook to fetch investor data after the existing useEffect
+  useEffect(() => {
+    const fetchInvestorData = async () => {
+      try {
+        if (!user || isLoading) return // Wait until user is fully loaded
+        const userId = user?.sub?.substring(14)
+
+        if (!userId) {
+          toast({
+            title: "Authentication error",
+            description: "Please sign in again to continue.",
+            variant: "destructive",
+          })
+          router.push("/api/auth/login")
+          return
+        }
+
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/admin/get-profile", {
+          method: "GET",
+          headers: {
+            user_id: userId,
+          },
+        })
+
+        const data = await response.json()
+
+        // Set avatar image if available
+        if (data.profilePic && data.profilePic.file_url) {
+          setAvatarSrc(data.profilePic.file_url)
+        }
+
+        // Set banner image if available
+        if (data.bannerImage) {
+          setBannerSrc(data.bannerImage)
+        }
+
+        // Update form with fetched data
+        form.reset({
+          fullName: data.username || "",
+          title: data.professionalTitle || "",
+          bio: data.bio || "",
+          investorType: data.investorData?.investorType || "",
+          experience: data.investorData?.investmentExperience || "",
+          location: data.location || "",
+          minInvestment: data.investorData?.minInvestment || 1000,
+          maxInvestment: data.investorData?.maxInvestment || 10000,
+          interests: data.investorData?.investmentInterest || [],
+          twitter: data.investorData?.socialLinks?.Twitter || "",
+          linkedin: data.investorData?.socialLinks?.Linkedin || "",
+          publicProfile: true,
+        })
+      } catch (error) {
+        console.error("Error fetching investor data:", error)
+        toast({
+          title: "Error",
+          description: "Failed to load investor data",
+          variant: "destructive",
+        })
+      }
+    }
+
+    if (user && !isLoading) {
+      fetchInvestorData()
+    }
+  }, [user, isLoading, form])
 
   async function onSubmit(data: InvestorProfileValues) {
     setIsSubmitting(true)
 
     try {
       // Get user_id from wherever it's stored in your application
-      const userId = user?.sub?.substring(14);
+      const userId = user?.sub?.substring(14)
 
       if (!userId) {
         toast({
@@ -347,7 +449,7 @@ export default function InvestorProfileSetupPage() {
         minInvestment: data.minInvestment,
         maxInvestment: data.maxInvestment,
         investmentInterest: data.interests,
-        socialLinks : {
+        socialLinks: {
           Linkedin: data.linkedin,
           Twitter: data.twitter,
         },
@@ -398,344 +500,103 @@ export default function InvestorProfileSetupPage() {
     }
   }
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      // Save file for upload
-      setAvatarFile(file)
-
-      // Preview image
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setAvatarSrc(e.target.result as string)
-        }
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
   return (
-    <AppLayout>
-    <div className="max-w-4xl mx-auto py-12">
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-white">Investor Profile</h1>
-          <p className="text-gray-400">Tell us about your investment preferences and experience</p>
-        </div>
-
-        <div className="w-full">
-          <div className="space-y-2 mb-6">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">Profile Setup</span>
-              <span className="text-white font-medium">Step 2 of 2</span>
-            </div>
-            <Progress
-              value={100}
-              className="h-2 bg-gray-700"
-              indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
-            />
+      <div className="max-w-4xl mx-auto py-12">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-white">Investor Profile</h1>
+            <p className="text-gray-400">Tell us about your investment preferences and experience</p>
           </div>
 
-          <Card className="bg-gray-900 border-gray-800">
-            <CardHeader>
-              <CardTitle className="text-xl text-white">Investor Information</CardTitle>
-              <CardDescription className="text-gray-400">
-                This information will help us match you with suitable projects
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="flex flex-col items-center mb-6">
-                    <div className="relative mb-4">
-                      <Avatar className="h-24 w-24 border-2 border-gray-800">
-                        <AvatarImage src={avatarSrc} alt="Profile" />
-                        <AvatarFallback className="bg-gray-800 text-gray-400">
-                          <User className="h-12 w-12" />
-                        </AvatarFallback>
-                      </Avatar>
-                      <label
-                        htmlFor="avatar-upload"
-                        className="absolute bottom-0 right-0 p-1 rounded-full bg-gray-800 border border-gray-700 cursor-pointer"
-                      >
-                        <Camera className="h-4 w-4 text-gray-400" />
-                        <span className="sr-only">Upload avatar</span>
-                      </label>
-                      <input
-                        id="avatar-upload"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleAvatarChange}
-                      />
-                    </div>
-                    <p className="text-sm text-gray-400">Upload a professional profile picture</p>
-                  </div>
+          <div className="w-full">
+            <div className="space-y-2 mb-6">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">Profile Setup</span>
+                <span className="text-white font-medium">Step 2 of 2</span>
+              </div>
+              <Progress
+                value={100}
+                className="h-2 bg-gray-700"
+                indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
+              />
+            </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="fullName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-white">Full Name</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="John Doe"
-                              className="bg-gray-800 border-gray-700 text-white"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-white">Professional Title</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Angel Investor / VC Partner"
-                              className="bg-gray-800 border-gray-700 text-white"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="bio"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white">Bio</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Tell us about your investment philosophy and background..."
-                            className="bg-gray-800 border-gray-700 text-white min-h-[120px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription className="text-gray-500">{field.value.length}/150 characters</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="investorType"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-white">Investor Type</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                                <SelectValue placeholder="Select investor type" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                              <SelectItem value="individual">Individual Investor</SelectItem>
-                              <SelectItem value="angel">Angel Investor</SelectItem>
-                              <SelectItem value="vc">Venture Capital</SelectItem>
-                              <SelectItem value="dao">DAO</SelectItem>
-                              <SelectItem value="family office">Family Office</SelectItem>
-                              <SelectItem value="corporate">Corporate Investor</SelectItem>
-                              <SelectItem value="crypto">Crypto Fund</SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="experience"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-white">Web3 Investment Experience</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                                <SelectValue placeholder="Select your experience level" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                              <SelectItem value="beginner">Beginner (&lt; 1 year)</SelectItem>
-                              <SelectItem value="intermediate">Intermediate (1-3 years)</SelectItem>
-                              <SelectItem value="experienced">Experienced (3-5 years)</SelectItem>
-                              <SelectItem value="expert">Expert (5+ years)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white">Location</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                              <SelectValue placeholder="Select your country" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="bg-gray-900 border-gray-800 text-white max-h-[200px]">
-                            {countries.map((country) => (
-                              <SelectItem key={country} value={country}>
-                                {country}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-medium text-white">Investment Preferences</h3>
-
-                    <div className="space-y-8">
-                      <div className="space-y-4">
-                        <div className="flex justify-between">
-                          <FormLabel className="text-white">Investment Range (USDC)</FormLabel>
-                          <span className="text-gray-400 text-sm">
-                            {form.watch("minInvestment").toLocaleString()} -{" "}
-                            {form.watch("maxInvestment").toLocaleString()} USDC
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <FormField
-                            control={form.control}
-                            name="minInvestment"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-white">Minimum Investment</FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                    <Input
-                                      type="number"
-                                      min={100}
-                                      step={100}
-                                      className="bg-gray-800 border-gray-700 text-white pl-10"
-                                      value={field.value}
-                                      onChange={(e) => field.onChange(Number.parseInt(e.target.value))}
-                                    />
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name="maxInvestment"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-white">Maximum Investment</FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                    <Input
-                                      type="number"
-                                      min={100}
-                                      step={100}
-                                      className="bg-gray-800 border-gray-700 text-white pl-10"
-                                      value={field.value}
-                                      onChange={(e) => field.onChange(Number.parseInt(e.target.value))}
-                                    />
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+            <Card className="bg-gray-900 border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-xl text-white">Investor Information</CardTitle>
+                <CardDescription className="text-gray-400">
+                  This information will help us match you with suitable projects
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="flex flex-col items-center mb-6">
+                      <div className="relative mb-4">
+                        <Avatar className="h-24 w-24 border-2 border-gray-800">
+                          <AvatarImage src={avatarSrc || "/placeholder.svg"} alt="Profile" />
+                          <AvatarFallback className="bg-gray-800 text-gray-400">
+                            <User className="h-12 w-12" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <label
+                          htmlFor="avatar-upload"
+                          className="absolute bottom-0 right-0 p-1 rounded-full bg-gray-800 border border-gray-700 cursor-pointer"
+                        >
+                          <Camera className="h-4 w-4 text-gray-400" />
+                          <span className="sr-only">Upload avatar</span>
+                        </label>
+                        <input
+                          id="avatar-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleAvatarChange}
+                        />
                       </div>
+                      <p className="text-sm text-gray-400">Upload a professional profile picture</p>
 
-                      <FormField
-                        control={form.control}
-                        name="interests"
-                        render={() => (
-                          <FormItem>
-                            <FormLabel className="text-white block mb-3">Investment Interests</FormLabel>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                              {interestOptions.map((option) => (
-                                <FormField
-                                  key={option.id}
-                                  control={form.control}
-                                  name="interests"
-                                  render={({ field }) => {
-                                    return (
-                                      <FormItem
-                                        key={option.id}
-                                        className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-3 bg-gray-800/50"
-                                      >
-                                        <FormControl>
-                                          <Checkbox
-                                            checked={field.value?.includes(option.id)}
-                                            onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([...field.value, option.id])
-                                                : field.onChange(field.value?.filter((value) => value !== option.id))
-                                            }}
-                                          />
-                                        </FormControl>
-                                        <FormLabel className="text-white font-normal cursor-pointer">
-                                          {option.label}
-                                        </FormLabel>
-                                      </FormItem>
-                                    )
-                                  }}
-                                />
-                              ))}
-                            </div>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
+                      {/* banner Image */}
+                      <div className="w-full mt-6">
+                        <p className="text-sm text-gray-400 mb-2">Banner Image</p>
+                        <div className="relative w-full h-32 bg-gray-800 rounded-lg overflow-hidden mb-2">
+                          <img
+                            src={bannerSrc || "/placeholder.svg"}
+                            alt="Banner"
+                            className="w-full h-full object-cover"
+                          />
+                          <label
+                            htmlFor="banner-upload"
+                            className="absolute bottom-2 right-2 p-1 rounded-full bg-gray-800 border border-gray-700 cursor-pointer"
+                          >
+                            <Camera className="h-4 w-4 text-gray-400" />
+                            <span className="sr-only">Upload banner</span>
+                          </label>
+                          <input
+                            id="banner-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleBannerChange}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500">Recommended size: 1000x300 pixels</p>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-white">Social Profiles</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
-                        name="twitter"
+                        name="fullName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Twitter</FormLabel>
+                            <FormLabel className="text-white">Full Name</FormLabel>
                             <FormControl>
-                              <div className="relative">
-                                <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                <Input
-                                  placeholder="@username"
-                                  className="bg-gray-800 border-gray-700 text-white pl-10"
-                                  {...field}
-                                />
-                              </div>
+                              <Input
+                                placeholder="John Doe"
+                                className="bg-gray-800 border-gray-700 text-white"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -744,73 +605,323 @@ export default function InvestorProfileSetupPage() {
 
                       <FormField
                         control={form.control}
-                        name="linkedin"
+                        name="title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">LinkedIn</FormLabel>
+                            <FormLabel className="text-white">Professional Title</FormLabel>
                             <FormControl>
-                              <div className="relative">
-                                <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                <Input
-                                  placeholder="linkedin.com/in/username"
-                                  className="bg-gray-800 border-gray-700 text-white pl-10"
-                                  {...field}
-                                />
-                              </div>
+                              <Input
+                                placeholder="Angel Investor / VC Partner"
+                                className="bg-gray-800 border-gray-700 text-white"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                  </div>
 
-                  <FormField
-                    control={form.control}
-                    name="publicProfile"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-4 bg-gray-800/50">
-                        <FormControl>
-                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="text-white">Make my profile public</FormLabel>
+                    <FormField
+                      control={form.control}
+                      name="bio"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white">Bio</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Tell us about your investment philosophy and background..."
+                              className="bg-gray-800 border-gray-700 text-white min-h-[120px]"
+                              {...field}
+                            />
+                          </FormControl>
                           <FormDescription className="text-gray-500">
-                            Allow founders to see your profile and contact you about investment opportunities
+                            {field.value.length}/150 characters
                           </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <div className="flex justify-between pt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => router.push("/profile/setup")}
-                      className="border-gray-700 text-white"
-                      disabled={isSubmitting || onboardingStatus === true}
-                    >
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      Back
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="bg-black hover:bg-gray-900 text-white border border-gray-800"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? "Submitting..." : "Complete Setup"}
-                      {!isSubmitting && <Check className="ml-2 h-4 w-4" />}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="investorType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Investor Type</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                                  <SelectValue placeholder="Select investor type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="bg-gray-900 border-gray-800 text-white">
+                                <SelectItem value="individual">Individual Investor</SelectItem>
+                                <SelectItem value="angel">Angel Investor</SelectItem>
+                                <SelectItem value="vc">Venture Capital</SelectItem>
+                                <SelectItem value="dao">DAO</SelectItem>
+                                <SelectItem value="family office">Family Office</SelectItem>
+                                <SelectItem value="corporate">Corporate Investor</SelectItem>
+                                <SelectItem value="crypto">Crypto Fund</SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="experience"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Web3 Investment Experience</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                                  <SelectValue placeholder="Select your experience level" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="bg-gray-900 border-gray-800 text-white">
+                                <SelectItem value="beginner">Beginner (&lt; 1 year)</SelectItem>
+                                <SelectItem value="intermediate">Intermediate (1-3 years)</SelectItem>
+                                <SelectItem value="experienced">Experienced (3-5 years)</SelectItem>
+                                <SelectItem value="expert">Expert (5+ years)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white">Location</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                                <SelectValue placeholder="Select your country" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-gray-900 border-gray-800 text-white max-h-[200px]">
+                              {countries.map((country) => (
+                                <SelectItem key={country} value={country}>
+                                  {country}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-medium text-white">Investment Preferences</h3>
+
+                      <div className="space-y-8">
+                        <div className="space-y-4">
+                          <div className="flex justify-between">
+                            <FormLabel className="text-white">Investment Range (USDC)</FormLabel>
+                            <span className="text-gray-400 text-sm">
+                              {form.watch("minInvestment").toLocaleString()} -{" "}
+                              {form.watch("maxInvestment").toLocaleString()} USDC
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <FormField
+                              control={form.control}
+                              name="minInvestment"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-white">Minimum Investment</FormLabel>
+                                  <FormControl>
+                                    <div className="relative">
+                                      <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                      <Input
+                                        type="number"
+                                        min={100}
+                                        step={100}
+                                        className="bg-gray-800 border-gray-700 text-white pl-10"
+                                        value={field.value}
+                                        onChange={(e) => field.onChange(Number.parseInt(e.target.value))}
+                                      />
+                                    </div>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name="maxInvestment"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-white">Maximum Investment</FormLabel>
+                                  <FormControl>
+                                    <div className="relative">
+                                      <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                      <Input
+                                        type="number"
+                                        min={100}
+                                        step={100}
+                                        className="bg-gray-800 border-gray-700 text-white pl-10"
+                                        value={field.value}
+                                        onChange={(e) => field.onChange(Number.parseInt(e.target.value))}
+                                      />
+                                    </div>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name="interests"
+                          render={() => (
+                            <FormItem>
+                              <FormLabel className="text-white block mb-3">Investment Interests</FormLabel>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {interestOptions.map((option) => (
+                                  <FormField
+                                    key={option.id}
+                                    control={form.control}
+                                    name="interests"
+                                    render={({ field }) => {
+                                      return (
+                                        <FormItem
+                                          key={option.id}
+                                          className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-3 bg-gray-800/50"
+                                        >
+                                          <FormControl>
+                                            <Checkbox
+                                              checked={field.value?.includes(option.id)}
+                                              onCheckedChange={(checked) => {
+                                                return checked
+                                                  ? field.onChange([...field.value, option.id])
+                                                  : field.onChange(field.value?.filter((value) => value !== option.id))
+                                              }}
+                                            />
+                                          </FormControl>
+                                          <FormLabel className="text-white font-normal cursor-pointer">
+                                            {option.label}
+                                          </FormLabel>
+                                        </FormItem>
+                                      )
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                              <FormMessage className="mt-2" />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium text-white">Social Profiles</h3>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          control={form.control}
+                          name="twitter"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-white">Twitter</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                  <Input
+                                    placeholder="@username"
+                                    className="bg-gray-800 border-gray-700 text-white pl-10"
+                                    {...field}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="linkedin"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-white">LinkedIn</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                  <Input
+                                    placeholder="linkedin.com/in/username"
+                                    className="bg-gray-800 border-gray-700 text-white pl-10"
+                                    {...field}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="publicProfile"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-4 bg-gray-800/50">
+                          <FormControl>
+                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-white">Make my profile public</FormLabel>
+                            <FormDescription className="text-gray-500">
+                              Allow founders to see your profile and contact you about investment opportunities
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="flex justify-between pt-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => router.push("/profile/setup")}
+                        className="border-gray-700 text-white"
+                        disabled={isSubmitting || onboardingStatus === true}
+                      >
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Back
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="bg-black hover:bg-gray-900 text-white border border-gray-800"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? "Submitting..." : "Complete Setup"}
+                        {!isSubmitting && <Check className="ml-2 h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
-    </AppLayout>
   )
 }
-

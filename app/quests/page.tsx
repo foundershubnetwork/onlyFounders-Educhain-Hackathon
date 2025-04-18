@@ -614,7 +614,7 @@ export default function QuestsPage() {
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
             >
               <Brain className="mr-2 h-4 w-4" />
-              EDUChain Quests
+              Quests Powered By EDU Chain
             </TabsTrigger>
 
             <TabsTrigger
@@ -622,7 +622,7 @@ export default function QuestsPage() {
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
             >
               <Brain className="mr-2 h-4 w-4" />
-              Verida Quests
+              Quests Powered By Verida
             </TabsTrigger>
           </TabsList>
         </div>

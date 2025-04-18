@@ -370,7 +370,7 @@ export default function ResourcesPage() {
                     </h2>
                     <p className="text-gray-300 mb-6">
                       Access comprehensive blogs written by industry experts to
-                      help you navigate the complexities of Web3 investments.
+                      help you navigate the complexities of Web3.
                     </p>
                     <Button
                       asChild
@@ -390,7 +390,7 @@ export default function ResourcesPage() {
                     </h2>
                     <p className="text-gray-300 mb-6">
                       Watch in-depth video tutorials and interviews with
-                      successful founders and investors in the Web3 space.
+                      successful founders and investors in the Web3.
                     </p>
                     <Button
                       asChild
@@ -431,7 +431,7 @@ export default function ResourcesPage() {
                     <p className="text-gray-300 mb-6">
                       Discover grants and funding programs for your Web3
                       project. Connect with foundations and organizations
-                      looking to support innovative blockchain solutions.
+                      looking to support innovative builders.
                     </p>
                     <Button
                       asChild

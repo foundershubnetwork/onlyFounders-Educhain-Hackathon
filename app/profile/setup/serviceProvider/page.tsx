@@ -56,6 +56,10 @@ export default function ServiceProviderProfileSetupPage() {
   const { user, isLoading } = useUser()
   const [onboardingStatus, setOnboardingStatus] = useState<boolean>()
 
+  // Add state for banner image
+  const [bannerSrc, setBannerSrc] = useState<string>("/placeholder.svg?height=300&width=1000")
+  const [bannerFile, setBannerFile] = useState<File | null>(null)
+
   const form = useForm<ServiceProviderProfileValues>({
     resolver: zodResolver(serviceProviderProfileSchema),
     defaultValues: {
@@ -307,38 +311,124 @@ export default function ServiceProviderProfileSetupPage() {
     "Custom",
   ]
 
+  // Add useEffect to fetch service provider data
+  useEffect(() => {
+    const fetchServiceProviderData = async () => {
+      try {
+        if (!user || isLoading) return // Wait until user is fully loaded
+        const userId = user?.sub?.substring(14)
 
-    useEffect(() => {
-        const getOnboardingStatus = async () => {
-          try {
-            const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-onboarding-status", {
-              method: "GET",
-              headers: {
-                user_id: user?.sub?.substring(14),
-              },
-            });
-      
-            // if (!response.ok) {
-            //   throw new Error("Failed to fetch onboarding status");
-            // }
-      
-            const data = await response.json();
-            setOnboardingStatus(data.status);
-          } catch (error) {
-            console.error("Error fetching onboarding status:", error);
-            toast({
-              title: "Failed to fetch onboarding status",
-              description: "Please try again later.",
-              variant: "destructive",
-            });
-          }
-        };
-      
-        if (user) {
-          getOnboardingStatus();
+        if (!userId) {
+          toast({
+            title: "Authentication error",
+            description: "Please sign in again to continue.",
+            variant: "destructive",
+          })
+          router.push("/api/auth/login")
+          return
         }
-      }, [user]);
 
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/admin/get-profile", {
+          method: "GET",
+          headers: {
+            user_id: String(userId),
+          },
+        })
+
+        if (!response.ok) {
+          console.error("Response Error:", response.status, await response.text())
+          throw new Error("Failed to fetch service provider data")
+        }
+
+        const data = await response.json()
+
+        // Set avatar image if available
+        if (data.profilePic && data.profilePic.file_url) {
+          setAvatarSrc(data.profilePic.file_url)
+        }
+
+        // Set banner image if available
+        if (data.bannerImage) {
+          setBannerSrc(data.bannerImage)
+        }
+
+        // Extract skills from data if available
+        let skillsString = ""
+        if (data.serviceProviderData && data.serviceProviderData.skills) {
+          skillsString = Array.isArray(data.serviceProviderData.skills)
+            ? data.serviceProviderData.skills.join(", ")
+            : data.serviceProviderData.skills
+        }
+
+        // Update form with fetched data
+        form.reset({
+          fullName: data.username || "",
+          title: data.professionalTitle || "",
+          bio: data.bio || "",
+          experience: data.serviceProviderData?.experience || "",
+          skills: skillsString,
+          location: data.location || "",
+          businessName: data.serviceProviderData?.businessName || "",
+          nameOfServiceProvider: data.serviceProviderData?.nameOfServiceProvider || "",
+          email: data.serviceProviderData?.email || data.email || "",
+          category: data.serviceProviderData?.category || "",
+          serviceDescription: data.serviceProviderData?.serviceDescription || "",
+          pricingModel: data.serviceProviderData?.pricingModel || "",
+          websiteUrl: data.serviceProviderData?.Website || "",
+          companyTwitter: data.serviceProviderData?.companySocialLinks?.Twitter || "",
+          companyLinkedin: data.serviceProviderData?.companySocialLinks?.LinkedIn || "",
+          companyInstagram: data.serviceProviderData?.companySocialLinks?.Instagram || "",
+          companyFacebook: data.serviceProviderData?.companySocialLinks?.Facebook || "",
+          personalTwitter: data.serviceProviderData?.personalSocialLinks?.Twitter || "",
+          personalLinkedin: data.serviceProviderData?.personalSocialLinks?.LinkedIn || "",
+          personalInstagram: data.serviceProviderData?.personalSocialLinks?.Instagram || "",
+          personalFacebook: data.serviceProviderData?.personalSocialLinks?.Facebook || "",
+        })
+      } catch (error) {
+        console.error("Error fetching service provider data:", error)
+        toast({
+          title: "Error",
+          description: "Failed to load service provider data",
+          variant: "destructive",
+        })
+      }
+    }
+
+    if (user && !isLoading) {
+      fetchServiceProviderData()
+    }
+  }, [user, isLoading, form, router])
+
+  useEffect(() => {
+    const getOnboardingStatus = async () => {
+      try {
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-onboarding-status", {
+          method: "GET",
+          headers: {
+            user_id: user?.sub?.substring(14),
+          },
+        })
+
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch onboarding status");
+        // }
+
+        const data = await response.json()
+        setOnboardingStatus(data.status)
+      } catch (error) {
+        console.error("Error fetching onboarding status:", error)
+        toast({
+          title: "Failed to fetch onboarding status",
+          description: "Please try again later.",
+          variant: "destructive",
+        })
+      }
+    }
+
+    if (user) {
+      getOnboardingStatus()
+    }
+  }, [user])
 
   async function onSubmit(data: ServiceProviderProfileValues) {
     setIsSubmitting(true)
@@ -372,6 +462,11 @@ export default function ServiceProviderProfileSetupPage() {
         formData.append("profile_pic_file", avatarFile)
       }
 
+      // Add banner image if available
+      if (bannerFile) {
+        formData.append("banner_image_file", bannerFile)
+      }
+
       // Parse skills into array
       const skillsArray = data.skills.split(",").map((skill) => skill.trim())
 
@@ -402,6 +497,8 @@ export default function ServiceProviderProfileSetupPage() {
         Website: data.websiteUrl,
         companySocialLinks: companySocialLinks,
         personalSocialLinks: personalSocialLinks,
+        skills: skillsArray,
+        experience: data.experience,
       }
 
       // Append serviceProviderData as JSON string
@@ -457,6 +554,24 @@ export default function ServiceProviderProfileSetupPage() {
     }
   }
 
+  // Add handleBannerChange function
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Save file for upload
+      setBannerFile(file)
+
+      // Preview image
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setBannerSrc(e.target.result as string)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   return (
     <div className="max-w-4xl mx-auto py-12">
       <div className="space-y-6">
@@ -491,7 +606,7 @@ export default function ServiceProviderProfileSetupPage() {
                   <div className="flex flex-col items-center mb-6">
                     <div className="relative mb-4">
                       <Avatar className="h-24 w-24 border-2 border-gray-800">
-                        <AvatarImage src={avatarSrc} alt="Profile" />
+                        <AvatarImage src={avatarSrc || "/placeholder.svg"} alt="Profile" />
                         <AvatarFallback className="bg-gray-800 text-gray-400">
                           <Building className="h-12 w-12" />
                         </AvatarFallback>
@@ -512,6 +627,33 @@ export default function ServiceProviderProfileSetupPage() {
                       />
                     </div>
                     <p className="text-sm text-gray-400">Upload a professional profile picture</p>
+
+                    {/* Add banner image section */}
+                    <div className="w-full mt-6">
+                      <p className="text-sm text-gray-400 mb-2">Banner Image</p>
+                      <div className="relative w-full h-32 bg-gray-800 rounded-lg overflow-hidden mb-2">
+                        <img
+                          src={bannerSrc || "/placeholder.svg"}
+                          alt="Banner"
+                          className="w-full h-full object-cover"
+                        />
+                        <label
+                          htmlFor="banner-upload"
+                          className="absolute bottom-2 right-2 p-1 rounded-full bg-gray-800 border border-gray-700 cursor-pointer"
+                        >
+                          <Camera className="h-4 w-4 text-gray-400" />
+                          <span className="sr-only">Upload banner</span>
+                        </label>
+                        <input
+                          id="banner-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleBannerChange}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500">Recommended size: 1000x300 pixels</p>
+                    </div>
                   </div>
 
                   <div className="space-y-6">
@@ -1006,4 +1148,3 @@ export default function ServiceProviderProfileSetupPage() {
     </div>
   )
 }
-

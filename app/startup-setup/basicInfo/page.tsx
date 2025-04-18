@@ -156,9 +156,10 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
 
         const data = response.data // ✅ Axios handles JSON parsing automatically
 
+
         if (data && data.startup) {
           const startup = data.startup
-
+          console.log(startup.wpaperurl)
           // Extract social links
           const socialLinks = startup.socialLinks || {}
 
@@ -189,7 +190,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
             telegram: socialLinks.telegram || socialLinks.Telegram || "",
             discord: socialLinks.discord || socialLinks.Discord || "",
             medium: socialLinks.medium || socialLinks.Medium || "",
-            whitepaper: startup.whitepaper_Url || "",
+            whitepaper: startup.wpaperurl || "",
             pitchDeckFile: "",
             pitchDeckLink: startup.pitchDeck_Url || "",
             pitchDeckText: startup.pitchDeckText || "",

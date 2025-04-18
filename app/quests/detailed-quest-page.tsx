@@ -24,6 +24,7 @@ import { useUser } from "@auth0/nextjs-auth0/client"
 import NFTSuccessModal from "./nft-success-modal"
 import {AppLayout} from '../../components/layout/app-layout'
 import { useToast } from "@/hooks/use-toast";
+import { useAccount } from "wagmi"
 
 // Comprehensive quest data based on the EduChain Hackathon document and JSON data
 const questsData = {
@@ -589,6 +590,7 @@ export default function DetailedQuestPage({ questId }) {
   const [mintModal, setMintModal] = useState(false)
   const [mintData, setMintData] = useState<mintData[]>([])
   const {toast} = useToast();
+  const {isConnected} = useAccount()
 
 
   // Calculate progress percentage based on current stage and question
@@ -695,19 +697,23 @@ export default function DetailedQuestPage({ questId }) {
 
       const userId = user?.user?.sub?.substring(14)
 
-      const walletConnect = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-walletconnect-status", {
-        method:"GET",
-        headers:{
-          user_id: userId,
-        },
-      })
+      // const walletConnect = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-walletconnect-status", {
+      //   method:"GET",
+      //   headers:{
+      //     user_id: userId,
+      //   },
+      // })
 
-      if(walletConnect.status === 200){
-        const walletData = await walletConnect.json()
-        if(walletData.message !== "Wallet connected"){
-          alert("Please connect your wallet to mint the NFT.")
+
+        if(!isConnected){
+          toast({
+            title: "Message",
+            description: "Please connect your wallet to mint the NFT.",
+            variant: "destructive",
+          })
           return
         }
+
         else{
           const response = await fetch("https://onlyfounders.azurewebsites.net/api/nft/mint-nft", {
             method: "POST",
@@ -729,7 +735,6 @@ export default function DetailedQuestPage({ questId }) {
           } else {
             setApiError("Failed to mint NFT. Please try again.")
           }
-        }
       }
 
       

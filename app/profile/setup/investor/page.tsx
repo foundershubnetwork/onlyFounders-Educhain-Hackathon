@@ -362,7 +362,7 @@ export default function InvestorProfileSetupPage() {
           return
         }
 
-        const response = await fetch("https://onlyfounders.azurewebsites.net/api/admin/get-profile", {
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-profile", {
           method: "GET",
           headers: {
             user_id: userId,
@@ -378,7 +378,7 @@ export default function InvestorProfileSetupPage() {
 
         // Set banner image if available
         if (data.bannerImage) {
-          setBannerSrc(data.bannerImage)
+          setBannerSrc(data.bannerImage.file_url)
         }
 
         // Update form with fetched data
@@ -397,12 +397,7 @@ export default function InvestorProfileSetupPage() {
           publicProfile: true,
         })
       } catch (error) {
-        console.error("Error fetching investor data:", error)
-        toast({
-          title: "Error",
-          description: "Failed to load investor data",
-          variant: "destructive",
-        })
+        console.log("Error fetching investor data:", error)
       }
     }
 
@@ -415,18 +410,10 @@ export default function InvestorProfileSetupPage() {
     setIsSubmitting(true)
 
     try {
+
+      if(!user) return
       // Get user_id from wherever it's stored in your application
       const userId = user?.sub?.substring(14)
-
-      if (!userId) {
-        toast({
-          title: "Authentication error",
-          description: "Please sign in again to continue.",
-          variant: "destructive",
-        })
-        router.push("/login")
-        return
-      }
 
       // Create FormData object
       const formData = new FormData()
@@ -436,6 +423,10 @@ export default function InvestorProfileSetupPage() {
       formData.append("location", data.location)
       formData.append("bio", data.bio)
       formData.append("username", data.fullName)
+
+      if(bannerFile) {
+        formData.append("bannerImage", bannerFile)
+      }
 
       // Add profile picture if available
       if (avatarFile) {
@@ -478,16 +469,19 @@ export default function InvestorProfileSetupPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null)
+        console.log("Error response:", errorData)
         // throw new Error(errorData?.message || "Failed to submit profile")
       }
 
+      if(response.ok) {
       toast({
         title: "Profile submitted successfully",
         description: "Your investor profile has been saved.",
       })
+      router.push("/profile-page/investor")
+    }
 
       // Navigate to dashboard
-      router.push("/profile")
     } catch (error) {
       console.error("Error submitting profile:", error)
       toast({
@@ -501,7 +495,7 @@ export default function InvestorProfileSetupPage() {
   }
 
   return (
-      <div className="max-w-4xl mx-auto py-12">
+      <div className="max-w-4xl mx-auto py-12 px-4">
         <div className="space-y-6">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-white">Investor Profile</h1>

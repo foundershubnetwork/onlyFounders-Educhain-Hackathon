@@ -27,7 +27,6 @@ const serviceProviderProfileSchema = z.object({
     .min(10, { message: "Bio must be at least 10 characters" })
     .max(500, { message: "Bio must be less than 500 characters" }),
   experience: z.string().min(1, { message: "Please select your experience level" }),
-  skills: z.string().min(2, { message: "Skills are required" }),
   location: z.string().min(1, { message: "Please select your country" }),
   businessName: z.string().min(2, { message: "Business name is required" }),
   nameOfServiceProvider: z.string().min(2, { message: "Service provider name is required" }),
@@ -67,7 +66,6 @@ export default function ServiceProviderProfileSetupPage() {
       title: "",
       bio: "",
       experience: "",
-      skills: "",
       location: "",
       businessName: "",
       nameOfServiceProvider: "",
@@ -318,26 +316,15 @@ export default function ServiceProviderProfileSetupPage() {
         if (!user || isLoading) return // Wait until user is fully loaded
         const userId = user?.sub?.substring(14)
 
-        if (!userId) {
-          toast({
-            title: "Authentication error",
-            description: "Please sign in again to continue.",
-            variant: "destructive",
-          })
-          router.push("/api/auth/login")
-          return
-        }
-
-        const response = await fetch("https://onlyfounders.azurewebsites.net/api/admin/get-profile", {
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-profile", {
           method: "GET",
           headers: {
-            user_id: String(userId),
+            user_id: userId,
           },
         })
 
         if (!response.ok) {
           console.error("Response Error:", response.status, await response.text())
-          throw new Error("Failed to fetch service provider data")
         }
 
         const data = await response.json()
@@ -348,16 +335,8 @@ export default function ServiceProviderProfileSetupPage() {
         }
 
         // Set banner image if available
-        if (data.bannerImage) {
-          setBannerSrc(data.bannerImage)
-        }
-
-        // Extract skills from data if available
-        let skillsString = ""
-        if (data.serviceProviderData && data.serviceProviderData.skills) {
-          skillsString = Array.isArray(data.serviceProviderData.skills)
-            ? data.serviceProviderData.skills.join(", ")
-            : data.serviceProviderData.skills
+        if (data.bannerImage.file_url) {
+          setBannerSrc(data.bannerImage.file_url)
         }
 
         // Update form with fetched data
@@ -366,7 +345,6 @@ export default function ServiceProviderProfileSetupPage() {
           title: data.professionalTitle || "",
           bio: data.bio || "",
           experience: data.serviceProviderData?.experience || "",
-          skills: skillsString,
           location: data.location || "",
           businessName: data.serviceProviderData?.businessName || "",
           nameOfServiceProvider: data.serviceProviderData?.nameOfServiceProvider || "",
@@ -374,7 +352,7 @@ export default function ServiceProviderProfileSetupPage() {
           category: data.serviceProviderData?.category || "",
           serviceDescription: data.serviceProviderData?.serviceDescription || "",
           pricingModel: data.serviceProviderData?.pricingModel || "",
-          websiteUrl: data.serviceProviderData?.Website || "",
+          websiteUrl: data.serviceProviderData?.websiteUrl || "",
           companyTwitter: data.serviceProviderData?.companySocialLinks?.Twitter || "",
           companyLinkedin: data.serviceProviderData?.companySocialLinks?.LinkedIn || "",
           companyInstagram: data.serviceProviderData?.companySocialLinks?.Instagram || "",
@@ -385,12 +363,7 @@ export default function ServiceProviderProfileSetupPage() {
           personalFacebook: data.serviceProviderData?.personalSocialLinks?.Facebook || "",
         })
       } catch (error) {
-        console.error("Error fetching service provider data:", error)
-        toast({
-          title: "Error",
-          description: "Failed to load service provider data",
-          variant: "destructive",
-        })
+        console.log("Error fetching service provider data:", error)
       }
     }
 
@@ -434,18 +407,10 @@ export default function ServiceProviderProfileSetupPage() {
     setIsSubmitting(true)
 
     try {
+
+      if(!user || isLoading) return // Wait until user is fully loaded
       // Get user_id from wherever it's stored in your application
       const userId = user?.sub?.substring(14)
-
-      if (!userId) {
-        toast({
-          title: "Authentication error",
-          description: "Please sign in again to continue.",
-          variant: "destructive",
-        })
-        router.push("/login")
-        return
-      }
 
       // Create FormData object
       const formData = new FormData()
@@ -455,7 +420,6 @@ export default function ServiceProviderProfileSetupPage() {
       formData.append("location", data.location)
       formData.append("bio", data.bio)
       formData.append("username", data.fullName)
-      formData.append("email", data.email)
 
       // Add profile picture if available
       if (avatarFile) {
@@ -464,11 +428,9 @@ export default function ServiceProviderProfileSetupPage() {
 
       // Add banner image if available
       if (bannerFile) {
-        formData.append("banner_image_file", bannerFile)
+        formData.append("bannerImage", bannerFile)
       }
 
-      // Parse skills into array
-      const skillsArray = data.skills.split(",").map((skill) => skill.trim())
 
       // Create company social links object
       const companySocialLinks = {
@@ -494,10 +456,9 @@ export default function ServiceProviderProfileSetupPage() {
         category: data.category,
         serviceDescription: data.serviceDescription,
         pricingModel: data.pricingModel,
-        Website: data.websiteUrl,
+        websiteUrl: data.websiteUrl,
         companySocialLinks: companySocialLinks,
         personalSocialLinks: personalSocialLinks,
-        skills: skillsArray,
         experience: data.experience,
       }
 
@@ -515,16 +476,18 @@ export default function ServiceProviderProfileSetupPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null)
+        console.log(errorData)
         // throw new Error(errorData?.message || "Failed to submit profile")
       }
 
-      toast({
-        title: "Profile submitted successfully",
-        description: "Your service provider profile has been saved.",
-      })
+      if(response.status === 201){
+        toast({
+          title: "Profile submitted successfully",
+          description: "Your service provider profile has been saved.",
+        })
+        router.push("/profile-page/service-provider")
+      }
 
-      // Navigate to next step
-      router.push("/profile")
     } catch (error) {
       console.error("Error submitting profile:", error)
       toast({
@@ -573,7 +536,7 @@ export default function ServiceProviderProfileSetupPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-12">
+    <div className="max-w-4xl mx-auto py-12 px-4">
       <div className="space-y-6">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-white">Service Provider Profile</h1>
@@ -743,7 +706,6 @@ export default function ServiceProviderProfileSetupPage() {
                       )}
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
                         name="experience"
@@ -768,25 +730,6 @@ export default function ServiceProviderProfileSetupPage() {
                         )}
                       />
 
-                      <FormField
-                        control={form.control}
-                        name="skills"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-white">Skills</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g. Smart Contracts, UI/UX, Marketing"
-                                className="bg-gray-800 border-gray-700 text-white"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription className="text-gray-500">Separate skills with commas</FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
                   </div>
 
                   <div className="space-y-6">
@@ -1133,7 +1076,7 @@ export default function ServiceProviderProfileSetupPage() {
                     <Button
                       type="submit"
                       className="bg-black hover:bg-gray-900 text-white border border-gray-800"
-                      disabled={isSubmitting || !form.formState.isValid}
+                      disabled={isSubmitting}
                     >
                       {isSubmitting ? "Submitting..." : "Submit"}
                       {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}

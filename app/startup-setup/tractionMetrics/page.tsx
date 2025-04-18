@@ -368,7 +368,7 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
   }
 
   return (
-    <div className="flex items-center justify-center mx-auto mt-4 py-4">
+    <div className="flex items-center justify-center mx-auto px-6 mt-4 py-4">
       <div className="w-full max-w-4xl">
         <div className="space-y-2 mb-6">
           <div className="flex items-center justify-between text-sm">

@@ -190,7 +190,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
             telegram: socialLinks.telegram || socialLinks.Telegram || "",
             discord: socialLinks.discord || socialLinks.Discord || "",
             medium: socialLinks.medium || socialLinks.Medium || "",
-            whitepaper: startup.wpaperurl || "",
+            whitepaper: startup.whitepaper_Url || "",
             pitchDeckFile: "",
             pitchDeckLink: startup.pitchDeck_Url || "",
             pitchDeckText: startup.pitchDeckText || "",
@@ -247,7 +247,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
           values.telegram !== (originalData.socialLinks?.telegram || originalData.socialLinks?.Telegram || "") ||
           values.discord !== (originalData.socialLinks?.discord || originalData.socialLinks?.Discord || "") ||
           values.medium !== (originalData.socialLinks?.medium || originalData.socialLinks?.Medium || "") ||
-          values.whitepaper !== (originalData.wpaperurl || "") ||
+          values.whitepaper !== (originalData.whitepaper_Url || "") ||
           values.pitchDeckLink !== (originalData.pitchDeck_Url || "") ||
           values.pitchDeckText !== (originalData.pitchDeckText || "") ||
           values.demoVideo !== (originalData.pitchDemoVideo_Url || "")
@@ -352,7 +352,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
       }
 
       // Add whitepaper link
-      formData.append("whitepaperUrl", hasChanges ? values.whitepaper : originalData.wpaperurl || "")
+      formData.append("wpaperurl", hasChanges ? values.whitepaper : originalData.whitepaper_Url || "")
 
       // Add pitch deck fields
       if (pitchDeckFile) formData.append("pitchDeck", pitchDeckFile)

@@ -1,205 +1,222 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { MapPin, Globe, Pencil, Twitter, Linkedin, Github } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { useUser } from "@auth0/nextjs-auth0/client"
-import { useRouter } from "next/navigation"
-import { investmentInterests } from "@/data/investor-data"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MapPin, Pencil, Twitter, Linkedin, ArrowLeft } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useRouter } from "next/navigation";
 
 interface InvestorProfile {
-  id: string
-  username: string
-  bio: string
-  name: string
-  website: string
-  role: string
-  jobTitle: string
-  companyType: string
-  location: string
-  professionalTitle: string
-  about: string
+  id: string;
+  username: string;
+  bio: string;
+  name: string;
+  website: string;
+  role: string;
+  jobTitle: string;
+  companyType: string;
+  location: string;
+  professionalTitle: string;
+  about: string;
+  status: string;
   investorData: {
-    investorType: string
-    investmentExperience: string
-    investmentInterest: string[]
+    investorType: string;
+    investmentExperience: string;
+    investmentInterest: string[];
     socialLinks: {
-        twitter: string
-        linkedin: string
-        website: string
-        github: string
-      }
-  }
+      Twitter: string;
+      linkedin: string;
+      website: string;
+    };
+  };
   profilePic: {
-    file_url: string
-  }
+    file_url: string;
+  };
   web3Experience: {
-    level: string
-    years: string
-  }
-  investmentPreferences: string[]
-  investmentInterests: string[]
-  investmentInterest: string
-  profileImage: string
+    level: string;
+    years: string;
+  };
+  investmentPreferences: string[];
+  investmentInterests: string[];
+  investmentInterest: string;
+  profileImage: string;
   bannerImage: {
-    file_url: string
-  }
-  
+    file_url: string;
+  };
 }
 
 export default function InvestorProfilePage() {
-  const [profile, setProfile] = useState<InvestorProfile | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editedProfile, setEditedProfile] = useState<InvestorProfile | null>(null)
-  const { toast } = useToast()
-  const { user, isUserLoading } = useUser()
-  const router = useRouter()
+  const [profile, setProfile] = useState<InvestorProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState<InvestorProfile | null>(
+    null
+  );
+  const { toast } = useToast();
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        setIsLoading(true)
+        setIsLoading(true);
 
-        if (!user || isUserLoading) return // Wait until user is fully loaded
+        if (!user || isUserLoading) return; // Wait until user is fully loaded
 
-        const userId = user?.sub?.substring(14)
+        const userId = user?.sub?.substring(14);
         if (!userId) {
           toast({
             title: "Authentication error",
             description: "Please sign in again to continue.",
             variant: "destructive",
-          })
-          router.push("/api/auth/login")
-          return
+          });
+          router.push("/api/auth/login");
+          return;
         }
 
-        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-profile", {
-          method: "GET",
-          headers: {
-            user_id: String(userId), // Ensure it's a string
-          },
-        })
+        const response = await fetch(
+          "https://onlyfounders.azurewebsites.net/api/profile/get-profile",
+          {
+            method: "GET",
+            headers: {
+              user_id: String(userId), // Ensure it's a string
+            },
+          }
+        );
 
         if (!response.ok) {
-          console.error("Response Error:", response.status, await response.text())
+          console.error(
+            "Response Error:",
+            response.status,
+            await response.text()
+          );
           // throw new Error("Failed to fetch profile data")
         }
 
-        const data = await response.json()
-        setProfile(data)
-        setEditedProfile(data)
+        const data = await response.json();
+        setProfile(data);
+        setEditedProfile(data);
       } catch (error) {
-        console.error("Error fetching profile:", error)
+        console.error("Error fetching profile:", error);
         toast({
           title: "Error",
           description: "Failed to load profile data",
           variant: "destructive",
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-      fetchProfile()
-  }, [user, isUserLoading, toast, router])
+    fetchProfile();
+  }, [user, isUserLoading, toast, router]);
 
   const handleEdit = () => {
-    setIsEditing(true)
-  }
+    setIsEditing(true);
+  };
 
   const handleSave = async () => {
     try {
-      const userId = user?.sub?.substring(14)
+      const userId = user?.sub?.substring(14);
 
       if (!userId) {
         toast({
           title: "Authentication error",
           description: "Please sign in again to continue.",
           variant: "destructive",
-        })
-        router.push("/login")
-        return
+        });
+        router.push("/login");
+        return;
       }
 
-      const formData = new FormData()
-           // Add profile data
-                 formData.append("professionalTitle", editedProfile?.professionalTitle)
-                 formData.append("location", editedProfile?.location)
-                 formData.append("bio", editedProfile?.bio)
-                 formData.append("username", editedProfile?.username)
-           
-                 // Add profile picture if available
-                 if (profile?.profilePic) {
-                   formData.append("profilePic", profile?.profilePic)
-                 }
-           
-                 const investorData = {
-                   investmentExperience: editedProfile?.investorData.investmentExperience,
-                   investmentInterests: editedProfile?.investorData.investmentInterest,
-                   socialLinks: {
-                     Twitter: profile?.investorData?.socialLinks?.twitter,
-                     github: profile?.investorData?.socialLinks?.github,
-                     LinkedIn: profile?.investorData?.socialLinks?.linkedin,
-                     website: profile?.investorData?.socialLinks?.website,
-                   },
-                 }
-           
-                 // Append founderData as JSON string
-                formData.append("founderData", JSON.stringify(investorData))
+      const formData = new FormData();
+      // Add profile data
+      formData.append("professionalTitle", editedProfile?.professionalTitle);
+      formData.append("location", editedProfile?.location);
+      formData.append("bio", editedProfile?.bio);
+      formData.append("username", editedProfile?.username);
 
-      const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/submit-personal-details", {
-        method: "POST",
-        headers: {
-            user_id: userId
+      // Add profile picture if available
+      if (profile?.profilePic) {
+        formData.append("profilePic", profile?.profilePic);
+      }
+
+      const investorData = {
+        investmentExperience: editedProfile?.investorData.investmentExperience,
+        investmentInterests: editedProfile?.investorData.investmentInterest,
+        socialLinks: {
+          Twitter: profile?.investorData?.socialLinks?.twitter,
+          github: profile?.investorData?.socialLinks?.github,
+          LinkedIn: profile?.investorData?.socialLinks?.linkedin,
+          website: profile?.investorData?.socialLinks?.website,
         },
-        body: formData
-      })
+      };
+
+      // Append founderData as JSON string
+      formData.append("founderData", JSON.stringify(investorData));
+
+      const response = await fetch(
+        "https://onlyfounders.azurewebsites.net/api/profile/submit-personal-details",
+        {
+          method: "POST",
+          headers: {
+            user_id: userId,
+          },
+          body: formData,
+        }
+      );
 
       // if (!response.ok) {
       //   throw new Error("Failed to update profile")
       // }
-      
-      console.log(JSON.stringify(formData))
-      setProfile(editedProfile)
-      setIsEditing(false)
+
+      console.log(JSON.stringify(formData));
+      setProfile(editedProfile);
+      setIsEditing(false);
       toast({
         title: "Success",
         description: "Profile updated successfully",
-      })
+      });
     } catch (error) {
-      console.error("Error updating profile:", error)
+      console.error("Error updating profile:", error);
       toast({
         title: "Error",
         description: "Failed to update profile",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleCancel = () => {
-    setEditedProfile(profile)
-    setIsEditing(false)
-  }
+    setEditedProfile(profile);
+    setIsEditing(false);
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!editedProfile) return
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (!editedProfile) return;
 
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
     // Handle different field types
-    if (name === "username" || name === "location" || name === "bio" || name === "professionalTitle") {
+    if (
+      name === "username" ||
+      name === "location" ||
+      name === "bio" ||
+      name === "professionalTitle"
+    ) {
       setEditedProfile({
         ...editedProfile,
         [name]: value,
-      })
+      });
     } else if (name === "website") {
       setEditedProfile({
         ...editedProfile,
@@ -207,7 +224,7 @@ export default function InvestorProfilePage() {
           ...editedProfile.socialLinks,
           website: value,
         },
-      })
+      });
     } else if (name === "investorType") {
       setEditedProfile({
         ...editedProfile,
@@ -215,15 +232,15 @@ export default function InvestorProfilePage() {
           ...editedProfile.investorData,
           investorType: value,
         },
-      })
+      });
     }
-  }
+  };
 
   const handlePreferenceChange = (index: number, value: string) => {
-    if (!editedProfile?.investorData?.investmentInterest) return
+    if (!editedProfile?.investorData?.investmentInterest) return;
 
-    const updatedInterests = [...editedProfile.investorData.investmentInterest]
-    updatedInterests[index] = value
+    const updatedInterests = [...editedProfile.investorData.investmentInterest];
+    updatedInterests[index] = value;
 
     setEditedProfile({
       ...editedProfile,
@@ -231,11 +248,11 @@ export default function InvestorProfilePage() {
         ...editedProfile.investorData,
         investmentInterest: updatedInterests,
       },
-    })
-  }
+    });
+  };
 
   const handleExperienceChange = (field: string, value: string) => {
-    if (!editedProfile) return
+    if (!editedProfile) return;
 
     setEditedProfile({
       ...editedProfile,
@@ -243,11 +260,11 @@ export default function InvestorProfilePage() {
         ...editedProfile.investorData,
         investmentExperience: value,
       },
-    })
-  }
+    });
+  };
 
   const handleSocialChange = (platform: string, value: string) => {
-    if (!editedProfile) return
+    if (!editedProfile) return;
 
     setEditedProfile({
       ...editedProfile,
@@ -255,16 +272,16 @@ export default function InvestorProfilePage() {
         ...editedProfile.socialLinks,
         [platform]: value,
       },
-    })
-  }
+    });
+  };
 
   const handleEditTemp = () => {
-    router.push('/profile/setup/investor')
-  }
+    router.push("/profile/setup/investor");
+  };
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-4xl mx-auto my-12">
+      <div className="w-full max-w-4xl mx-auto px-4 my-12">
         <Skeleton className="h-48 w-full rounded-md bg-blue-600" />
         <div className="bg-[#121026] p-6 rounded-b-lg relative">
           <div className="flex justify-between items-start">
@@ -314,32 +331,47 @@ export default function InvestorProfilePage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!profile) {
     return (
       <div className="w-full max-w-4xl mx-auto p-6 bg-[#121026] rounded-lg">
-        <p className="text-white text-center">Failed to load profile data. Please try again later.</p>
+        <p className="text-white text-center">
+          Failed to load profile data. Please try again later.
+        </p>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto my-12">
+    <div className="w-full max-w-4xl mx-auto px-4 my-4">
+      <Button
+        variant={"outline"}
+        className="mb-4 flex items-center gap-1"
+        onClick={() => router.push("/")}
+      >
+        <ArrowLeft /> Back to Home
+      </Button>
       <img
-        src={profile.bannerImage?.file_url || "/placeholder.svg?height=192&width=896&query=profile banner"}
+        src={
+          profile.bannerImage?.file_url ||
+          "/placeholder.svg?height=192&width=896&query=profile banner"
+        }
         alt="Profile banner"
         className="h-48 w-full object-cover rounded-t-lg"
       />
       <div className="bg-[#121026] p-6 rounded-b-lg relative">
         <div className="flex justify-between items-start">
-          <div className="flex items-start gap-4">
-            <div className="h-24 w-24 rounded-full -mt-12 border-4 border-[#121026] bg-gray-300 overflow-hidden">
+          <div className="flex items-center md:items-start gap-4">
+            <div className="absolute md:relative -top-[60px] md:top-0 rounded-full -ml-0 border-4 border-[#121026] bg-gray-300 overflow-hidden">
               <img
-                src={profile.profilePic?.file_url || "/placeholder.svg?height=96&width=96"}
+                src={
+                  profile.profilePic?.file_url ||
+                  "/placeholder.svg?height=96&width=96"
+                }
                 alt={profile.username || "Investor"}
-                className="h-full w-full object-cover"
+                className="h-20 w-20 object-cover aspect-square"
               />
             </div>
             <div className="space-y-1 mt-2">
@@ -351,7 +383,9 @@ export default function InvestorProfilePage() {
                   className="text-white font-bold text-2xl bg-[#1e1a3c] border-none"
                 />
               ) : (
-                <h1 className="text-white font-bold text-2xl">{profile.username}</h1>
+                <h1 className="text-white font-bold text-2xl">
+                  {profile.username}
+                </h1>
               )}
               <div className="flex items-center gap-2">
                 {isEditing ? (
@@ -365,7 +399,9 @@ export default function InvestorProfilePage() {
                   <p className="text-gray-300">{profile.professionalTitle}</p>
                 )}
                 <span className="text-gray-300">•</span>
-                <span className="text-gray-300 bg-[#1e1a3c] px-2 py-0.5 rounded text-sm">{profile.role}</span>
+                <span className="text-gray-300 bg-[#1e1a3c] px-2 py-0.5 rounded text-sm">
+                  {profile.role}
+                </span>
                 {isEditing ? (
                   <Input
                     name="investorType"
@@ -374,8 +410,20 @@ export default function InvestorProfilePage() {
                     className="text-gray-300 text-sm bg-[#1e1a3c] border-none"
                   />
                 ) : (
-                  <span className="text-gray-300">{profile.investorData?.investorType}</span>
+                  <span className="text-gray-300">
+                    {profile.investorData?.investorType}
+                  </span>
                 )}
+                <Badge
+                  variant="outline"
+                  className={`text-white border-none px-2 py-0.5 rounded ${
+                    profile.status === "Verified"
+                      ? "bg-green-700"
+                      : "bg-yellow-700"
+                  }`}
+                >
+                  {profile.status}
+                </Badge>
               </div>
             </div>
           </div>
@@ -391,7 +439,8 @@ export default function InvestorProfilePage() {
             </div>
           ) : (
             <Button variant="outline" size="sm" onClick={handleEditTemp}>
-              <Pencil className="h-4 w-4 mr-2" /> Edit Profile
+              <Pencil className="h-4 w-4 mr-0 md:mr-2 " />{" "}
+              <span className="hidden md:block">Edit Profile</span>
             </Button>
           )}
         </div>
@@ -403,13 +452,17 @@ export default function InvestorProfilePage() {
                 <Input
                   placeholder="Twitter URL"
                   value={editedProfile?.socialLinks?.twitter || ""}
-                  onChange={(e) => handleSocialChange("twitter", e.target.value)}
+                  onChange={(e) =>
+                    handleSocialChange("twitter", e.target.value)
+                  }
                   className="hidden"
                 />
                 <Input
                   placeholder="LinkedIn URL"
                   value={editedProfile?.socialLinks?.linkedin || ""}
-                  onChange={(e) => handleSocialChange("linkedin", e.target.value)}
+                  onChange={(e) =>
+                    handleSocialChange("linkedin", e.target.value)
+                  }
                   className="hidden"
                 />
                 <Input
@@ -420,15 +473,20 @@ export default function InvestorProfilePage() {
                 />
               </>
             ) : null}
-            <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
+            <a
+              href={profile.investorData.socialLinks.Twitter}
+              target="_blank"
+              className="flex items-center justify-center h-10 w-10 rounded-md bg-[#1e1a3c] border-none"
+            >
               <Twitter className="h-5 w-5 text-white" />
-            </Button>
-            <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
+            </a>
+            <a
+              href={profile.investorData.socialLinks.Linkedin}
+              target="_blank"
+              className="flex items-center justify-center h-10 w-10 rounded-md bg-[#1e1a3c] border-none"
+            >
               <Linkedin className="h-5 w-5 text-white" />
-            </Button>
-            <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
-              <Github className="h-5 w-5 text-white" />
-            </Button>
+            </a>
           </div>
 
           <div className="space-y-2">
@@ -443,20 +501,6 @@ export default function InvestorProfilePage() {
                 />
               ) : (
                 <span>{profile.location}</span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2 text-gray-300">
-              <Globe className="h-4 w-4" />
-              {isEditing ? (
-                <Input
-                  name="website"
-                  value={editedProfile?.socialLinks?.website || ""}
-                  onChange={handleChange}
-                  className="text-gray-300 text-sm bg-[#1e1a3c] border-none"
-                />
-              ) : (
-                <span>{profile.socialLinks?.website}</span>
               )}
             </div>
           </div>
@@ -476,48 +520,64 @@ export default function InvestorProfilePage() {
           </div>
 
           <div>
-            <h2 className="text-white text-lg font-semibold mb-2">Web3 Experience</h2>
+            <h2 className="text-white text-lg font-semibold mb-2">
+              Web3 Experience
+            </h2>
             {isEditing ? (
               <div className="flex gap-2 items-center">
                 <Input
-                  value={editedProfile?.investorData?.investmentExperience || ""}
-                  onChange={(e) => handleExperienceChange("level", e.target.value)}
+                  value={
+                    editedProfile?.investorData?.investmentExperience || ""
+                  }
+                  onChange={(e) =>
+                    handleExperienceChange("level", e.target.value)
+                  }
                   className="text-gray-300 bg-[#1e1a3c] border-none"
                 />
               </div>
             ) : (
-              <Badge variant="outline" className="bg-[#3d3654] text-white border-none px-4 py-2 rounded-full">
+              <Badge
+                variant="outline"
+                className="bg-[#3d3654] text-white border-none px-4 py-2 rounded-full"
+              >
                 {profile.investorData?.investmentExperience}
               </Badge>
             )}
           </div>
 
           <div>
-            <h2 className="text-white text-lg font-semibold mb-2">Investment Interests</h2>
+            <h2 className="text-white text-lg font-semibold mb-2">
+              Investment Interests
+            </h2>
             <div className="flex flex-wrap gap-2">
               {isEditing && editedProfile?.investorData?.investmentInterest
-                ? editedProfile.investorData.investmentInterest.map((interest, index) => (
-                    <Input
-                      key={index}
-                      value={interest}
-                      onChange={(e) => handlePreferenceChange(index, e.target.value)}
-                      className="text-gray-300 bg-[#1e1a3c] border-none w-auto"
-                    />
-                  ))
-                : profile.investorData?.investmentInterest?.map((interest, index) => (
-                    <Badge
-                      key={index}
-                      variant="outline"
-                      className="bg-[#3d3654] text-white border-none px-4 py-2 rounded-full"
-                    >
-                      {interest}
-                    </Badge>
-                  ))}
+                ? editedProfile.investorData.investmentInterest.map(
+                    (interest, index) => (
+                      <Input
+                        key={index}
+                        value={interest}
+                        onChange={(e) =>
+                          handlePreferenceChange(index, e.target.value)
+                        }
+                        className="text-gray-300 bg-[#1e1a3c] border-none w-auto"
+                      />
+                    )
+                  )
+                : profile.investorData?.investmentInterest?.map(
+                    (interest, index) => (
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="bg-[#3d3654] text-white border-none px-4 py-2 rounded-full"
+                      >
+                        {interest}
+                      </Badge>
+                    )
+                  )}
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-

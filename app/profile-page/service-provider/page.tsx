@@ -1,257 +1,292 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Skeleton } from "@/components/ui/skeleton"
-import { MapPin, Globe, Pencil, Twitter, Linkedin, Instagram, Facebook, Building2, Mail, Briefcase } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { useUser } from "@auth0/nextjs-auth0/client"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  MapPin,
+  Globe,
+  Pencil,
+  Twitter,
+  Linkedin,
+  Instagram,
+  Facebook,
+  Building2,
+  Mail,
+  Briefcase,
+  ArrowLeft,
+} from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
 
 interface ServiceProviderProfile {
-  id: string
-  name: string
-  role: string
-  jobTitle: string
-  location: string
-  website: string
-  websiteUrl: string
-  about: string
+  id: string;
+  name: string;
+  role: string;
+  jobTitle: string;
+  location: string;
+  website: string;
+  websiteUrl: string;
+  about: string;
+  status: string;
   businessInfo: {
-    companyName: string
-    email: string
-    serviceType: string
-    companyWebsite: string
-  }
+    companyName: string;
+    email: string;
+    serviceType: string;
+    companyWebsite: string;
+  };
   serviceDetails: {
-    categories: string[]
-    description: string
-  }
+    categories: string[];
+    description: string;
+  };
   companySocialLinks: {
-    twitter: string
-    linkedin: string
-    instagram: string
-    facebook: string
-  }
-  profileImage: string
+    Twitter: string;
+    LinkedIn: string;
+    Instagram: string;
+    Facebook: string;
+  };
+  profileImage: string;
   bannerImage: {
-    file_url: string
-  }
+    file_url: string;
+  };
   socialLinks: {
-    twitter: string
-    linkedin: string
-    instagram: string
-    facebook: string
-    github: string
-  }
+    Twitter: string;
+    LinkedIn: string;
+    Instagram: string;
+    Facebook: string;
+  };
   // Additional fields that might be in the API response
-  username?: string
-  professionalTitle?: string
-  bio?: string
+  username?: string;
+  professionalTitle?: string;
+  bio?: string;
   profilePic?: {
-    file_url: string
-  }
+    file_url: string;
+  };
   serviceProviderData?: {
-    businessName?: string
-    email?: string
-    nameOfServiceProvider?: string
-    category?: string
+    businessName?: string;
+    email?: string;
+    nameOfServiceProvider?: string;
+    category?: string;
     businessInfo?: {
-      companyName: string
-      email: string
-      serviceType: string
-      companyWebsite: string
-    }
+      companyName: string;
+      email: string;
+      serviceType: string;
+      companyWebsite: string;
+    };
     serviceDetails?: {
-      categories: string[]
-      description: string
-    }
+      categories: string[];
+      description: string;
+    };
     companySocialLinks?: {
-      twitter: string
-      linkedin: string
-      instagram: string
-      facebook: string
-    }
-  }
+      Twitter: string;
+      LinkedIn: string;
+      Instagram: string;
+      Facebook: string;
+    };
+    personalSocialLinks?: {
+      Twitter: string;
+      LinkedIn: string;
+      Instagram: string;
+      Facebook: string;
+    };
+  };
 }
 
 export default function ServiceProviderProfilePage() {
-  const [profile, setProfile] = useState<ServiceProviderProfile | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editedProfile, setEditedProfile] = useState<ServiceProviderProfile | null>(null)
-  const { toast } = useToast()
-  const { user, isUserLoading } = useUser()
-  const router = useRouter()
+  const [profile, setProfile] = useState<ServiceProviderProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] =
+    useState<ServiceProviderProfile | null>(null);
+  const { toast } = useToast();
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        setIsLoading(true)
+        setIsLoading(true);
 
-        
-        const userId = user?.sub?.substring(14)
+        const userId = user?.sub?.substring(14);
         if (!userId) {
           toast({
             title: "Authentication error",
             description: "Please sign in again to continue.",
             variant: "destructive",
-          })
-          router.push("/api/auth/login")
-          return
+          });
+          router.push("/api/auth/login");
+          return;
         }
-        if (!user || isUserLoading) return // Wait until user is fully loaded
+        if (!user || isUserLoading) return; // Wait until user is fully loaded
 
-        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-profile", {
-          method: "GET",
-          headers: {
-            user_id: String(userId), // Ensure it's a string
-          },
-        })
+        const response = await fetch(
+          "https://onlyfounders.azurewebsites.net/api/profile/get-profile",
+          {
+            method: "GET",
+            headers: {
+              user_id: String(userId), // Ensure it's a string
+            },
+          }
+        );
 
         // if (!response.ok) {
         //   throw new Error("Failed to fetch profile data")
         // }
 
-        const data = await response.json()
-        console.log("Fetched profile data:", data) // Log the data structure
+        const data = await response.json();
+        console.log("Fetched profile data:", data); // Log the data structure
 
-        setProfile(data)
-        setEditedProfile(JSON.parse(JSON.stringify(data)))
+        setProfile(data);
+        setEditedProfile(JSON.parse(JSON.stringify(data)));
       } catch (error) {
-        console.error("Error fetching profile:", error)
+        console.error("Error fetching profile:", error);
         toast({
           title: "Error",
           description: "Failed to load profile data",
           variant: "destructive",
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
     if (user && !isUserLoading) {
-      fetchProfile()
+      fetchProfile();
     }
-  }, [toast, user, isUserLoading, router])
+  }, [toast, user, isUserLoading, router]);
 
   const handleEdit = () => {
     // Create a deep copy of the profile to avoid reference issues
-    setEditedProfile(JSON.parse(JSON.stringify(profile)))
-    setIsEditing(true)
-  }
+    setEditedProfile(JSON.parse(JSON.stringify(profile)));
+    setIsEditing(true);
+  };
 
   const handleSave = async () => {
     try {
-      console.log("Saving profile:", editedProfile) // Log what's being sent
+      console.log("Saving profile:", editedProfile); // Log what's being sent
 
-      const userId = user?.sub?.substring(14)
+      const userId = user?.sub?.substring(14);
       if (!userId) {
         toast({
           title: "Authentication error",
           description: "Please sign in again to continue.",
           variant: "destructive",
-        })
-        router.push("/login")
-        return
+        });
+        router.push("/login");
+        return;
       }
 
-      const formData = new FormData()
-                 // Add profile data
-                       formData.append("professionalTitle", editedProfile?.professionalTitle)
-                       formData.append("location", editedProfile?.location)
-                       formData.append("bio", editedProfile?.bio)
-                       formData.append("username", editedProfile?.username)
-                 
-                       // Add profile picture if available
-                       if (profile?.profilePic) {
-                         formData.append("profilePic", profile?.profilePic)
-                       }
-                 
-                       const serviceProviderData = {
-                         businessName: editedProfile?.serviceProviderData?.businessName,
-                         nameOfServiceProvider: editedProfile?.serviceProviderData?.nameOfServiceProvider,
-                         email: editedProfile?.serviceProviderData?.email,
-                         category:editedProfile?.serviceProviderData?.category,
-                         serviceDescription: profile?.serviceProviderData?.serviceDescription, 
-                         websiteUrl: editedProfile?.serviceProviderData?.websiteUrl,
-                         companySocialLinks: {
-                           Twitter: profile?.serviceProviderData?.companySocialLinks?.twitter,
-                           facbook: profile?.serviceProviderData?.companySocialLinks?.facebook,
-                           linkedin: profile?.serviceProviderData?.companySocialLinks?.linkedin,
-                           instagram: profile?.serviceProviderData?.companySocialLinks?.instagram,
-                         },
-                         personalSocialLinks:{
-                          Twitter: profile?.serviceProviderData?.companySocialLinks?.twitter,
-                          facbook: profile?.serviceProviderData?.companySocialLinks?.facebook,
-                          linkedin: profile?.serviceProviderData?.companySocialLinks?.linkedin,
-                          instagram: profile?.serviceProviderData?.companySocialLinks?.instagram,
-                         }
-                       }
-                 
-                       // Append founderData as JSON string
-                      formData.append("founderData", JSON.stringify(serviceProviderData))
+      const formData = new FormData();
+      // Add profile data
+      formData.append("professionalTitle", editedProfile?.professionalTitle);
+      formData.append("location", editedProfile?.location);
+      formData.append("bio", editedProfile?.bio);
+      formData.append("username", editedProfile?.username);
 
-      const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/submit-personal-details", {
-        method: "POST",
-        headers: {
-          user_id: String(userId),
+      // Add profile picture if available
+      if (profile?.profilePic) {
+        formData.append("profilePic", profile?.profilePic);
+      }
+
+      const serviceProviderData = {
+        businessName: editedProfile?.serviceProviderData?.businessName,
+        nameOfServiceProvider:
+          editedProfile?.serviceProviderData?.nameOfServiceProvider,
+        email: editedProfile?.serviceProviderData?.email,
+        category: editedProfile?.serviceProviderData?.category,
+        serviceDescription: profile?.serviceProviderData?.serviceDescription,
+        websiteUrl: editedProfile?.serviceProviderData?.websiteUrl,
+        companySocialLinks: {
+          Twitter: profile?.serviceProviderData?.companySocialLinks?.twitter,
+          facbook: profile?.serviceProviderData?.companySocialLinks?.facebook,
+          linkedin: profile?.serviceProviderData?.companySocialLinks?.linkedin,
+          instagram:
+            profile?.serviceProviderData?.companySocialLinks?.instagram,
         },
-        body: formData
-      })
+        personalSocialLinks: {
+          Twitter: profile?.serviceProviderData?.companySocialLinks?.twitter,
+          facbook: profile?.serviceProviderData?.companySocialLinks?.facebook,
+          linkedin: profile?.serviceProviderData?.companySocialLinks?.linkedin,
+          instagram:
+            profile?.serviceProviderData?.companySocialLinks?.instagram,
+        },
+      };
+
+      // Append founderData as JSON string
+      formData.append("founderData", JSON.stringify(serviceProviderData));
+
+      const response = await fetch(
+        "https://onlyfounders.azurewebsites.net/api/profile/submit-personal-details",
+        {
+          method: "POST",
+          headers: {
+            user_id: String(userId),
+          },
+          body: formData,
+        }
+      );
 
       // if (!response.ok) {
       //   throw new Error("Failed to update profile")
       // }
 
-      setProfile(editedProfile)
-      setIsEditing(false)
+      setProfile(editedProfile);
+      setIsEditing(false);
       toast({
         title: "Success",
         description: "Profile updated successfully",
-      })
+      });
     } catch (error) {
-      console.error("Error updating profile:", error)
+      console.error("Error updating profile:", error);
       toast({
         title: "Error",
         description: "Failed to update profile",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleCancel = () => {
-    setEditedProfile(JSON.parse(JSON.stringify(profile)))
-    setIsEditing(false)
-  }
+    setEditedProfile(JSON.parse(JSON.stringify(profile)));
+    setIsEditing(false);
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!editedProfile) return
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (!editedProfile) return;
 
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
-    console.log(`Changing ${name} to ${value}`) // Debug log
+    console.log(`Changing ${name} to ${value}`); // Debug log
 
     // Handle nested properties
-    if (name === "username" || name === "location" || name === "bio" || name === "professionalTitle") {
+    if (
+      name === "username" ||
+      name === "location" ||
+      name === "bio" ||
+      name === "professionalTitle"
+    ) {
       setEditedProfile({
         ...editedProfile,
         [name]: value,
-      })
+      });
     } else if (name === "websiteUrl") {
       setEditedProfile({
         ...editedProfile,
         websiteUrl: value,
-      })
+      });
     }
-  }
+  };
 
   const handleBusinessInfoChange = (field: string, value: string) => {
-    if (!editedProfile) return
+    if (!editedProfile) return;
 
     // Update the correct field based on the data structure
     if (field === "companyName") {
@@ -261,7 +296,7 @@ export default function ServiceProviderProfilePage() {
           ...editedProfile.serviceProviderData,
           businessName: value,
         },
-      })
+      });
     } else if (field === "email") {
       setEditedProfile({
         ...editedProfile,
@@ -269,7 +304,7 @@ export default function ServiceProviderProfilePage() {
           ...editedProfile.serviceProviderData,
           email: value,
         },
-      })
+      });
     } else if (field === "serviceType") {
       setEditedProfile({
         ...editedProfile,
@@ -277,7 +312,7 @@ export default function ServiceProviderProfilePage() {
           ...editedProfile.serviceProviderData,
           nameOfServiceProvider: value,
         },
-      })
+      });
     } else if (field === "companyWebsite") {
       setEditedProfile({
         ...editedProfile,
@@ -285,14 +320,14 @@ export default function ServiceProviderProfilePage() {
           ...editedProfile.serviceProviderData,
           category: value,
         },
-      })
+      });
     }
-  }
+  };
 
   const handleSocialChange = (platform: string, value: string) => {
-    if (!editedProfile) return
+    if (!editedProfile) return;
 
-    console.log(`Changing social link ${platform} to ${value}`) // Debug log
+    console.log(`Changing social link ${platform} to ${value}`); // Debug log
 
     // Make sure we're updating the correct structure
     setEditedProfile({
@@ -304,13 +339,13 @@ export default function ServiceProviderProfilePage() {
           [platform]: value,
         },
       },
-    })
-  }
+    });
+  };
 
   const handleCompanySocialChange = (platform: string, value: string) => {
-    if (!editedProfile) return
+    if (!editedProfile) return;
 
-    console.log(`Changing company social link ${platform} to ${value}`) // Debug log
+    console.log(`Changing company social link ${platform} to ${value}`); // Debug log
 
     // Make sure we're updating the correct structure
     setEditedProfile({
@@ -322,16 +357,16 @@ export default function ServiceProviderProfilePage() {
           [platform]: value,
         },
       },
-    })
-  }
+    });
+  };
 
   const handleEditTemp = () => {
-    router.push('/profile/setup/serviceProvider')
-  }
+    router.push("/profile/setup/serviceProvider");
+  };
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-4xl mx-auto my-12">
+      <div className="w-full max-w-4xl mx-auto px-4 my-4">
         <Skeleton className="h-48 w-full rounded-md bg-blue-600" />
         <div className="bg-[#121026] p-6 rounded-b-lg relative">
           <div className="flex justify-between items-start">
@@ -394,38 +429,50 @@ export default function ServiceProviderProfilePage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!profile) {
     return (
       <div className="w-full max-w-4xl mx-auto p-6 bg-[#121026] rounded-lg">
-        <p className="text-white text-center">Failed to load profile data. Please try again later.</p>
+        <p className="text-white text-center">
+          Failed to load profile data. Please try again later.
+        </p>
       </div>
-    )
+    );
   }
 
   // Determine which data structure to use for display
-  const displayName = profile.username
-  const displayJobTitle = profile.professionalTitle
-  const displayAbout = profile.bio
-  const displayImage = profile.profilePic?.file_url
+  const displayName = profile.username;
+  const displayJobTitle = profile.professionalTitle;
+  const displayAbout = profile.bio;
+  const displayImage = profile.profilePic?.file_url;
 
   return (
-    <div className="w-full max-w-4xl mx-auto my-12">
+    <div className="w-full max-w-4xl mx-auto px-4 my-4">
+      <Button
+        variant={"outline"}
+        className="mb-4 flex items-center gap-1"
+        onClick={() => router.push("/")}
+      >
+        <ArrowLeft /> Back to Home
+      </Button>
       <img
-        src={profile.bannerImage.file_url || "/placeholder.svg?height=192&width=896&query=profile banner"}
+        src={
+          profile.bannerImage.file_url ||
+          "/placeholder.svg?height=192&width=896&query=profile banner"
+        }
         alt="Profile banner"
         className="h-48 w-full object-cover rounded-t-lg"
       />
       <div className="bg-[#121026] p-6 rounded-b-lg relative">
         <div className="flex justify-between items-start">
           <div className="flex items-start gap-4">
-            <div className="h-24 w-24 rounded-full -mt-12 border-4 border-[#121026] bg-gray-300 overflow-hidden">
+            <div className="absolute md:relative -top-[60px] md:top-0 rounded-full -ml-0 border-4 border-[#121026] bg-gray-300 overflow-hidden">
               <img
                 src={displayImage || "/placeholder.svg?height=96&width=96"}
                 alt={displayName || "Profile"}
-                className="h-full w-full object-cover"
+                className="h-20 w-20 object-cover aspect-square"
               />
             </div>
             <div className="space-y-1 mt-2">
@@ -451,7 +498,19 @@ export default function ServiceProviderProfilePage() {
                   <p className="text-gray-300">{displayJobTitle}</p>
                 )}
                 <span className="text-gray-300">•</span>
-                <span className="text-gray-300 bg-[#1e1a3c] px-2 py-0.5 rounded text-sm">{profile.role}</span>
+                <span className="text-gray-300 bg-[#1e1a3c] px-2 py-0.5 rounded text-sm">
+                  {profile.role}
+                </span>
+                <Badge
+                  variant="outline"
+                  className={`text-white border-none px-2 py-0.5 rounded ${
+                    profile.status === "Verified"
+                      ? "bg-green-700"
+                      : "bg-yellow-700"
+                  }`}
+                >
+                  {profile.status}
+                </Badge>
               </div>
             </div>
           </div>
@@ -467,59 +526,42 @@ export default function ServiceProviderProfilePage() {
             </div>
           ) : (
             <Button variant="outline" size="sm" onClick={handleEditTemp}>
-              <Pencil className="h-4 w-4 mr-2" /> Edit Profile
+              <Pencil className="h-4 w-4 mr-0 md:mr-2 " />{" "}
+              <span className="hidden md:block">Edit Profile</span>
             </Button>
           )}
         </div>
 
         <div className="mt-6 space-y-6">
           <div className="flex gap-2">
-            {isEditing ? (
-              <>
-                <Input
-                  placeholder="Twitter URL"
-                  value={editedProfile?.serviceProviderData?.companySocialLinks?.twitter || ""}
-                  onChange={(e) => handleSocialChange("twitter", e.target.value)}
-                  className="hidden"
-                />
-                <Input
-                  placeholder="LinkedIn URL"
-                  value={editedProfile?.serviceProviderData?.companySocialLinks?.linkedin || ""}
-                  onChange={(e) => handleSocialChange("linkedin", e.target.value)}
-                  className="hidden"
-                />
-                <Input
-                  placeholder="GitHub URL"
-                  value={editedProfile?.serviceProviderData?.companySocialLinks?.github || ""}
-                  onChange={(e) => handleSocialChange("github", e.target.value)}
-                  className="hidden"
-                />
-                <Input
-                  placeholder="Instagram URL"
-                  value={editedProfile?.serviceProviderData?.companySocialLinks?.instagram || ""}
-                  onChange={(e) => handleSocialChange("instagram", e.target.value)}
-                  className="hidden"
-                />
-                <Input
-                  placeholder="Facebook URL"
-                  value={editedProfile?.serviceProviderData?.companySocialLinks?.facebook || ""}
-                  onChange={(e) => handleSocialChange("facebook", e.target.value)}
-                  className="hidden"
-                />
-              </>
-            ) : null}
-            <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
+            <a
+              href={profile.serviceProviderData?.personalSocialLinks.Twitter}
+              target="_blank"
+              className="flex items-center justify-center h-10 w-10 rounded-md bg-[#1e1a3c] border-none"
+            >
               <Twitter className="h-5 w-5 text-white" />
-            </Button>
-            <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
+            </a>
+            <a
+              href={profile.serviceProviderData?.personalSocialLinks.LinkedIn}
+              target="_blank"
+              className="flex items-center justify-center h-10 w-10 rounded-md bg-[#1e1a3c] border-none"
+            >
               <Linkedin className="h-5 w-5 text-white" />
-            </Button>
-            <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
+            </a>
+            <a
+              href={profile.serviceProviderData?.personalSocialLinks.Instagram}
+              target="_blank"
+              className="flex items-center justify-center h-10 w-10 rounded-md bg-[#1e1a3c] border-none"
+            >
               <Instagram className="h-5 w-5 text-white" />
-            </Button>
-            <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
+            </a>
+            <a
+              href={profile.serviceProviderData?.personalSocialLinks.Facebook}
+              target="_blank"
+              className="flex items-center justify-center h-10 w-10 rounded-md bg-[#1e1a3c] border-none"
+            >
               <Facebook className="h-5 w-5 text-white" />
-            </Button>
+            </a>
           </div>
 
           <div className="space-y-2">
@@ -547,7 +589,7 @@ export default function ServiceProviderProfilePage() {
                   className="text-gray-300 text-sm bg-[#1e1a3c] border-none"
                 />
               ) : (
-                <span>{profile.websiteUrl}</span>
+                <span>{profile.serviceProviderData.websiteUrl}</span>
               )}
             </div>
           </div>
@@ -567,14 +609,20 @@ export default function ServiceProviderProfilePage() {
           </div>
 
           <div>
-            <h2 className="text-white text-lg font-semibold mb-2">Business Information</h2>
+            <h2 className="text-white text-lg font-semibold mb-2">
+              Business Information
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center gap-2 text-gray-300">
                 <Building2 className="h-4 w-4 flex-shrink-0" />
                 {isEditing ? (
                   <Input
-                    value={editedProfile?.serviceProviderData?.businessName || ""}
-                    onChange={(e) => handleBusinessInfoChange("companyName", e.target.value)}
+                    value={
+                      editedProfile?.serviceProviderData?.businessName || ""
+                    }
+                    onChange={(e) =>
+                      handleBusinessInfoChange("companyName", e.target.value)
+                    }
                     className="text-gray-300 bg-[#1e1a3c] border-none"
                   />
                 ) : (
@@ -587,7 +635,9 @@ export default function ServiceProviderProfilePage() {
                 {isEditing ? (
                   <Input
                     value={editedProfile?.serviceProviderData?.email || ""}
-                    onChange={(e) => handleBusinessInfoChange("email", e.target.value)}
+                    onChange={(e) =>
+                      handleBusinessInfoChange("email", e.target.value)
+                    }
                     className="text-gray-300 bg-[#1e1a3c] border-none"
                   />
                 ) : (
@@ -599,12 +649,19 @@ export default function ServiceProviderProfilePage() {
                 <Briefcase className="h-4 w-4 flex-shrink-0" />
                 {isEditing ? (
                   <Input
-                    value={editedProfile?.serviceProviderData?.nameOfServiceProvider || ""}
-                    onChange={(e) => handleBusinessInfoChange("serviceType", e.target.value)}
+                    value={
+                      editedProfile?.serviceProviderData
+                        ?.nameOfServiceProvider || ""
+                    }
+                    onChange={(e) =>
+                      handleBusinessInfoChange("serviceType", e.target.value)
+                    }
                     className="text-gray-300 bg-[#1e1a3c] border-none"
                   />
                 ) : (
-                  <span>{profile.serviceProviderData?.nameOfServiceProvider}</span>
+                  <span>
+                    {profile.serviceProviderData?.nameOfServiceProvider}
+                  </span>
                 )}
               </div>
 
@@ -613,7 +670,9 @@ export default function ServiceProviderProfilePage() {
                 {isEditing ? (
                   <Input
                     value={editedProfile?.serviceProviderData?.category || ""}
-                    onChange={(e) => handleBusinessInfoChange("companyWebsite", e.target.value)}
+                    onChange={(e) =>
+                      handleBusinessInfoChange("companyWebsite", e.target.value)
+                    }
                     className="text-gray-300 bg-[#1e1a3c] border-none"
                   />
                 ) : (
@@ -624,53 +683,90 @@ export default function ServiceProviderProfilePage() {
           </div>
 
           <div>
-            <h2 className="text-white text-lg font-semibold mb-2">Company Social Media</h2>
+            <h2 className="text-white text-lg font-semibold mb-2">
+              Company Social Media
+            </h2>
             <div className="flex gap-2">
               {isEditing ? (
                 <>
                   <Input
                     placeholder="Company Twitter URL"
-                    value={editedProfile?.serviceProviderData?.companySocialLinks?.twitter || ""}
-                    onChange={(e) => handleCompanySocialChange("twitter", e.target.value)}
+                    value={
+                      editedProfile?.serviceProviderData?.companySocialLinks
+                        ?.Twitter || ""
+                    }
+                    onChange={(e) =>
+                      handleCompanySocialChange("twitter", e.target.value)
+                    }
                     className="hidden"
                   />
                   <Input
                     placeholder="Company LinkedIn URL"
-                    value={editedProfile?.serviceProviderData?.companySocialLinks?.linkedin || ""}
-                    onChange={(e) => handleCompanySocialChange("linkedin", e.target.value)}
+                    value={
+                      editedProfile?.serviceProviderData?.companySocialLinks
+                        ?.LinkedIn || ""
+                    }
+                    onChange={(e) =>
+                      handleCompanySocialChange("linkedin", e.target.value)
+                    }
                     className="hidden"
                   />
                   <Input
                     placeholder="Company Instagram URL"
-                    value={editedProfile?.serviceProviderData?.companySocialLinks?.instagram || ""}
-                    onChange={(e) => handleCompanySocialChange("instagram", e.target.value)}
+                    value={
+                      editedProfile?.serviceProviderData?.companySocialLinks
+                        ?.Instagram || ""
+                    }
+                    onChange={(e) =>
+                      handleCompanySocialChange("instagram", e.target.value)
+                    }
                     className="hidden"
                   />
                   <Input
                     placeholder="Company Facebook URL"
-                    value={editedProfile?.serviceProviderData?.companySocialLinks?.facebook || ""}
-                    onChange={(e) => handleCompanySocialChange("facebook", e.target.value)}
+                    value={
+                      editedProfile?.serviceProviderData?.companySocialLinks
+                        ?.Facebook || ""
+                    }
+                    onChange={(e) =>
+                      handleCompanySocialChange("facebook", e.target.value)
+                    }
                     className="hidden"
                   />
                 </>
               ) : null}
-              <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
+              <a
+                href={profile.serviceProviderData?.companySocialLinks.Twitter}
+                target="_blank"
+                className="flex items-center justify-center h-10 w-10 rounded-md bg-[#1e1a3c] border-none"
+              >
                 <Twitter className="h-5 w-5 text-white" />
-              </Button>
-              <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
+              </a>
+              <a
+                href={profile.serviceProviderData?.companySocialLinks?.LinkedIn}
+                target="_blank"
+                className="flex items-center justify-center h-10 w-10 rounded-md bg-[#1e1a3c] border-none"
+              >
                 <Linkedin className="h-5 w-5 text-white" />
-              </Button>
-              <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
+              </a>
+              <a
+                href={profile.serviceProviderData?.companySocialLinks.Instagram}
+                target="_blank"
+                className="flex items-center justify-center h-10 w-10 rounded-md bg-[#1e1a3c] border-none"
+              >
                 <Instagram className="h-5 w-5 text-white" />
-              </Button>
-              <Button variant="outline" size="icon" className="h-10 w-10 rounded-md bg-[#1e1a3c] border-none">
+              </a>
+              <a
+                href={profile.serviceProviderData?.companySocialLinks.Facebook}
+                target="_blank"
+                className="flex items-center justify-center h-10 w-10 rounded-md bg-[#1e1a3c] border-none"
+              >
                 <Facebook className="h-5 w-5 text-white" />
-              </Button>
+              </a>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-

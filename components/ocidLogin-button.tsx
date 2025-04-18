@@ -3,9 +3,11 @@
 import React from 'react';
 // @ts-ignore
 import { useOCAuth } from '@opencampus/ocid-connect-js';
+import { useAccount } from 'wagmi';
 
 export default function LoginButton() {
   const auth = useOCAuth();
+  const {address, isConnected} = useAccount();
 
   if (!auth) return null;
 
@@ -22,14 +24,14 @@ export default function LoginButton() {
   return (
     <button
       onClick={handleLogin}
-      className="flex items-center gap-2 px-3 py-1 rounded-full bg-white text-black font-semibold hover:opacity-90 transition"
+      className={`flex items-center gap-2 ${isConnected? 'px-1 py-1' : ''} px-3 py-1 rounded-full bg-white text-black font-semibold hover:opacity-90 transition`}
     >
       <img
         src="/ocid.png" 
         alt="OCID Logo"
         className="w-5 h-5"
       />
-      OCID Login
+      {isConnected ? '' : 'OCID Connect'}
     </button>
   );
 }

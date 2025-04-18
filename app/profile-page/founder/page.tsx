@@ -1,143 +1,153 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { MapPin, Globe, Pencil, Twitter, Linkedin, Github } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { useUser } from "@auth0/nextjs-auth0/client"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MapPin, Globe, Pencil, Twitter, Linkedin, Github, ArrowLeft } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useRouter } from "next/navigation";
 
 interface FounderProfile {
-  id: string
-  name: string
-  role: string
-  jobTitle: string
-  location: string
-  website: string
-  about: string
+  id: string;
+  name: string;
+  role: string;
+  jobTitle: string;
+  location: string;
+  website: string;
+  about: string;
   web3Experience: {
-    level: string
-    years: string
-  }
-  profileImage: string
-  bannerImage: string
+    level: string;
+    years: string;
+  };
+  profileImage: string;
+  bannerImage: string;
   socialLinks: {
-    Twitter: string
-    LinkedIn: string
-    github: string
-  }
-  username: string
-  professionalTitle: string
-  bio: string
+    Twitter: string;
+    LinkedIn: string;
+    github: string;
+  };
+  username: string;
+  professionalTitle: string;
+  bio: string;
+  status: string;
   founderData: {
     socialLinks: {
-      website: string
-      Twitter: string
-      linkedIn: string
-      github: string
-    }
-    skills: string[]
-    experienceLevel: string
-  }
+      website: string;
+      Twitter: string;
+      linkedIn: string;
+      github: string;
+    };
+    skills: string[];
+    experienceLevel: string;
+  };
 }
 
 export default function FounderProfilePage() {
-  const [profile, setProfile] = useState<FounderProfile | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editedProfile, setEditedProfile] = useState<FounderProfile | null>(null)
-  const { toast } = useToast()
-  const { user, isUserLoading } = useUser()
-  const router = useRouter()
+  const [profile, setProfile] = useState<FounderProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState<FounderProfile | null>(
+    null
+  );
+  const { toast } = useToast();
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        setIsLoading(true)
+        setIsLoading(true);
 
-        if (!user || isUserLoading) return // Wait until user is fully loaded
-        const userId = user?.sub?.substring(14)
+        if (!user || isUserLoading) return; // Wait until user is fully loaded
+        const userId = user?.sub?.substring(14);
 
         if (!userId) {
           toast({
             title: "Authentication error",
             description: "Please sign in again to continue.",
             variant: "destructive",
-          })
-          router.push("/api/auth/login")
-          return
+          });
+          router.push("/api/auth/login");
+          return;
         }
 
-        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-profile", {
-          method: "GET",
-          headers: {
-            user_id: String(userId), // Ensure it's a string
-          },
-        })
+        const response = await fetch(
+          "https://onlyfounders.azurewebsites.net/api/profile/get-profile",
+          {
+            method: "GET",
+            headers: {
+              user_id: String(userId), // Ensure it's a string
+            },
+          }
+        );
 
         if (!response.ok) {
-          console.error("Response Error:", response.status, await response.text())
+          console.error(
+            "Response Error:",
+            response.status,
+            await response.text()
+          );
           // throw new Error("Failed to fetch profile data")
         }
 
-        const data = await response.json()
-        setProfile(data)
-        setEditedProfile(data)
+        const data = await response.json();
+        setProfile(data);
+        setEditedProfile(data);
       } catch (error) {
-        console.error("Error fetching profile:", error)
+        console.error("Error fetching profile:", error);
         toast({
           title: "Error",
           description: "Failed to load profile data",
           variant: "destructive",
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
     if (user && !isUserLoading) {
-      fetchProfile()
+      fetchProfile();
     }
-  }, [user]) // Removed isUserLoading to prevent unnecessary re-renders
+  }, [user]); // Removed isUserLoading to prevent unnecessary re-renders
 
   const handleEdit = () => {
-    setIsEditing(true)
-  }
+    setIsEditing(true);
+  };
 
   const handleSave = async () => {
     try {
-      const userId = user?.sub?.substring(14)
+      const userId = user?.sub?.substring(14);
 
       if (!userId) {
         toast({
           title: "Authentication error",
           description: "Please sign in again to continue.",
           variant: "destructive",
-        })
-        router.push("/login")
-        return
+        });
+        router.push("/login");
+        return;
       }
 
-      const formData = new FormData()
+      const formData = new FormData();
       // Add profile data
-      formData.append("professionalTitle", editedProfile?.professionalTitle)
-      formData.append("location", editedProfile?.location)
-      formData.append("bio", editedProfile?.bio)
-      formData.append("username", editedProfile?.username)
+      formData.append("professionalTitle", editedProfile?.professionalTitle);
+      formData.append("location", editedProfile?.location);
+      formData.append("bio", editedProfile?.bio);
+      formData.append("username", editedProfile?.username);
 
       // Add profile picture if available
       if (profile?.profile_pic_file) {
-        formData.append("profile_pic_file", profile?.profile_pic_file)
+        formData.append("profile_pic_file", profile?.profile_pic_file);
       }
 
       // Parse skills into array
-      const skillsArray = editedProfile?.founderData.skills
+      const skillsArray = editedProfile?.founderData.skills;
 
       const founderData = {
         experienceLevel: editedProfile?.experienceLevel,
@@ -148,55 +158,65 @@ export default function FounderProfilePage() {
           LinkedIn: profile?.founderData?.socialLinks?.linkedIn,
           website: profile?.founderData?.socialLinks?.website,
         },
-      }
+      };
 
       // Append founderData as JSON string
-      formData.append("founderData", JSON.stringify(founderData))
+      formData.append("founderData", JSON.stringify(founderData));
 
-      const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/submit-personal-details", {
-        method: "POST",
-        headers: {
-          user_id: userId,
-        },
-        body: formData,
-      })
+      const response = await fetch(
+        "https://onlyfounders.azurewebsites.net/api/profile/submit-personal-details",
+        {
+          method: "POST",
+          headers: {
+            user_id: userId,
+          },
+          body: formData,
+        }
+      );
 
       // if (!response.ok) {
       //   throw new Error("Failed to update profile")
       // }
 
-      setProfile(editedProfile)
-      setIsEditing(false)
+      setProfile(editedProfile);
+      setIsEditing(false);
       toast({
         title: "Success",
         description: "Profile updated successfully",
-      })
+      });
     } catch (error) {
-      console.error("Error updating profile:", error)
+      console.error("Error updating profile:", error);
       toast({
         title: "Error",
         description: "Failed to update profile",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleCancel = () => {
-    setEditedProfile(profile)
-    setIsEditing(false)
-  }
+    setEditedProfile(profile);
+    setIsEditing(false);
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!editedProfile) return
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (!editedProfile) return;
 
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
     // Handle nested properties
-    if (name === "username" || name === "location" || name === "bio" || name === "professionalTitle") {
+    if (
+      name === "username" ||
+      name === "location" ||
+      name === "bio" ||
+      name === "professionalTitle"
+    ) {
       setEditedProfile({
         ...editedProfile,
         [name]: value,
-      })
+      });
     } else if (name === "website") {
       setEditedProfile({
         ...editedProfile,
@@ -207,15 +227,15 @@ export default function FounderProfilePage() {
             website: value,
           },
         },
-      })
+      });
     }
-  }
+  };
 
   const handleSkillChange = (index: number, value: string) => {
-    if (!editedProfile) return
+    if (!editedProfile) return;
 
-    const updatedSkills = [...editedProfile.founderData.skills]
-    updatedSkills[index] = value
+    const updatedSkills = [...editedProfile.founderData.skills];
+    updatedSkills[index] = value;
 
     setEditedProfile({
       ...editedProfile,
@@ -223,11 +243,11 @@ export default function FounderProfilePage() {
         ...editedProfile.founderData,
         skills: updatedSkills,
       },
-    })
-  }
+    });
+  };
 
   const handleExperienceChange = (field: string, value: string) => {
-    if (!editedProfile) return
+    if (!editedProfile) return;
 
     setEditedProfile({
       ...editedProfile,
@@ -235,11 +255,11 @@ export default function FounderProfilePage() {
         ...editedProfile.founderData,
         experienceLevel: value,
       },
-    })
-  }
+    });
+  };
 
   const handleSocialChange = (platform: string, value: string) => {
-    if (!editedProfile) return
+    if (!editedProfile) return;
 
     setEditedProfile({
       ...editedProfile,
@@ -250,16 +270,16 @@ export default function FounderProfilePage() {
           [platform]: value,
         },
       },
-    })
-  }
+    });
+  };
 
   const handleEditTemp = () => {
-    router.push("/profile/setup/founder")
-  }
+    router.push("/profile/setup/founder");
+  };
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-4xl mx-auto p-10">
+      <div className="w-full max-w-4xl mx-auto px-4 p-10">
         <Skeleton className="h-48 w-full rounded-md bg-blue-600" />
         <div className="bg-[#121026] p-6 rounded-b-lg relative">
           <div className="flex justify-between items-start">
@@ -306,32 +326,46 @@ export default function FounderProfilePage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!profile) {
     return (
       <div className="w-full max-w-4xl mx-auto p-6 bg-[#121026] rounded-lg">
-        <p className="text-white text-center">Failed to load profile data. Please try again later.</p>
+        <p className="text-white text-center">
+          Failed to load profile data. Please try again later.
+        </p>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-10">
+    <div className="w-full max-w-4xl mx-auto px-4 py-4 lg:p-10">
+
+      <Button variant={"outline"} className="mb-4 flex items-center gap-1" onClick={() => router.push("/")}>
+        <ArrowLeft/> Back to Home
+      </Button>
+
       <img
-        src={profile.bannerImage.file_url || "/placeholder.svg?height=192&width=896&query=profile banner"}
+        src={
+          profile.bannerImage.file_url ||
+          "/placeholder.svg?height=192&width=896&query=profile banner"
+        }
         alt="Profile banner"
         className="h-48 w-full object-cover rounded-t-lg"
       />
       <div className="bg-[#121026] p-6 rounded-b-lg relative">
         <div className="flex justify-between items-start">
-          <div className="flex items-start gap-4">
-            <div className="h-20 w-20 md:h-24 md:w-24 rounded-full -mt-12 border-4 border-[#121026] bg-gray-300 overflow-hidden">
+          <div className="flex items-center md:items-start gap-4">
+            <div className="absolute md:relative -top-[60px] md:top-0 rounded-full -ml-0 border-4 border-[#121026] bg-gray-300 overflow-hidden">
               <img
-                src={profile.profilePic.file_url || "/placeholder.svg?height=96&width=96" || "/placeholder.svg"}
+                src={
+                  profile.profilePic.file_url ||
+                  "/placeholder.svg?height=96&width=96" ||
+                  "/placeholder.svg"
+                }
                 alt={profile.username}
-                className="h-full w-full object-cover"
+                className="h-20 w-20 object-cover aspect-square"
               />
             </div>
             <div className="space-y-1 mt-2">
@@ -343,7 +377,9 @@ export default function FounderProfilePage() {
                   className="text-white font-bold text-2xl bg-[#1e1a3c] border-none"
                 />
               ) : (
-                <h1 className="text-white font-bold text-lg md:text-2xl">{profile.username}</h1>
+                <h1 className="text-white font-bold text-lg md:text-2xl">
+                  {profile.username}
+                </h1>
               )}
               <div className="flex items-center gap-2">
                 {isEditing ? (
@@ -354,10 +390,24 @@ export default function FounderProfilePage() {
                     className="text-gray-300 text-sm bg-[#1e1a3c] border-none"
                   />
                 ) : (
-                  <p className="text-gray-300 text-sm md:text-lg">{profile.professionalTitle}</p>
+                  <p className="text-gray-300 text-sm md:text-lg">
+                    {profile.professionalTitle}
+                  </p>
                 )}
                 <span className="text-gray-300">•</span>
-                <span className="text-gray-300 bg-[#1e1a3c] px-2 py-0.5 rounded text-sm">{profile.role}</span>
+                <span className="text-gray-300 bg-[#1e1a3c] px-2 py-0.5 rounded text-sm">
+                  {profile.role}
+                </span>
+                <Badge
+                  variant="outline"
+                  className={`text-white border-none px-2 py-0.5 rounded ${
+                    profile.status === "Verified"
+                      ? "bg-green-700"
+                      : "bg-yellow-700"
+                  }`}
+                >
+                  {profile.status}
+                </Badge>
               </div>
             </div>
           </div>
@@ -373,7 +423,8 @@ export default function FounderProfilePage() {
             </div>
           ) : (
             <Button variant="outline" size="sm" onClick={handleEditTemp}>
-              <Pencil className="h-4 w-4 mr-2" /> <span className="hidden md:block">Edit Profile</span>
+              <Pencil className="h-4 w-4 mr-0 md:mr-2 " />{" "}
+              <span className="hidden md:block">Edit Profile</span>
             </Button>
           )}
         </div>
@@ -385,13 +436,19 @@ export default function FounderProfilePage() {
                 <Input
                   placeholder="Twitter URL"
                   value={editedProfile?.founderData?.socialLinks?.Twitter || ""}
-                  onChange={(e) => handleSocialChange("Twitter", e.target.value)}
+                  onChange={(e) =>
+                    handleSocialChange("Twitter", e.target.value)
+                  }
                   className="hidden"
                 />
                 <Input
                   placeholder="LinkedIn URL"
-                  value={editedProfile?.founderData?.socialLinks?.linkedIn || ""}
-                  onChange={(e) => handleSocialChange("LinkedIn", e.target.value)}
+                  value={
+                    editedProfile?.founderData?.socialLinks?.linkedIn || ""
+                  }
+                  onChange={(e) =>
+                    handleSocialChange("LinkedIn", e.target.value)
+                  }
                   className="hidden"
                 />
                 <Input
@@ -404,6 +461,7 @@ export default function FounderProfilePage() {
             ) : null}
             <a
               href={profile?.founderData?.socialLinks?.Twitter}
+              target="_blank"
               className="flex items-center justify-center hover:bg-gray-700 h-10 w-10 border border-gray-700 rounded-md bg-[#1e1a3c] border-none"
             >
               <Twitter className="h-5 w-5 text-white" />
@@ -451,7 +509,9 @@ export default function FounderProfilePage() {
                   className="text-gray-300 text-sm bg-[#1e1a3c] border-none"
                 />
               ) : (
-                <span>{profile.founderData?.socialLinks?.website}</span>
+                <span className="break-words break-all whitespace-normal">
+                  {profile.founderData?.socialLinks?.website}
+                </span>
               )}
             </div>
           </div>
@@ -471,12 +531,16 @@ export default function FounderProfilePage() {
           </div>
 
           <div>
-            <h2 className="text-white text-lg font-semibold mb-2">Web3 Experience</h2>
+            <h2 className="text-white text-lg font-semibold mb-2">
+              Web3 Experience
+            </h2>
             {isEditing ? (
               <div className="flex gap-2 items-center">
                 <Input
                   value={editedProfile?.founderData.experienceLevel || ""}
-                  onChange={(e) => handleExperienceChange("level", e.target.value)}
+                  onChange={(e) =>
+                    handleExperienceChange("level", e.target.value)
+                  }
                   className="text-gray-300 bg-[#1e1a3c] border-none"
                 />
                 {/* <Input
@@ -486,14 +550,19 @@ export default function FounderProfilePage() {
                 /> */}
               </div>
             ) : (
-              <Badge variant="outline" className="bg-[#3d3654] text-white border-none px-4 py-2 rounded-full">
+              <Badge
+                variant="outline"
+                className="bg-[#3d3654] text-white border-none px-4 py-2 rounded-full"
+              >
                 {profile.founderData.experienceLevel}
               </Badge>
             )}
           </div>
 
           <div>
-            <h2 className="text-white text-lg font-semibold mb-2">Skills & Expertise</h2>
+            <h2 className="text-white text-lg font-semibold mb-2">
+              Skills & Expertise
+            </h2>
             <div className="flex flex-wrap gap-2">
               {isEditing
                 ? editedProfile?.founderData.skills.map((skill, index) => (
@@ -518,5 +587,5 @@ export default function FounderProfilePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -71,7 +71,7 @@ export default function ProfileSetupPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-12">
+    <div className="max-w-4xl mx-auto px-4 py-12">
       <div className="space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold text-white">Welcome to OnlyFounders</h1>

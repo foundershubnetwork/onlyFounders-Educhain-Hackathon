@@ -171,13 +171,28 @@ export default function MarketplacePage() {
     return userRole !== "Founder" && userRole !== "serviceProvider"
   }
 
+  const handleCreateStartup = () => {
+    if(!user){
+      toast({
+        title: "Message",
+        description: "Please login to create a startup",
+        variant: "destructive",
+      })
+      router.push('api/auth/login')
+    }
+
+    else{
+      router.push('startup-setup/basicInfo')
+    }
+  }
+
   // Filter startups based on active tab
   const filteredStartups = startups.filter((startup) => {
     if (activeTab === "all") return true
     if (activeTab === "trending") return startup.featuredStatus === "Trending"
     if (activeTab === "featured") return startup.featuredStatus === "Featured"
-    if (activeTab === "defi") return startup.category === "DEFI"
-    if (activeTab === "nfts") return startup.category === "NFT"
+    if (activeTab === "defi") return startup.category === "DEFI" || startup.category === "defi"
+    if (activeTab === "nfts") return startup.category === "NFT" || startup.category === "nft"
     // Filter by category
     return startup.category.toLowerCase() === activeTab.toLowerCase()
   })
@@ -234,8 +249,8 @@ export default function MarketplacePage() {
           </div>
 
           <div className="gap-4">
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-              <Link href="/startup-setup/basicInfo">{hasStartup? "Edit your Startup" : "Create a Startup"} </Link>
+            <Button onClick={() => handleCreateStartup()} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+              {hasStartup? "Edit your Startup" : "Create a Startup"}
             </Button>
           </div>  
         </div>
@@ -451,6 +466,7 @@ export default function MarketplacePage() {
                               description: "Please login to view startup details",
                               variant: "destructive",
                             })
+                            router.push('api/auth/login')
                           }
                         }} disabled={isLoading}>
                           View Details
@@ -475,33 +491,22 @@ export default function MarketplacePage() {
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                 <Input placeholder="Search projects..." className="pl-9 bg-gray-900 border-gray-700 text-white" />
               </div>
-              <Select defaultValue="newest">
-                <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700 text-white">
-                  <Filter className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                  <SelectItem value="newest">Newest</SelectItem>
-                  <SelectItem value="trending">Trending</SelectItem>
-                  <SelectItem value="mostFunded">Most Funded</SelectItem>
-                  <SelectItem value="closingSoon">Closing Soon</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
 
-            <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="space-y-6 ">
+              <div className="flex items-center justify-center">
               <TabsList className="bg-gray-900 border border-gray-800 p-1">
                 <TabsTrigger
                   value="all"
                   className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
                 >
-                  All Projects
+                  All <span className="hidden md:block">Projects</span> 
                 </TabsTrigger>
                 <TabsTrigger
                   value="trending"
                   className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
                 >
-                  <TrendingUp className="mr-2 h-4 w-4" />
+                  <TrendingUp className="mr-2 h-4 w-4 hidden md:block" />
                   Trending
                 </TabsTrigger>
                 <TabsTrigger
@@ -523,6 +528,7 @@ export default function MarketplacePage() {
                   NFTs
                 </TabsTrigger>
               </TabsList>
+              </div>
 
               <TabsContent value={activeTab} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

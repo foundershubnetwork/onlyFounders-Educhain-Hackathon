@@ -401,7 +401,14 @@ export function AppLayout({
           )}
         </div>
 
-        {user ? <ConnectButton /> : null}
+        {user ? (
+          <ConnectButton
+            accountStatus={{
+              smallScreen: "avatar",
+              largeScreen: "full",
+            }}
+          />
+        ) : null}
       </>
     );
   };
@@ -779,7 +786,6 @@ export function AppLayout({
                             Login
                           </Button>
                         </a>
-            
                       </div>
                     )}
 

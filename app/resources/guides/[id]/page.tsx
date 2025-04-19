@@ -49,26 +49,14 @@ export default function BlogDetail() {
   const { user, isLoading } = useUser()
   const { toast } = useToast()
 
+  const userId = user?.sub?.substring(14)
+
   useEffect(() => {
     const fetchBlog = async () => {
       try {
         setIsBlogLoading(true)
-        if (!user || isLoading) {
-          return
-        }
 
-        const userId = user.sub?.substring(14)
-
-        const response = await fetch(`https://onlyfounders.azurewebsites.net/api/blog/get-blog-by-id/${blogId}`, {
-          method: "GET",
-          headers: {
-            user_id: userId,
-          },
-        })
-
-        // if (!response.ok) {
-        //   throw new Error(`Failed to fetch blog: ${response.status}`)
-        // }
+        const response = await fetch(`https://onlyfounders.azurewebsites.net/api/blog/get-blog-by-id/${blogId}`)
 
         const data: ApiResponse = await response.json()
         setBlog(data.blog)
@@ -94,8 +82,12 @@ export default function BlogDetail() {
       if (!user || isLoading) {
         return
       }
+
       const userId = user.sub?.substring(14)
       setLikeLoading(true)
+
+
+      
       const response = await fetch(`https://onlyfounders.azurewebsites.net/api/blog/upvote-blog/${blogId}`, {
         method: "POST",
         headers: {
@@ -230,7 +222,7 @@ export default function BlogDetail() {
               <Button
                 variant="ghost"
                 className={`flex items-center space-x-2 ${hasLiked ? "text-blue-400" : "text-gray-400 hover:text-blue-400"}`}
-                onClick={handleLike}
+                onClick={() => {userId? handleLike() : toast({title: "Message", description: "You must login to like a blog", variant: "default"})}}
               >
                 {likeLoading ? (
                   <div>loading...</div>

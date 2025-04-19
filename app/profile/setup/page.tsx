@@ -152,7 +152,7 @@ export default function ProfileSetupPage() {
                   <div>
                     <h3 className="text-lg font-medium text-white">Service Provider</h3>
                     <p className="text-gray-400 text-sm mt-1">
-                      Access both founder and investor features to raise funds and invest in projects
+                    Connect with Startups, Mentor, Scale, Support and Build.
                     </p>
                   </div>
                 </div>

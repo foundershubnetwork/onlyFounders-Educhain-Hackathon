@@ -38,6 +38,7 @@ import {
   Rocket,
 } from "lucide-react";
 
+
 export default function NetworkPage() {
   const [activeTab, setActiveTab] = useState("members");
 
@@ -289,7 +290,7 @@ export default function NetworkPage() {
   ];
 
   return (
-    <AppLayout className="z-50">
+    <div>
       {/* Coming Soon Overlay */}
       <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md overflow-x-auto">
         <Card className="w-full max-w-md mx-4 border-purple-800/30 shadow-xl rounded-2xl relative overflow-hidden">
@@ -760,6 +761,6 @@ export default function NetworkPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </AppLayout>
+    </div>
   );
 }

@@ -58,6 +58,7 @@ const veridaRequestUrl = buildVeridaRequestUrl(
   commonConfig.VERIDA_VAULT_BASE_URL
 );
 
+
 export default function QuestsPage() {
   const { user, isLoading } = useUser();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -584,7 +585,7 @@ export default function QuestsPage() {
                 </CardContent>
                 <CardFooter className="px-6 pb-6 pt-0">
                   <Button
-                    onClick={() => handleStartQuest(quest.id)}
+                    onClick={() => {!user ? toast({title: "Message", description: "Please login to start the Quest", variant: "destructive"}) : handleStartQuest(quest.id)}}
                     disabled={completion}
                     className="w-full bg-[#00CFFF] hover:bg-[#00E0FF] text-[#0B0E17] font-medium shadow-[0_0_10px_rgba(0,207,255,0.3)] hover:shadow-[0_0_15px_rgba(0,224,255,0.5)] transition-all duration-300"
                   >
@@ -600,7 +601,7 @@ export default function QuestsPage() {
   );
 
   return (
-    <AppLayout className="">
+    <div>
       <Tabs
         defaultValue="EDUChain Quests"
         value={activeTab}
@@ -965,6 +966,6 @@ export default function QuestsPage() {
           </div>
         </TabsContent>
       </Tabs>
-    </AppLayout>
+    </div>
   );
 }

@@ -1,31 +1,30 @@
-import { AppLayout } from "@/components/layout/app-layout";
 import { ReactNode } from "react";
 
 //seo tags
 import { Metadata } from "next";
+import { AppLayout } from "@/components/layout/app-layout";
 
 export const metadata: Metadata = {
-  title: "OnlyFounders | Resources",
-  description: "Educate. Elevate. Empower.",
+  title: "OnlyFounders | Quests",
+  description: "Learn. Earn. Unlock Possibilities.",
   openGraph: {
-    title: "Resources",
-    description: "Educate. Elevate. Empower.",
+    title: "Quests",
+    description: "Learn. Earn. Unlock Possibilities.",
     images: [
       {
-        url: "/resources-seo.jpg",
+        url: "/quest-seo.jpg",
         width: 1200,
         height: 630,
-        alt: "OnlyFounders Resources",
+        alt: "OnlyFounders Quests",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "OnlyFounders | Resources",
-    images: ["/resources-seo.jpg"],
+    title: "OnlyFounders | Quests",
+    images: ["/quest-seo.jpg"],
   },
 };
-
 
 interface LayoutProps {
   children: ReactNode;

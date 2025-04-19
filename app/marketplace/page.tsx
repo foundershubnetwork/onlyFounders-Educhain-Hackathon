@@ -16,6 +16,7 @@ import { useUser } from "@auth0/nextjs-auth0/client"
 import {useToast} from '../../hooks/use-toast'
 import { useRouter } from "next/navigation"
 
+
 // Define the startup interface based on the updated API response
 interface Startup {
   startupName: string
@@ -201,7 +202,7 @@ export default function MarketplacePage() {
   const featuredStartups = startups.filter((startup) => startup.featuredStatus === "Featured")
 
   return (
-    <AppLayout className="z-50">
+    <div>
       {/* Coming Soon Overlay */}
             {/* <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md">
               <Card className="w-full max-w-md mx-4 border-purple-800/30 shadow-xl rounded-2xl relative overflow-hidden">
@@ -249,7 +250,9 @@ export default function MarketplacePage() {
           </div>
 
           <div className="gap-4">
-            <Button onClick={() => handleCreateStartup()} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+            <Button 
+              onClick={() => handleCreateStartup()} 
+              className={` ${userRole != 'Founder' ? 'hidden' : 'block'} bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white`} >
               {hasStartup? "Edit your Startup" : "Create a Startup"}
             </Button>
           </div>  
@@ -672,7 +675,7 @@ export default function MarketplacePage() {
           </>
         )}
       </div>
-    </AppLayout>
+    </div>
   )
 }
 

@@ -21,23 +21,28 @@ import { toast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { AppLayout } from "@/components/layout/app-layout"
 
-const investorProfileSchema = z.object({
-  fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  title: z.string().min(2, { message: "Title is required" }),
-  bio: z
-    .string()
-    .min(10, { message: "Bio must be at least 10 characters" })
-    .max(150, { message: "Bio must be less than 150 characters" }),
-  investorType: z.string().min(1, { message: "Please select your investor type" }),
-  experience: z.string().min(1, { message: "Please select your experience level" }),
-  location: z.string().min(1, { message: "Please select your country" }),
-  minInvestment: z.number().min(100, { message: "Minimum investment must be at least 100 USDC" }),
-  maxInvestment: z.number().min(100, { message: "Maximum investment must be at least 100 USDC" }),
-  interests: z.array(z.string()).min(1, { message: "Please select at least one interest" }),
-  twitter: z.string().optional().or(z.literal("")),
-  linkedin: z.string().optional().or(z.literal("")),
-  publicProfile: z.boolean().default(true),
-})
+const investorProfileSchema = z
+  .object({
+    fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
+    title: z.string().min(2, { message: "Title is required" }),
+    bio: z
+      .string()
+      .min(10, { message: "Bio must be at least 10 characters" })
+      .max(150, { message: "Bio must be less than 150 characters" }),
+    investorType: z.string().min(1, { message: "Please select your investor type" }),
+    experience: z.string().min(1, { message: "Please select your experience level" }),
+    location: z.string().min(1, { message: "Please select your country" }),
+    minInvestment: z.number().min(100, { message: "Minimum investment must be at least 100 USDC" }),
+    maxInvestment: z.number().min(100, { message: "Maximum investment must be at least 100 USDC" }),
+    interests: z.array(z.string()).min(1, { message: "Please select at least one interest" }),
+    twitter: z.string().optional().or(z.literal("")),
+    linkedin: z.string().optional().or(z.literal("")),
+    publicProfile: z.boolean().default(true),
+  })
+  .refine((data) => data.maxInvestment >= data.minInvestment, {
+    message: "Maximum investment must be greater than or equal to minimum investment",
+    path: ["maxInvestment"], // This specifies which field the error should be shown on
+  })
 
 type InvestorProfileValues = z.infer<typeof investorProfileSchema>
 
@@ -270,8 +275,8 @@ export default function InvestorProfileSetupPage() {
       investorType: "",
       experience: "",
       location: "",
-      minInvestment: 1000,
-      maxInvestment: 10000,
+      minInvestment: 0,
+      maxInvestment: 0,
       interests: [],
       twitter: "",
       linkedin: "",
@@ -410,8 +415,7 @@ export default function InvestorProfileSetupPage() {
     setIsSubmitting(true)
 
     try {
-
-      if(!user) return
+      if (!user) return
       // Get user_id from wherever it's stored in your application
       const userId = user?.sub?.substring(14)
 
@@ -424,7 +428,7 @@ export default function InvestorProfileSetupPage() {
       formData.append("bio", data.bio)
       formData.append("username", data.fullName)
 
-      if(bannerFile) {
+      if (bannerFile) {
         formData.append("bannerImage", bannerFile)
       }
 
@@ -473,13 +477,13 @@ export default function InvestorProfileSetupPage() {
         // throw new Error(errorData?.message || "Failed to submit profile")
       }
 
-      if(response.ok) {
-      toast({
-        title: "Profile submitted successfully",
-        description: "Your investor profile has been saved.",
-      })
-      router.push("/profile-page/investor")
-    }
+      if (response.ok) {
+        toast({
+          title: "Profile submitted successfully",
+          description: "Your investor profile has been saved.",
+        })
+        router.push("/profile-page/investor")
+      }
 
       // Navigate to dashboard
     } catch (error) {
@@ -746,7 +750,16 @@ export default function InvestorProfileSetupPage() {
                                         step={100}
                                         className="bg-gray-800 border-gray-700 text-white pl-10"
                                         value={field.value}
-                                        onChange={(e) => field.onChange(Number.parseInt(e.target.value))}
+                                        onChange={(e) => {
+                                          const value = e.target.value === "" ? 0 : Number(e.target.value)
+                                          field.onChange(value)
+
+                                          // If max is less than the new min, update max to match min
+                                          const maxValue = form.getValues("maxInvestment")
+                                          if (maxValue < value) {
+                                            form.setValue("maxInvestment", value)
+                                          }
+                                        }}
                                       />
                                     </div>
                                   </FormControl>
@@ -770,7 +783,10 @@ export default function InvestorProfileSetupPage() {
                                         step={100}
                                         className="bg-gray-800 border-gray-700 text-white pl-10"
                                         value={field.value}
-                                        onChange={(e) => field.onChange(Number.parseInt(e.target.value))}
+                                        onChange={(e) => {
+                                          const value = e.target.value === "" ? 0 : Number(e.target.value)
+                                          field.onChange(value)
+                                        }}
                                       />
                                     </div>
                                   </FormControl>

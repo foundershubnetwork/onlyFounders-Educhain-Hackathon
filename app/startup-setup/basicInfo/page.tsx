@@ -84,8 +84,16 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
 
   // Define standard blockchain options
   const blockchains = [
-    { id: "solana", label: "Solana" },
-    { id: "ethereum", label: "Ethereum" },
+    { id: "SOLANA", label: "SOLANA" },
+    { id: "ETHEREUM", label: "ETHEREUM" },
+    { id: "SKALE", label: "SKALE" },
+    { id: "ICP", label: "ICP" },
+    { id: "MEGA ETH", label: "MEGA ETH" },
+    { id: "SOON", label: "SOON" },
+    { id: "Abstract", label: "Abstract" },
+    { id: "Bitcoin", label: "Bitcoin" },
+    { id: "IoTeX", label: "IoTeX" },
+    { id: "Multi-chain", label: "Multi-chain" },
     { id: "others", label: "Others" },
   ]
 
@@ -189,14 +197,11 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
             (platform: string) => !standardBlockchainIds.includes(platform),
           )
 
-          // If there are custom platforms, add "others" to the platforms list if not already there
-          const updatedPlatforms = [...blockchainPlatforms]
-          if (customPlatforms.length > 0 && !updatedPlatforms.includes("others")) {
-            updatedPlatforms.push("others")
-          }
-
           // Set custom blockchains state
           setCustomBlockchains(customPlatforms)
+
+          // Create updated platforms without "others" in the actual data
+          const updatedPlatforms = blockchainPlatforms.filter((platform: string) => platform !== "others")
 
           // Set form values
           form.reset({
@@ -340,7 +345,10 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
 
       formData.append("category", categoryToSubmit)
 
-      const platformsToSubmit = hasChanges ? values.blockchainPlatforms : originalData.blockchainPlatforms || []
+      const platformsToSubmit = hasChanges
+        ? values.blockchainPlatforms.filter((platform) => platform !== "others")
+        : originalData.blockchainPlatforms?.filter((platform: string) => platform !== "others") || []
+
       platformsToSubmit.forEach((platform: string, index: number) => {
         formData.append(`blockchainPlatforms[${index}]`, platform)
       })
@@ -792,18 +800,16 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                                     newCustomBlockchains.splice(index, 1)
                                     setCustomBlockchains(newCustomBlockchains)
 
-                                    // Update the form value
+                                    // Update the form value to completely remove the deleted blockchain
                                     const currentValues = form.getValues("blockchainPlatforms")
-                                    form.setValue(
-                                      "blockchainPlatforms",
-                                      currentValues.filter((v) => v !== blockchain),
-                                    )
+                                    const updatedValues = currentValues.filter((v) => v !== blockchain)
+                                    form.setValue("blockchainPlatforms", updatedValues)
 
                                     // If no custom blockchains left, remove "others" from the selection
                                     if (newCustomBlockchains.length === 0) {
                                       form.setValue(
                                         "blockchainPlatforms",
-                                        currentValues.filter((v) => v !== "others"),
+                                        updatedValues.filter((v) => v !== "others"),
                                       )
                                     }
                                   }}
@@ -830,12 +836,17 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                                   // Add to custom blockchains
                                   setCustomBlockchains([...customBlockchains, newCustomBlockchain])
 
-                                  // Add to form values
+                                  // Add to form values - don't add "others" to the actual values array
                                   const currentValues = form.getValues("blockchainPlatforms")
                                   if (!currentValues.includes("others")) {
+                                    // Just set the "others" flag in the UI, but don't include it in the values
                                     form.setValue("blockchainPlatforms", [...currentValues, "others"])
                                   }
-                                  form.setValue("blockchainPlatforms", [...currentValues, newCustomBlockchain])
+                                  // Add only the custom blockchain, not "others"
+                                  form.setValue("blockchainPlatforms", [
+                                    ...currentValues.filter((value) => value !== "others"),
+                                    newCustomBlockchain,
+                                  ])
 
                                   // Clear input
                                   setNewCustomBlockchain("")

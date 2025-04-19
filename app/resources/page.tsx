@@ -50,6 +50,7 @@ import {
 import { useUser } from "@auth0/nextjs-auth0/client";
 import {useToast} from '../../hooks/use-toast'
 
+
 export default function ResourcesPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -60,7 +61,6 @@ export default function ResourcesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { user, isLoading } = useUser();
   const { toast } = useToast()
-
 
 
   // Filter blogs based on selected category

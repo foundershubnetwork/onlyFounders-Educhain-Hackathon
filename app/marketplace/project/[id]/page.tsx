@@ -55,6 +55,16 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import dynamic from "next/dynamic";
 import { FaPeopleGroup } from "react-icons/fa6";
+import { DropdownMenuCheckboxItemProps, DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface TeamMember {
   name: string;
@@ -914,7 +924,21 @@ export default function ProjectDetailPage({
             onValueChange={setActiveTab}
             className="space-y-6"
           >
-            <div className="flex justify-center md:justify-start items-center md:items-start">
+
+            <div className="w-full md:hidden">
+              <select
+                onChange={(e) => setActiveTab(e.target.value)}
+                className="bg-gray-900 border border-gray-800 w-full text-white p-2 rounded"
+              >
+                <option value="overview">Overview</option>
+                <option value="team">Team</option>
+                <option value="roadmap">Roadmap</option>
+                <option value="tokenomics">Tokenomics</option>
+                <option value="updates">Updates</option>
+              </select>
+            </div>
+
+            <div className="hidden md:flex justify-center md:justify-start items-center md:items-start">
               <TabsList className="bg-gray-900 border border-gray-800 p-1">
                 <TabsTrigger
                   value="overview"
@@ -1627,7 +1651,6 @@ export default function ProjectDetailPage({
                       <Badge className="bg-green-600">Passed</Badge>
                     )}
                   </div>
-
                   <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 border border-gray-800">
                     <div className="flex items-center">
                       <Shield className="h-5 w-5 text-green-500 mr-2" />
@@ -1635,7 +1658,8 @@ export default function ProjectDetailPage({
                         Smart Contract Audit
                       </span>
                     </div>
-                    <Badge className="bg-amber-600">coming Soon</Badge>
+                    <Badge className="hidden md:block bg-amber-600">coming Soon</Badge>
+                    <Badge className="md:hidden bg-amber-600">Soon</Badge>
                   </div>
 
                   <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 border border-gray-800">
@@ -1643,7 +1667,8 @@ export default function ProjectDetailPage({
                       <Users className="h-5 w-5 text-green-500 mr-2" />
                       <span className="text-gray-300">Team Verification</span>
                     </div>
-                    <Badge className="bg-amber-600">coming Soon</Badge>
+                    <Badge className="hidden md:block bg-amber-600">coming Soon</Badge>
+                    <Badge className="md:hidden bg-amber-600">Soon</Badge>
                   </div>
                 </div>
 

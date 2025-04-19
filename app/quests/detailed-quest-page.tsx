@@ -772,7 +772,6 @@ export default function DetailedQuestPage({ questId }) {
   }
 
   return (
-    <AppLayout className="">
     <div className="min-h-screen bg-[#0B0E17] text-[#F5F7FA] p-6 font-['Poppins',sans-serif]">
       {/* Custom font styles */}
       <style jsx global>{`
@@ -1480,7 +1479,6 @@ export default function DetailedQuestPage({ questId }) {
         })()
       }
   </div>
-  </AppLayout>
   )
 }
 

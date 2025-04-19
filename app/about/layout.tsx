@@ -1,6 +1,30 @@
 import { AppLayout } from "@/components/layout/app-layout";
 import { ReactNode } from "react";
 
+//seo tags
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "OnlyFounders | About",
+  description: "Team. Traction. Partners. Advisors.",
+  openGraph: {
+    title: "About",
+    description: "Team. Traction. Partners. Advisors.",
+    images: [
+      {
+        url: "/about-seo.jpg",
+        width: 1200,
+        height: 630,
+        alt: "OnlyFounders About",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OnlyFounders | About",
+    images: ["/about-seo.jpg"],
+  },
+};
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,7 +32,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <AppLayout>
+    <AppLayout className="">
         {children}
     </AppLayout>
   );

@@ -308,18 +308,15 @@ export default function ProjectDetailPage({
   });
   const userId = user?.sub?.substring(14);
 
-  const [currentUrl, setCurrentUrl] = useState<string>('');
+  //twitter share code
+  const shortUrl = 'https://www.onlyfounders.xyz';
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setCurrentUrl(window.location.href);
-    }
-  }, []);
+  const fullText = `No warm intros. No BS. Just traction. I'm live on @onlyfoundersxyz — the new home for early-stage founders. Follow me there.\n${shortUrl}`;
 
-  const shareText = encodeURIComponent("Check out this amazing startup! 🚀");
-
-  //twitter share link
-  const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${shareText}`;
+  const shareText = encodeURIComponent(fullText);
+  
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${shareText}`;
+  
 
   //api to fetch updates
   // useEffect(() => {

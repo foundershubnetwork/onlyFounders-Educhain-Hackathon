@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import { AppLayout } from "@/components/layout/app-layout";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.onlyfounders.xyz/quests"),
   title: "OnlyFounders | Quests",
   description: "Learn. Earn. Unlock Possibilities.",
   openGraph: {

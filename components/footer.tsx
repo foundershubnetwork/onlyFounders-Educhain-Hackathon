@@ -80,7 +80,7 @@ export function Footer() {
                 <span className="sr-only">Discord</span>
               </Link>
               <Link
-                href="https://t.me/founders_hub_network"
+                href="https://discord.gg/xyKaHgyz5w"
                 className="text-gray-400 hover:text-white"
                 target="_blank"
                 rel="noopener noreferrer"

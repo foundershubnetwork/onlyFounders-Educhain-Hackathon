@@ -36,6 +36,7 @@ export default function HomePage() {
       totalRaised: number;
       goal?: number;
       deadline?: string;
+      startup_id: string;
     }>
   >([]);
   const [isloading, setIsLoading] = useState(true);
@@ -119,7 +120,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <AppLayout showHero={true}>
+    <AppLayout className="" showHero={true}>
       <section className="relative py-12 overflow-hidden">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 z-0"></div>
@@ -528,10 +529,17 @@ export default function HomePage() {
                         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                       >
                         <Button
-                          onClick={() => toast({
-                            title: "Message",
-                            description: "Startup Details will be available soon!",
-                          })}
+                          onClick={() => {
+                            if (user) {
+                              router.push(`/marketplace/project/${item.startup_id}`)
+                            } else {
+                              toast({
+                                title: "Message",
+                                description: "Please login to view startup details",
+                                variant: "destructive",
+                              })
+                            }
+                          }} disabled={isLoading}
                         >
                           View Startup Details
                           <ArrowRight className="ml-2 h-4 w-4" />

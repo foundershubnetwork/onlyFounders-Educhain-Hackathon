@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.onlyfounders.xyz/resources"),
   title: "OnlyFounders | Resources",
   description: "Educate. Elevate. Empower.",
   openGraph: {

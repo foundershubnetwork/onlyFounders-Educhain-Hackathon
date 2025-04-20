@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     description: "Learn. Earn. Unlock Possibilities.",
     images: [
       {
-        url: "/quest-seo.jpg",
+        url: "https://f3ai.blob.core.windows.net/frontend-picture-storage/quest-seo.jpg",
         width: 1200,
         height: 630,
         alt: "OnlyFounders Quests",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "OnlyFounders | Quests",
-    images: ["/quest-seo.jpg"],
+    images: ["https://f3ai.blob.core.windows.net/frontend-picture-storage/quest-seo.jpg"],
   },
 };
 

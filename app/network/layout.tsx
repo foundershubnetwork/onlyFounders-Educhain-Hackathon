@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     description: "Browse, network, connect, and build with industry experts and leaders.",
     images: [
       {
-        url: "/network-seo.jpg",
+        url: "https://f3ai.blob.core.windows.net/frontend-picture-storage/network-seo.jpg",
         width: 1200,
         height: 630,
         alt: "OnlyFounders Network",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "OnlyFounders | Network",
-    images: ["/network-seo.jpg"],
+    images: ["https://f3ai.blob.core.windows.net/frontend-picture-storage/network-seo.jpg"],
   },
 };
 

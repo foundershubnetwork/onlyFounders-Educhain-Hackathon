@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     description: "Explore deals. Invest. Contribute. Grow.",
     images: [
       {
-        url: "/marketplace-seo.jpg",
+        url: "https://f3ai.blob.core.windows.net/frontend-picture-storage/marketplace-seo.jpg",
         width: 1200,
         height: 630,
         alt: "OnlyFounders Marketplace",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "OnlyFounders | Marketplace",
-    images: ["/marketplace-seo.jpg"],
+    images: ["https://f3ai.blob.core.windows.net/frontend-picture-storage/marketplace-seo.jpg"],
   },
 };
 

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     description: "Team. Traction. Partners. Advisors.",
     images: [
       {
-        url: "/about-seo.jpg",
+        url: "https://f3ai.blob.core.windows.net/frontend-picture-storage/about-seo.jpg",
         width: 1200,
         height: 630,
         alt: "OnlyFounders About",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "OnlyFounders | About",
-    images: ["/about-seo.jpg"],
+    images: ["https://f3ai.blob.core.windows.net/frontend-picture-storage/about-seo.jpg"],
   },
 };
 

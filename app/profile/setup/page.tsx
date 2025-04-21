@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +16,15 @@ export default function ProfileSetupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   
   const { user, isLoading } = useUser();
+
+  useEffect(() => {
+    toast({
+      title: "Welcome to OnlyFounders",
+      description: "Please Complete your profile to access the platform!",
+      variant: "default",
+    })
+  }, [])
+  
 
   const handleContinue = async () => {
     if (!selectedType) return

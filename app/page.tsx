@@ -559,18 +559,18 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Join the OnlyFounders Community?
+                Join the OnlyFounders Community
                 </h2>
                 <p className="text-purple-200/70 mb-6">
                 Whether you're a founder looking to raise funds or an investor seeking the next big thing, OnlyFounders has you covered.
                 </p>
                 <div className="flex gap-4">
-                  <Link href="/marketplace" className="w-72 md:w-auto">
+                  <Link href="/marketplace" className="w-64 md:w-auto">
                     <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                       Explore Startups <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
-                  <Link href="/" className="w-72 md:w-auto">
+                  <Link href="/" className="w-64 md:w-auto">
                     <Button
                       variant="outline"
                       className="border-purple-800/20 text-white hover:bg-purple-900/30"

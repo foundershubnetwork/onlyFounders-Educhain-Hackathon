@@ -499,7 +499,6 @@ export default function InvestorProfileSetupPage() {
   }
 
   return (
-    <AppLayout className="">
       <div className="max-w-4xl mx-auto py-12 px-4">
         <div className="space-y-6">
           <div className="space-y-2">
@@ -934,6 +933,5 @@ export default function InvestorProfileSetupPage() {
           </div>
         </div>
       </div>
-    </AppLayout>
   )
 }

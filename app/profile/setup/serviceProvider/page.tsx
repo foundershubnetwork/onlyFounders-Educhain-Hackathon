@@ -18,7 +18,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, ArrowRight, Building, Camera, Facebook, Globe, Instagram, Linkedin, Twitter } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
-import { AppLayout } from "@/components/layout/app-layout"
 
 const serviceProviderProfileSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -36,14 +35,14 @@ const serviceProviderProfileSchema = z.object({
   serviceDescription: z.string().min(10, { message: "Service description must be at least 10 characters" }),
   pricingModel: z.string().min(1, { message: "Please select a pricing model" }),
   websiteUrl: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
-  companyTwitter: z.string().optional().or(z.literal("")),
-  companyLinkedin: z.string().optional().or(z.literal("")),
-  companyInstagram: z.string().optional().or(z.literal("")),
-  companyFacebook: z.string().optional().or(z.literal("")),
-  personalTwitter: z.string().optional().or(z.literal("")),
-  personalLinkedin: z.string().optional().or(z.literal("")),
-  personalInstagram: z.string().optional().or(z.literal("")),
-  personalFacebook: z.string().optional().or(z.literal("")),
+  companyTwitter: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  companyLinkedin: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  companyInstagram: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  companyFacebook: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  personalTwitter: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  personalLinkedin: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  personalInstagram: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  personalFacebook: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
 })
 
 type ServiceProviderProfileValues = z.infer<typeof serviceProviderProfileSchema>
@@ -537,7 +536,6 @@ export default function ServiceProviderProfileSetupPage() {
   }
 
   return (
-    <AppLayout className="">
     <div className="max-w-4xl mx-auto py-12 px-4">
       <div className="space-y-6">
         <div className="space-y-2">
@@ -1091,6 +1089,5 @@ export default function ServiceProviderProfileSetupPage() {
         </div>
       </div>
     </div>
-    </AppLayout>
   )
 }

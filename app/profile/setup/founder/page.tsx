@@ -501,7 +501,6 @@ export default function FounderProfileSetupPage() {
   }
 
   return (
-    <AppLayout className="">
       <div className="px-2 md:px-0 max-w-4xl mx-auto py-12">
         <div className="space-y-6">
           <div className="space-y-2">
@@ -832,6 +831,5 @@ export default function FounderProfileSetupPage() {
           </div>
         </div>
       </div>
-      </AppLayout>
   )
 }

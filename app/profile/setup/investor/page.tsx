@@ -28,7 +28,7 @@ const investorProfileSchema = z
     bio: z
       .string()
       .min(10, { message: "Bio must be at least 10 characters" })
-      .max(150, { message: "Bio must be less than 150 characters" }),
+      .max(300, { message: "Bio must be less than 300 characters" }),
     investorType: z.string().min(1, { message: "Please select your investor type" }),
     experience: z.string().min(1, { message: "Please select your experience level" }),
     location: z.string().min(1, { message: "Please select your country" }),
@@ -552,11 +552,11 @@ export default function InvestorProfileSetupPage() {
                           onChange={handleAvatarChange}
                         />
                       </div>
-                      <p className="text-sm text-gray-400">Upload a professional profile picture</p>
+                      <p className="text-sm text-gray-400">Upload a professional profile picture<span className="text-red-500 text-sm">*</span></p>
 
                       {/* banner Image */}
                       <div className="w-full mt-6">
-                        <p className="text-sm text-gray-400 mb-2">Banner Image</p>
+                        <p className="text-sm text-gray-400 mb-2">Banner Image<span className="text-red-500 text-sm">*</span></p>
                         <div className="relative w-full h-32 bg-gray-800 rounded-lg overflow-hidden mb-2">
                           <img
                             src={bannerSrc || "/placeholder.svg"}
@@ -588,7 +588,7 @@ export default function InvestorProfileSetupPage() {
                         name="fullName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Full Name</FormLabel>
+                            <FormLabel className="text-white">Full Name<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="John Doe"
@@ -606,7 +606,7 @@ export default function InvestorProfileSetupPage() {
                         name="title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Professional Title</FormLabel>
+                            <FormLabel className="text-white">Professional Title<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="Angel Investor / VC Partner"
@@ -625,7 +625,7 @@ export default function InvestorProfileSetupPage() {
                       name="bio"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white">Bio</FormLabel>
+                          <FormLabel className="text-white">Bio<span className="text-red-500 text-sm">*</span></FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Tell us about your investment philosophy and background..."
@@ -634,7 +634,7 @@ export default function InvestorProfileSetupPage() {
                             />
                           </FormControl>
                           <FormDescription className="text-gray-500">
-                            {field.value.length}/150 characters
+                            {field.value.length}/300 characters
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -647,7 +647,7 @@ export default function InvestorProfileSetupPage() {
                         name="investorType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Investor Type</FormLabel>
+                            <FormLabel className="text-white">Investor Type<span className="text-red-500 text-sm">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -675,7 +675,7 @@ export default function InvestorProfileSetupPage() {
                         name="experience"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Web3 Investment Experience</FormLabel>
+                            <FormLabel className="text-white">Web3 Investment Experience<span className="text-red-500 text-sm">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -700,7 +700,7 @@ export default function InvestorProfileSetupPage() {
                       name="location"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white">Location</FormLabel>
+                          <FormLabel className="text-white">Location<span className="text-red-500 text-sm">*</span></FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -721,7 +721,7 @@ export default function InvestorProfileSetupPage() {
                     />
 
                     <div className="space-y-6">
-                      <h3 className="text-lg font-medium text-white">Investment Preferences</h3>
+                      <h3 className="text-lg font-medium text-white">Investment Preferences<span className="text-red-500 text-sm">*</span></h3>
 
                       <div className="space-y-8">
                         <div className="space-y-4">
@@ -739,7 +739,7 @@ export default function InvestorProfileSetupPage() {
                               name="minInvestment"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-white">Minimum Investment</FormLabel>
+                                  <FormLabel className="text-white">Minimum Investment<span className="text-red-500 text-sm">*</span></FormLabel>
                                   <FormControl>
                                     <div className="relative">
                                       <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -772,7 +772,7 @@ export default function InvestorProfileSetupPage() {
                               name="maxInvestment"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-white">Maximum Investment</FormLabel>
+                                  <FormLabel className="text-white">Maximum Investment<span className="text-red-500 text-sm">*</span></FormLabel>
                                   <FormControl>
                                     <div className="relative">
                                       <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -801,7 +801,7 @@ export default function InvestorProfileSetupPage() {
                           name="interests"
                           render={() => (
                             <FormItem>
-                              <FormLabel className="text-white block mb-3">Investment Interests</FormLabel>
+                              <FormLabel className="text-white block mb-3">Investment Interests<span className="text-red-500 text-sm">*</span></FormLabel>
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 {interestOptions.map((option) => (
                                   <FormField
@@ -841,7 +841,7 @@ export default function InvestorProfileSetupPage() {
                     </div>
 
                     <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-white">Social Profiles</h3>
+                      <h3 className="text-lg font-medium text-white">Social Profiles<span className="text-red-500 text-sm">*</span></h3>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField
@@ -849,7 +849,7 @@ export default function InvestorProfileSetupPage() {
                           name="twitter"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Twitter</FormLabel>
+                              <FormLabel className="text-white">Twitter<span className="text-red-500 text-sm">*</span></FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -870,7 +870,7 @@ export default function InvestorProfileSetupPage() {
                           name="linkedin"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">LinkedIn</FormLabel>
+                              <FormLabel className="text-white">LinkedIn<span className="text-red-500 text-sm">*</span></FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />

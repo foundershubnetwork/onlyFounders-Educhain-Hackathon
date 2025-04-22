@@ -383,7 +383,7 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
           <Progress
             value={80}
             className="h-2 bg-gray-700"
-            // indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
+            indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
           />
         </div>
         <div className="bg-gray-900 p-6 rounded-lg">
@@ -437,7 +437,7 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
                           name="quarter"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Quarter</FormLabel>
+                              <FormLabel className="text-white">Quarter<span className="text-red-500 text-sm">*</span></FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                   <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -462,7 +462,7 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
                           name="year"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Year</FormLabel>
+                              <FormLabel className="text-white">Year<span className="text-red-500 text-sm">*</span></FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                   <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -485,7 +485,7 @@ export default function RoadmapForm({ data, updateData, onNext }: RoadmapFormPro
 
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-medium text-white">Milestones</h4>
+                          <h4 className="text-sm font-medium text-white">Milestones<span className="text-red-500 text-sm">*</span></h4>
                           <Button
                             type="button"
                             variant="outline"

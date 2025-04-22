@@ -45,13 +45,13 @@ const otherMetricOptions = [
 // Updated schema to handle numbers properly but store as strings
 const tractionMetricsSchema = z.object({
   waitlistSignups: z.string().optional(),
-  strategicPartners: z.string().optional(),
-  communitySize: z.string().optional(),
+  strategicPartners: z.string(),
+  communitySize: z.string(),
   growthMetrics: z
     .array(
       z.object({
         metricName: z.string(),
-        metricValue: z.string().optional(), // Keep as string for form handling
+        metricValue: z.string(), // Keep as string for form handling
       }),
     )
     .default([]),
@@ -391,7 +391,6 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
 
                 <FormField
                   control={form.control}
-                  required
                   rules={{ required: "This field is required" }}
                   name="waitlistSignups"
                   render={({ field }) => (
@@ -411,11 +410,10 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
                 <FormField
                   control={form.control}
                   name="strategicPartners"
-                  required
                   rules={{ required: "This field is required" }}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-white">Strategic Partners</FormLabel>
+                      <FormLabel className="text-white">Strategic Partners<span className="text-red-500 text-sm">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., 12" className="bg-gray-800 border-gray-700 text-white" {...field} />
                       </FormControl>
@@ -434,7 +432,7 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
                   rules={{ required: "This field is required" }}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-white">Community Size</FormLabel>
+                      <FormLabel className="text-white">Community Size<span className="text-red-500 text-sm">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., 12" className="bg-gray-800 border-gray-700 text-white" {...field} />
                       </FormControl>
@@ -448,7 +446,7 @@ export default function TractionMetricsForm({ data, updateData, onNext, userId }
 
                 {/* Growth Metrics Dropdown */}
                 <div className="space-y-2">
-                  <FormLabel className="text-white">Growth Metrics</FormLabel>
+                  <FormLabel className="text-white">Growth Metrics<span className="text-red-500 text-sm">*</span></FormLabel>
                   <div className="flex gap-2">
                     <Select value={selectedGrowthMetric} onValueChange={setSelectedGrowthMetric}>
                       <SelectTrigger className="bg-gray-800 border-gray-700 text-white">

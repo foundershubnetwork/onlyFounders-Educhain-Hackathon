@@ -25,7 +25,7 @@ const serviceProviderProfileSchema = z.object({
   bio: z
     .string()
     .min(10, { message: "Bio must be at least 10 characters" })
-    .max(500, { message: "Bio must be less than 500 characters" }),
+    .max(300, { message: "Bio must be less than 300 characters" }),
   experience: z.string().min(1, { message: "Please select your experience level" }),
   location: z.string().min(1, { message: "Please select your country" }),
   businessName: z.string().min(2, { message: "Business name is required" }),
@@ -589,11 +589,11 @@ export default function ServiceProviderProfileSetupPage() {
                         onChange={handleAvatarChange}
                       />
                     </div>
-                    <p className="text-sm text-gray-400">Upload a professional profile picture</p>
+                    <p className="text-sm text-gray-400">Upload a professional profile picture<span className="text-red-500 text-sm">*</span></p>
 
                     {/* Add banner image section */}
                     <div className="w-full mt-6">
-                      <p className="text-sm text-gray-400 mb-2">Banner Image</p>
+                      <p className="text-sm text-gray-400 mb-2">Banner Image<span className="text-red-500 text-sm">*</span></p>
                       <div className="relative w-full h-32 bg-gray-800 rounded-lg overflow-hidden mb-2">
                         <img
                           src={bannerSrc || "/placeholder.svg"}
@@ -628,7 +628,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="fullName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Full Name</FormLabel>
+                            <FormLabel className="text-white">Full Name<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="John Doe"
@@ -646,7 +646,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Professional Title</FormLabel>
+                            <FormLabel className="text-white">Professional Title<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="CEO & Founder"
@@ -665,7 +665,7 @@ export default function ServiceProviderProfileSetupPage() {
                       name="bio"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white">Bio</FormLabel>
+                          <FormLabel className="text-white">Bio<span className="text-red-500 text-sm">*</span></FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Tell us about your background, experience, and vision..."
@@ -674,7 +674,7 @@ export default function ServiceProviderProfileSetupPage() {
                             />
                           </FormControl>
                           <FormDescription className="text-gray-500">
-                            {field.value.length}/500 characters
+                            {field.value.length}/300 characters
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -686,7 +686,7 @@ export default function ServiceProviderProfileSetupPage() {
                       name="location"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white">Location</FormLabel>
+                          <FormLabel className="text-white">Location<span className="text-red-500 text-sm">*</span></FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -711,7 +711,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="experience"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Experience</FormLabel>
+                            <FormLabel className="text-white">Experience<span className="text-red-500 text-sm">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -741,7 +741,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="businessName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Business Name</FormLabel>
+                            <FormLabel className="text-white">Business Name<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="Your Company LLC"
@@ -759,7 +759,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="nameOfServiceProvider"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Service Provider Name</FormLabel>
+                            <FormLabel className="text-white">Service Provider Name<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="Name of your service"
@@ -777,7 +777,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Business Email</FormLabel>
+                            <FormLabel className="text-white">Business Email<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 type="email"
@@ -796,7 +796,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="category"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Service Category</FormLabel>
+                            <FormLabel className="text-white">Service Category<span className="text-red-500 text-sm">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -822,7 +822,7 @@ export default function ServiceProviderProfileSetupPage() {
                       name="serviceDescription"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white">Service Description</FormLabel>
+                          <FormLabel className="text-white">Service Description<span className="text-red-500 text-sm">*</span></FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Describe the services you offer in detail..."
@@ -841,7 +841,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="pricingModel"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Pricing Model</FormLabel>
+                            <FormLabel className="text-white">Pricing Model<span className="text-red-500 text-sm">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -866,7 +866,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="websiteUrl"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Website URL</FormLabel>
+                            <FormLabel className="text-white">Website URL<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -892,7 +892,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="companyTwitter"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Company Twitter</FormLabel>
+                            <FormLabel className="text-white">Company Twitter<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -913,7 +913,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="companyLinkedin"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Company LinkedIn</FormLabel>
+                            <FormLabel className="text-white">Company LinkedIn<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -934,7 +934,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="companyInstagram"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Company Instagram</FormLabel>
+                            <FormLabel className="text-white">Company Instagram<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -955,7 +955,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="companyFacebook"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Company Facebook</FormLabel>
+                            <FormLabel className="text-white">Company Facebook<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -981,7 +981,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="personalTwitter"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Personal Twitter</FormLabel>
+                            <FormLabel className="text-white">Personal Twitter<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -1002,7 +1002,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="personalLinkedin"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Personal LinkedIn</FormLabel>
+                            <FormLabel className="text-white">Personal LinkedIn<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -1023,7 +1023,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="personalInstagram"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Personal Instagram</FormLabel>
+                            <FormLabel className="text-white">Personal Instagram<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -1044,7 +1044,7 @@ export default function ServiceProviderProfileSetupPage() {
                         name="personalFacebook"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Personal Facebook</FormLabel>
+                            <FormLabel className="text-white">Personal Facebook<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />

@@ -40,7 +40,7 @@ const basicInfoSchema = z.object({
   discord: z.string().min(1, { message: "Please enter a valid Discord handle" }),
   medium: z.string().url().min(1, { message: "Please enter a valid Medium URL" }),
   whitepaper: z.string().url().min(1, { message: "Please enter a valid Whitepaper URL" }),
-  pitchDeckFile: z.string().optional().or(z.literal("")),
+  pitchDeckFile: z.string().or(z.literal("")),
   pitchDeckLink: z.string().url().min(1, { message: "Please enter a valid Pitch Deck URL" }),
   pitchDeckText: z.string().min(1, { message: "Please enter a description for the Pitch Deck" }),
   demoVideo: z.string().url().min(1, { message: "Please enter a valid Demo Video URL" }),
@@ -413,7 +413,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
       // Show success toast
       toast({
         title: "Success!",
-        description: "Step 1 submitted successfully.",
+        description: "Basic Info submitted successfully.",
       })
 
       // Route to next page
@@ -534,7 +534,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                 render={({ field }) => (
                   <FormItem>
                     <h1 className="text-start font-bold text-3xl text-white mb-6">Basic Information</h1>
-                    <FormLabel className="text-md text-white">Startup Name</FormLabel>
+                    <FormLabel className="text-md text-white">Startup Name<span className="text-red-500 text-sm">*</span></FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter your startup name"
@@ -549,7 +549,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
 
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-white mb-2">Startup Logo</h3>
+                  <h3 className="text-white mb-2">Startup Logo<span className="text-red-500 text-sm">*</span></h3>
                   <div className="flex flex-col items-center mb-4">
                     <div className="relative mb-2">
                       <Avatar className="h-24 w-24 border-2 border-gray-800">
@@ -576,7 +576,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                 </div>
 
                 <div>
-                  <h3 className="text-white mb-2">Banner Image</h3>
+                  <h3 className="text-white mb-2">Banner Image<span className="text-red-500 text-sm">*</span></h3>
                   <div className="flex flex-col items-center mb-4">
                     <div className="relative mb-2 w-full">
                       <div className="aspect-[3/1] w-full overflow-hidden rounded-lg border-2 border-gray-800 bg-gray-800">
@@ -611,7 +611,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                 name="tagline"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white">Tagline</FormLabel>
+                    <FormLabel className="text-white">Tagline<span className="text-red-500 text-sm">*</span></FormLabel>
                     <FormControl>
                       <Input
                         placeholder="A short, catchy description of your startup"
@@ -630,7 +630,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white">Detailed Description</FormLabel>
+                    <FormLabel className="text-white">Detailed Description<span className="text-red-500 text-sm">*</span></FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Describe your project, its mission, and vision in detail..."
@@ -649,7 +649,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                 name="stage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white">Stage</FormLabel>
+                    <FormLabel className="text-white">Stage<span className="text-red-500 text-sm">*</span></FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -675,7 +675,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                 render={({ field }) => (
                   <FormItem>
                     <div className="mb-4">
-                      <FormLabel className="text-white">Categories</FormLabel>
+                      <FormLabel className="text-white">Categories<span className="text-red-500 text-sm">*</span></FormLabel>
                       <FormDescription className="text-gray-500">
                         Select a category that applies to your startup
                       </FormDescription>
@@ -726,7 +726,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                   return (
                     <FormItem>
                       <div className="mb-4">
-                        <FormLabel className="text-white">Blockchain Platforms</FormLabel>
+                        <FormLabel className="text-white">Blockchain Platforms<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormDescription className="text-gray-500">
                           Select all blockchain platforms your project is built on
                         </FormDescription>
@@ -874,7 +874,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="website"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Website</FormLabel>
+                        <FormLabel className="text-white">Website<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -895,7 +895,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="twitter"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Twitter</FormLabel>
+                        <FormLabel className="text-white">Twitter<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -916,7 +916,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="github"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">GitHub</FormLabel>
+                        <FormLabel className="text-white">GitHub<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Github className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -937,7 +937,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="telegram"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Telegram</FormLabel>
+                        <FormLabel className="text-white">Telegram<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="t.me/yourchannel"
@@ -955,7 +955,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="discord"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Discord</FormLabel>
+                        <FormLabel className="text-white">Discord<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="discord.gg/yourchannel"
@@ -973,7 +973,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="medium"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Medium</FormLabel>
+                        <FormLabel className="text-white">Medium<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="medium.com/@yourusername"
@@ -991,7 +991,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="whitepaper"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Whitepaper</FormLabel>
+                        <FormLabel className="text-white">Whitepaper<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="https://yourwebsite.com/whitepaper"
@@ -1010,7 +1010,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="pitchDeck"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Pitch Deck (PDF)</FormLabel>
+                        <FormLabel className="text-white">Pitch Deck (PDF)<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <div className="flex items-center gap-2">
                             <Input
@@ -1050,7 +1050,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="pitchDeckLink"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Pitch Deck Link</FormLabel>
+                        <FormLabel className="text-white">Pitch Deck Link<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="https://yourwebsite.com/pitchdeck"
@@ -1069,7 +1069,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="pitchDeckText"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Pitch Deck Text</FormLabel>
+                        <FormLabel className="text-white">Pitch Deck Text<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder="Enter additional information about your pitch deck..."
@@ -1087,7 +1087,7 @@ export default function BasicInfoForm({ data, updateData, onNext, userId }: Basi
                     name="demoVideo"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Demo Video Link</FormLabel>
+                        <FormLabel className="text-white">Demo Video Link<span className="text-red-500 text-sm">*</span></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="https://youtube.com/your-video or https://vimeo.com/your-video"

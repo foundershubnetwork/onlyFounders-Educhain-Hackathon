@@ -221,7 +221,7 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
           <Progress
             value={60}
             className="h-2 bg-gray-700"
-            // indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
+            indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
           />
         </div>
         <div className="bg-gray-900 p-6 rounded-lg">
@@ -318,7 +318,7 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
                             onChange={handleAvatarChange}
                           />
                         </div>
-                        <p className="text-sm text-gray-400">Upload a professional profile picture</p>
+                        <p className="text-sm text-gray-400">Upload a professional profile picture<span className="text-red-500 text-sm">*</span></p>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -327,7 +327,7 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
                           name="fullName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Full Name</FormLabel>
+                              <FormLabel className="text-white">Full Name<span className="text-red-500 text-sm">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="John Doe"
@@ -345,7 +345,7 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
                           name="title"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Title / Role</FormLabel>
+                              <FormLabel className="text-white">Title / Role<span className="text-red-500 text-sm">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="CEO & Founder"
@@ -364,7 +364,7 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
                         name="bio"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Short Bio</FormLabel>
+                            <FormLabel className="text-white">Short Bio<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Brief description of experience and expertise..."
@@ -386,7 +386,7 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
                           name="linkedin"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">LinkedIn Profile URL</FormLabel>
+                              <FormLabel className="text-white">LinkedIn Profile URL<span className="text-red-500 text-sm">*</span></FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -407,7 +407,7 @@ export default function CoreTeamForm({ data, updateData, onNext }: CoreTeamFormP
                           name="twitter"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">X (Twitter) Profile URL</FormLabel>
+                              <FormLabel className="text-white">X (Twitter) Profile URL<span className="text-red-500 text-sm">*</span></FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />

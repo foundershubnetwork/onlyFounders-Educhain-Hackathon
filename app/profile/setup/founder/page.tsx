@@ -26,7 +26,7 @@ const founderProfileSchema = z.object({
   bio: z
     .string()
     .min(10, { message: "Bio must be at least 10 characters" })
-    .max(150, { message: "Bio must be less than 150 characters" }),
+    .max(300, { message: "Bio must be less than 300 characters" }),
   experience: z.string().min(1, { message: "Please select your experience level" }),
   skills: z.string().min(2, { message: "Skills are required" }),
   location: z.string().min(1, { message: "Please select your country" }),
@@ -556,10 +556,10 @@ export default function FounderProfileSetupPage() {
                           onChange={handleAvatarChange}
                         />
                       </div>
-                      <p className="text-sm text-gray-400">Upload a professional profile picture</p>
+                      <p className="text-sm text-gray-400">Upload a professional profile picture<span className="text-red-500 text-sm">*</span></p>
 
                       <div className="w-full mt-6">
-                        <p className="text-sm text-gray-400 mb-2">Banner Image</p>
+                        <p className="text-sm text-gray-400 mb-2">Banner Image<span className="text-red-500 text-sm">*</span></p>
                         <div className="relative w-full h-32 bg-gray-800 rounded-lg overflow-hidden mb-2">
                           <img
                             src={bannerSrc || "/placeholder.svg"}
@@ -591,7 +591,7 @@ export default function FounderProfileSetupPage() {
                         name="fullName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Full Name</FormLabel>
+                            <FormLabel className="text-white">Full Name<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="John Doe"
@@ -609,7 +609,7 @@ export default function FounderProfileSetupPage() {
                         name="title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Professional Title</FormLabel>
+                            <FormLabel className="text-white">Professional Title<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="CEO & Founder"
@@ -628,7 +628,7 @@ export default function FounderProfileSetupPage() {
                       name="bio"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white">Bio</FormLabel>
+                          <FormLabel className="text-white">Bio<span className="text-red-500 text-sm">*</span></FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Tell us about your background, experience, and vision..."
@@ -637,7 +637,7 @@ export default function FounderProfileSetupPage() {
                             />
                           </FormControl>
                           <FormDescription className="text-gray-500">
-                            {field.value.length}/150 characters
+                            {field.value.length}/300 characters
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -650,7 +650,7 @@ export default function FounderProfileSetupPage() {
                         name="experience"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Web3 Experience</FormLabel>
+                            <FormLabel className="text-white">Web3 Experience<span className="text-red-500 text-sm">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -674,10 +674,10 @@ export default function FounderProfileSetupPage() {
                         name="skills"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Skills & Expertise</FormLabel>
+                            <FormLabel className="text-white">Skills & Expertise<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="Blockchain, Smart Contracts, DeFi, etc."
+                                placeholder="Blockchain, DeFi, Fundraising, Communication etc..."
                                 className="bg-gray-800 border-gray-700 text-white"
                                 {...field}
                               />
@@ -694,7 +694,7 @@ export default function FounderProfileSetupPage() {
                       name="location"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white">Location</FormLabel>
+                          <FormLabel className="text-white">Location<span className="text-red-500 text-sm">*</span></FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -715,7 +715,7 @@ export default function FounderProfileSetupPage() {
                     />
 
                     <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-white">Social & Web Presence</h3>
+                      <h3 className="text-lg font-medium text-white">Social & Web Presence<span className="text-red-500 text-sm">*</span></h3>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField
@@ -723,7 +723,7 @@ export default function FounderProfileSetupPage() {
                           name="website"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Website</FormLabel>
+                              <FormLabel className="text-white">Website<span className="text-red-500 text-sm">*</span></FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -744,7 +744,7 @@ export default function FounderProfileSetupPage() {
                           name="twitter"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Twitter</FormLabel>
+                              <FormLabel className="text-white">Twitter<span className="text-red-500 text-sm">*</span></FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -765,7 +765,7 @@ export default function FounderProfileSetupPage() {
                           name="linkedin"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">LinkedIn</FormLabel>
+                              <FormLabel className="text-white">LinkedIn<span className="text-red-500 text-sm">*</span></FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -786,7 +786,7 @@ export default function FounderProfileSetupPage() {
                           name="github"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">GitHub</FormLabel>
+                              <FormLabel className="text-white">GitHub<span className="text-red-500 text-sm">*</span></FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Github className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />

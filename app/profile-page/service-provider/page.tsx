@@ -361,7 +361,7 @@ export default function ServiceProviderProfilePage() {
   };
 
   const handleEditTemp = () => {
-    router.push("/profile/setup/serviceProvider");
+    router.push("/profile/setup/");
   };
 
   if (isLoading) {
@@ -450,13 +450,6 @@ export default function ServiceProviderProfilePage() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 my-4">
-      <Button
-        variant={"outline"}
-        className="mb-4 flex items-center gap-1"
-        onClick={() => router.push("/")}
-      >
-        <ArrowLeft /> Back to Home
-      </Button>
       <img
         src={
           profile.bannerImage.file_url ||
@@ -498,9 +491,7 @@ export default function ServiceProviderProfilePage() {
                   <p className="text-gray-300">{displayJobTitle}</p>
                 )}
                 <span className="text-gray-300">•</span>
-                <span className="text-gray-300 bg-[#1e1a3c] px-2 py-0.5 rounded text-sm">
-                  {profile.role}
-                </span>
+                
                 <Badge
                   variant="outline"
                   className={`text-white border-none px-2 py-0.5 rounded ${

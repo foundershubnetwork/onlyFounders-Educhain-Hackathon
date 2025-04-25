@@ -15,7 +15,7 @@ import OCConnectWrapper from '../components/OCConnectWrapper';
 const opts = {
   clientId: '<Does_Not_Matter_For_Sandbox_mode>',    
   redirectUri: 'http://localhost:3000/', // Adjust this URL
-  referralCode: 'PARTNER6', // Assign partner code
+  referralCode: 'ONLYFOUNDERS', // Assign partner code
 };
 
 const inter = Inter({ subsets: ["latin"] });

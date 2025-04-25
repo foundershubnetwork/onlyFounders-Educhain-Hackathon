@@ -283,11 +283,7 @@ interface APIResponse {
   startup: StartupAPI;
 }
 
-export default function ProjectDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function ProjectDetailPage({params, }: { params: { id: string }; }) {
   const [activeTab, setActiveTab] = useState("overview");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showInvestDialog, setShowInvestDialog] = useState(false);
@@ -403,17 +399,13 @@ export default function ProjectDetailPage({
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              user_id: userId, // This should be dynamically set in a production app
+              user_id: userId, 
             },
             body: JSON.stringify({
-              projectId: params.id, // In a real app, this would come from params.id
+              projectId: params.id, 
             }),
           }
         );
-
-        // if (!response.ok) {
-        //   throw new Error("Failed to fetch startup data")
-        // }
 
         const data: APIResponse = await response.json();
         setStartupData(data.startup);

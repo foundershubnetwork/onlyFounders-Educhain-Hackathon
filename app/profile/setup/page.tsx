@@ -1,21 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { ArrowRight, Building, User, Wallet } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useUser } from "@auth0/nextjs-auth0/client"
 
 export default function ProfileSetupPage() {
   const router = useRouter()
-  const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
-  const { user, isLoading } = useUser();
+  const { user, isLoading } = useUser()
 
   useEffect(() => {
     toast({
@@ -24,15 +22,25 @@ export default function ProfileSetupPage() {
       variant: "default",
     })
   }, [])
-  
+
+  const handleRoleToggle = (role: string) => {
+    setSelectedTypes((prev) => {
+      // If role is already selected, remove it
+      if (prev.includes(role)) {
+        return prev.filter((r) => r !== role)
+      }
+      // Otherwise add it to the array
+      return [...prev, role]
+    })
+  }
 
   const handleContinue = async () => {
-    if (!selectedType) return
+    if (selectedTypes.length === 0) return
 
     setIsSubmitting(true)
 
     try {
-      const userId = user.sub?.substring(14);
+      const userId = user?.sub?.substring(14)
 
       if (!userId) {
         toast({
@@ -44,28 +52,38 @@ export default function ProfileSetupPage() {
         return
       }
 
-      const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/submit-role", {
+      const response = await fetch("https://ofstaging.azurewebsites.net/api/profile/submit-role", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           user_id: userId,
         },
         body: JSON.stringify({
-          role: selectedType,
+          role: selectedTypes,
         }),
       })
 
-      // if (!response.ok) {
-      //   throw new Error("Failed to submit role")
-      // }
+      const getRole = await fetch("https://ofstaging.azurewebsites.net/api/profile/get-onboarding-status", {
+        method: "GET",
+        headers: {
+          user_id: user?.sub?.substring(14),
+        },
+      })
 
-      // Navigate to the next page based on the selected role
-      if (selectedType === "Founder") {
-        router.push("/profile/setup/founder")
-      } else if (selectedType === "Investor") {
-        router.push("/profile/setup/investor")
-      } else if (selectedType === "ServiceProvider") {
-        router.push("/profile/setup/serviceProvider")
+      const roleData = await getRole.json()
+      // Navigate to the next page based on the first selected role (0th index)
+      const primaryRole = roleData.role[0]
+
+      console.log("Role is", primaryRole)
+      
+      const roleCount = 0;
+
+      if (primaryRole === "Founder") {
+        router.push(`/profile/setup/founder/${roleCount}`)
+      } else if (primaryRole === "Investor") {
+        router.push(`/profile/setup/investor/${roleCount}`)
+      } else if (primaryRole === "ServiceProvider") {
+        router.push(`/profile/setup/serviceProvider/${roleCount}`)
       }
     } catch (error) {
       console.error("Error submitting role:", error)
@@ -105,17 +123,19 @@ export default function ProfileSetupPage() {
 
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
-                <CardTitle className="text-xl text-white">Choose Your Role</CardTitle>
-                <CardDescription className="text-gray-400">Select how you want to use Optimus AI</CardDescription>
+                <CardTitle className="text-xl text-white">Choose Your Role(s)</CardTitle>
+                <CardDescription className="text-gray-400">
+                  Select how you want to use OnlyFounders
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div
                   className={`flex items-start p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedType === "Founder"
+                    selectedTypes.includes("Founder")
                       ? "border-blue-600 bg-blue-950/20"
                       : "border-gray-800 bg-gray-800/50 hover:border-gray-700"
                   }`}
-                  onClick={() => setSelectedType("Founder")}
+                  onClick={() => handleRoleToggle("Founder")}
                 >
                   <div className="mr-4 p-2 rounded-full bg-blue-900/30">
                     <Building className="h-6 w-6 text-blue-400" />
@@ -130,11 +150,11 @@ export default function ProfileSetupPage() {
 
                 <div
                   className={`flex items-start p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedType === "Investor"
+                    selectedTypes.includes("Investor")
                       ? "border-purple-600 bg-purple-950/20"
                       : "border-gray-800 bg-gray-800/50 hover:border-gray-700"
                   }`}
-                  onClick={() => setSelectedType("Investor")}
+                  onClick={() => handleRoleToggle("Investor")}
                 >
                   <div className="mr-4 p-2 rounded-full bg-purple-900/30">
                     <Wallet className="h-6 w-6 text-purple-400" />
@@ -149,11 +169,11 @@ export default function ProfileSetupPage() {
 
                 <div
                   className={`flex items-start p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedType === "ServiceProvider"
+                    selectedTypes.includes("ServiceProvider")
                       ? "border-amber-600 bg-amber-950/20"
                       : "border-gray-800 bg-gray-800/50 hover:border-gray-700"
                   }`}
-                  onClick={() => setSelectedType("ServiceProvider")}
+                  onClick={() => handleRoleToggle("ServiceProvider")}
                 >
                   <div className="mr-4 p-2 rounded-full bg-amber-900/30">
                     <User className="h-6 w-6 text-amber-400" />
@@ -161,7 +181,7 @@ export default function ProfileSetupPage() {
                   <div>
                     <h3 className="text-lg font-medium text-white">Service Provider</h3>
                     <p className="text-gray-400 text-sm mt-1">
-                    Connect with Startups, Mentor, Scale, Support and Build.
+                      Connect with Startups, Mentor, Scale, Support and Build.
                     </p>
                   </div>
                 </div>
@@ -169,7 +189,7 @@ export default function ProfileSetupPage() {
               <CardFooter>
                 <Button
                   onClick={handleContinue}
-                  disabled={!selectedType || isSubmitting}
+                  disabled={selectedTypes.length === 0 || isSubmitting}
                   className="w-full bg-black hover:bg-gray-900 text-white border border-gray-800"
                 >
                   {isSubmitting ? "Submitting..." : "Continue"}
@@ -183,4 +203,3 @@ export default function ProfileSetupPage() {
     </div>
   )
 }
-

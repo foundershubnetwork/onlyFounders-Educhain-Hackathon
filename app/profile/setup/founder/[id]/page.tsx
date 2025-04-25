@@ -14,59 +14,63 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ArrowLeft, Camera, Check, Linkedin, Twitter, User, Wallet } from "lucide-react"
+import { ArrowLeft, ArrowRight, Building, Camera, Github, Globe, Linkedin, Twitter } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { AppLayout } from "@/components/layout/app-layout"
 
-const investorProfileSchema = z
-  .object({
-    fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
-    title: z.string().min(2, { message: "Title is required" }),
-    bio: z
-      .string()
-      .min(10, { message: "Bio must be at least 10 characters" })
-      .max(300, { message: "Bio must be less than 300 characters" }),
-    investorType: z.string().min(1, { message: "Please select your investor type" }),
-    experience: z.string().min(1, { message: "Please select your experience level" }),
-    location: z.string().min(1, { message: "Please select your country" }),
-    minInvestment: z.number().min(100, { message: "Minimum investment must be at least 100 USDC" }),
-    maxInvestment: z.number().min(100, { message: "Maximum investment must be at least 100 USDC" }),
-    interests: z.array(z.string()).min(1, { message: "Please select at least one interest" }),
-    twitter: z.string().optional().or(z.literal("")),
-    linkedin: z.string().optional().or(z.literal("")),
-    publicProfile: z.boolean().default(true),
-  })
-  .refine((data) => data.maxInvestment >= data.minInvestment, {
-    message: "Maximum investment must be greater than or equal to minimum investment",
-    path: ["maxInvestment"], // This specifies which field the error should be shown on
-  })
+const founderProfileSchema = z.object({
+  fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  title: z.string().min(2, { message: "Title is required" }),
+  bio: z
+    .string()
+    .min(10, { message: "Bio must be at least 10 characters" })
+    .max(300, { message: "Bio must be less than 300 characters" }),
+  experience: z.string().min(1, { message: "Please select your experience level" }),
+  skills: z.string().min(2, { message: "Skills are required" }),
+  location: z.string().min(1, { message: "Please select your country" }),
+  website: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  twitter: z.string().optional().or(z.literal("")),
+  linkedin: z.string().optional().or(z.literal("")),
+  github: z.string().optional().or(z.literal("")),
+})
 
-type InvestorProfileValues = z.infer<typeof investorProfileSchema>
+type FounderProfileValues = z.infer<typeof founderProfileSchema>
 
-export default function InvestorProfileSetupPage() {
+interface UserRole {
+  role: string[]
+}
+
+export default function FounderProfileSetupPage({params, }: { params: { id: number }; }) {
   const router = useRouter()
   const [avatarSrc, setAvatarSrc] = useState<string>("/placeholder.svg?height=100&width=100")
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { user, isLoading } = useUser()
   const [onboardingStatus, setOnboardingStatus] = useState<boolean>()
+  const [originalData, setOriginalData] = useState<any>(null)
+  const [userRole, setUserRole] = useState<string[]>([])
 
+  // Add a new state for banner image
   const [bannerSrc, setBannerSrc] = useState<string>("/placeholder.svg?height=300&width=1000")
   const [bannerFile, setBannerFile] = useState<File | null>(null)
 
-  const interestOptions = [
-    { id: "defi", label: "DeFi" },
-    { id: "nft", label: "NFT" },
-    { id: "dao", label: "DAO" },
-    { id: "gaming", label: "Gaming" },
-    { id: "infrastructure", label: "Infrastructure" },
-    { id: "metaverse", label: "Metaverse" },
-    { id: "privacy", label: "Privacy" },
-    { id: "social", label: "Social" },
-  ]
+  const form = useForm<FounderProfileValues>({
+    resolver: zodResolver(founderProfileSchema),
+    defaultValues: {
+      fullName: "",
+      title: "",
+      bio: "",
+      experience: "",
+      skills: "",
+      location: "",
+      website: "",
+      twitter: "",
+      linkedin: "",
+      github: "",
+    },
+  })
 
   const countries = [
     "Afghanistan",
@@ -266,40 +270,21 @@ export default function InvestorProfileSetupPage() {
     "Zimbabwe",
   ]
 
-  const form = useForm<InvestorProfileValues>({
-    resolver: zodResolver(investorProfileSchema),
-    defaultValues: {
-      fullName: "",
-      title: "",
-      bio: "",
-      investorType: "",
-      experience: "",
-      location: "",
-      minInvestment: 0,
-      maxInvestment: 0,
-      interests: [],
-      twitter: "",
-      linkedin: "",
-      publicProfile: true,
-    },
-  })
-
   useEffect(() => {
     const getOnboardingStatus = async () => {
       try {
-        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-onboarding-status", {
+        const response = await fetch("https://ofstaging.azurewebsites.net/api/profile/get-onboarding-status", {
           method: "GET",
           headers: {
             user_id: user?.sub?.substring(14),
           },
         })
 
-        // if (!response.ok) {
-        //   throw new Error("Failed to fetch onboarding status");
-        // }
-
         const data = await response.json()
+        console.log("data is: ", data)
         setOnboardingStatus(data.status)
+        const rolesArray = Array.isArray(data.role) ? data.role : [data.role]
+        setUserRole(rolesArray)
       } catch (error) {
         console.error("Error fetching onboarding status:", error)
         toast({
@@ -314,6 +299,205 @@ export default function InvestorProfileSetupPage() {
       getOnboardingStatus()
     }
   }, [user])
+
+
+  // Add a useEffect to fetch profile data when the component loads
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (!user) return
+
+      try {
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-profile", {
+          method: "GET",
+          headers: {
+            user_id: user?.sub?.substring(14),
+          },
+        })
+
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch profile data")
+        // }
+
+        const data = await response.json()
+        setOriginalData(data)
+
+        // Set avatar if available
+        if (data.profilePic?.file_url) {
+          setAvatarSrc(data.profilePic.file_url)
+        }
+
+        // Update the fetchProfileData useEffect to set banner if available
+        // Inside the fetchProfileData function, after setting avatar:
+        if (data.bannerImage?.file_url) {
+          setBannerSrc(data.bannerImage.file_url)
+        }
+
+        // Parse skills array to comma-separated string
+        const skillsString = data.founderData?.skills?.join(", ") || ""
+
+        // Set form values
+        form.reset({
+          fullName: data.username || "",
+          title: data.professionalTitle || "",
+          bio: data.bio || "",
+          experience: data.founderData?.experienceLevel || "",
+          skills: skillsString,
+          location: data.location || "",
+          website: data.founderData?.socialLinks?.website || "",
+          twitter: data.founderData?.socialLinks?.Twitter || "",
+          linkedin: data.founderData?.socialLinks?.LinkedIn || "",
+          github: data.founderData?.socialLinks?.github || "",
+        })
+      } catch (error) {
+        console.error("Error fetching profile data:", error)
+        toast({
+          title: "Failed to fetch profile data",
+          description: "Please try again later.",
+          variant: "destructive",
+        })
+      }
+    }
+
+    if (user) {
+      fetchProfileData()
+    }
+  }, [user, form])
+
+  // Modify the onSubmit function to check for changes
+  async function onSubmit(data: FounderProfileValues) {
+    setIsSubmitting(true)
+
+    try {
+      // Get user_id from wherever it's stored in your application
+      const userId = user?.sub?.substring(14)
+
+      if (!userId) {
+        toast({
+          title: "Authentication error",
+          description: "Please sign in again to continue.",
+        })
+        router.push("/api/auth/login")
+        return
+      }
+
+      // Create FormData object
+      const formData = new FormData()
+
+      // Update the hasChanges check in onSubmit function to include bannerFile
+      const hasChanges =
+        !originalData ||
+        originalData.username !== data.fullName ||
+        originalData.professionalTitle !== data.title ||
+        originalData.bio !== data.bio ||
+        originalData.location !== data.location ||
+        originalData.founderData?.experienceLevel !== data.experience ||
+        originalData.founderData?.skills?.join(", ") !== data.skills ||
+        originalData.founderData?.socialLinks?.website !== data.website ||
+        originalData.founderData?.socialLinks?.Twitter !== data.twitter ||
+        originalData.founderData?.socialLinks?.LinkedIn !== data.linkedin ||
+        originalData.founderData?.socialLinks?.github !== data.github ||
+        avatarFile !== null ||
+        bannerFile !== null
+
+      // Add profile data
+      formData.append("professionalTitle", data.title)
+      formData.append("location", data.location)
+      formData.append("bio", data.bio)
+      formData.append("username", data.fullName)
+
+      // Add profile picture if available and changed
+      if (avatarFile) {
+        formData.append("profile_pic_file", avatarFile)
+      }
+
+      // Update the formData in onSubmit to include banner image
+      // After adding profile picture:
+      if (bannerFile) {
+        formData.append("bannerImage", bannerFile)
+      }
+
+      // Parse skills into array
+      const skillsArray = data.skills.split(",").map((skill) => skill.trim())
+
+      const founderData = {
+        experienceLevel: data.experience,
+        skills: skillsArray,
+        socialLinks: {
+          Twitter: data.twitter,
+          github: data.github,
+          LinkedIn: data.linkedin,
+          website: data.website,
+        },
+      }
+
+      // Append founderData as JSON string
+      formData.append("founderData", JSON.stringify(founderData))
+
+      // Add a flag to indicate if data has changed
+      formData.append("hasChanges", String(hasChanges))
+
+      // Make API call
+      const response = await fetch("https://ofstaging.azurewebsites.net/api/profile/submit-personal-details", {
+        method: "POST",
+        headers: {
+          user_id: userId,
+        },
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+        // throw new Error(errorData?.message || "Failed to submit profile")
+      }
+
+      if(response.status === 201) {
+
+        console.log("role is: ", userRole)
+        const roleCount = Number(params.id) +1;
+        console.log("Current Index is: ",roleCount)
+        console.log("Array length is: ", userRole.length)
+
+        if(roleCount < userRole.length) {
+          const nextRole = userRole[roleCount]
+
+          if (nextRole === "Investor") {
+            toast({
+              title: hasChanges ? "Profile updated successfully" : "Profile submitted successfully",
+              description: hasChanges ? "Your changes have been saved." : "Your founder profile has been saved.",
+            })
+            router.push(`/profile/setup/investor/${roleCount}`)
+          }
+
+          else if (nextRole === "ServiceProvider") {
+            toast({
+              title: hasChanges ? "Profile updated successfully" : "Profile submitted successfully",
+              description: hasChanges ? "Your changes have been saved." : "Your founder profile has been saved.",
+            })
+            router.push(`/profile/setup/serviceProvider/${roleCount}`)
+
+          } 
+        }
+        else {
+          toast({
+            title: hasChanges ? "Profile updated successfully" : "Profile submitted successfully",
+            description: hasChanges ? "Your changes have been saved." : "Your founder profile has been saved.",
+          })
+          router.push("/profile-page/combined")
+        }
+     }
+
+    } catch (error) {
+      console.error("Error submitting profile:", error)
+      console.log("Error is: ",error)
+      toast({
+        title: "Submission failed",
+        description: error instanceof Error ? error.message : "Failed to save your profile. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -332,7 +516,7 @@ export default function InvestorProfileSetupPage() {
     }
   }
 
-  // Add the handleBannerChange function after the handleAvatarChange function
+  // Add a handler for banner image change
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -350,160 +534,12 @@ export default function InvestorProfileSetupPage() {
     }
   }
 
-  // Add a new useEffect hook to fetch investor data after the existing useEffect
-  useEffect(() => {
-    const fetchInvestorData = async () => {
-      try {
-        if (!user || isLoading) return // Wait until user is fully loaded
-        const userId = user?.sub?.substring(14)
-
-        if (!userId) {
-          toast({
-            title: "Authentication error",
-            description: "Please sign in again to continue.",
-            variant: "destructive",
-          })
-          router.push("/api/auth/login")
-          return
-        }
-
-        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-profile", {
-          method: "GET",
-          headers: {
-            user_id: userId,
-          },
-        })
-
-        const data = await response.json()
-
-        // Set avatar image if available
-        if (data.profilePic && data.profilePic.file_url) {
-          setAvatarSrc(data.profilePic.file_url)
-        }
-
-        // Set banner image if available
-        if (data.bannerImage) {
-          setBannerSrc(data.bannerImage.file_url)
-        }
-
-        // Update form with fetched data
-        form.reset({
-          fullName: data.username || "",
-          title: data.professionalTitle || "",
-          bio: data.bio || "",
-          investorType: data.investorData?.investorType || "",
-          experience: data.investorData?.investmentExperience || "",
-          location: data.location || "",
-          minInvestment: data.investorData?.minInvestment || 100,
-          maxInvestment: data.investorData?.maxInvestment || 100,
-          interests: data.investorData?.investmentInterest || [],
-          twitter: data.investorData?.socialLinks?.Twitter || "",
-          linkedin: data.investorData?.socialLinks?.Linkedin || "",
-          publicProfile: true,
-        })
-      } catch (error) {
-        console.log("Error fetching investor data:", error)
-      }
-    }
-
-    if (user && !isLoading) {
-      fetchInvestorData()
-    }
-  }, [user, isLoading, form])
-
-  async function onSubmit(data: InvestorProfileValues) {
-    setIsSubmitting(true)
-
-    try {
-      if (!user) return
-      // Get user_id from wherever it's stored in your application
-      const userId = user?.sub?.substring(14)
-
-      // Create FormData object
-      const formData = new FormData()
-
-      // Add profile data
-      formData.append("professionalTitle", data.title)
-      formData.append("location", data.location)
-      formData.append("bio", data.bio)
-      formData.append("username", data.fullName)
-
-      if (bannerFile) {
-        formData.append("bannerImage", bannerFile)
-      }
-
-      // Add profile picture if available
-      if (avatarFile) {
-        formData.append("profile_pic_file", avatarFile)
-      }
-
-      // Create investorData object
-      const investorData = {
-        investorType: data.investorType,
-        investmentExperience: data.experience,
-        minInvestment: data.minInvestment,
-        maxInvestment: data.maxInvestment,
-        investmentInterest: data.interests,
-        socialLinks: {
-          Linkedin: data.linkedin,
-          Twitter: data.twitter,
-        },
-      }
-
-      // Append investorData as JSON string
-      formData.append("investorData", JSON.stringify(investorData))
-
-      // Create socialLinks object
-      const socialLinks = {
-        Linkedin: data.linkedin,
-        Twitter: data.twitter,
-      }
-
-      // Append socialLinks as JSON string
-      formData.append("socialLinks", JSON.stringify(socialLinks))
-
-      // Make API call
-      const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/submit-personal-details", {
-        method: "POST",
-        headers: {
-          user_id: userId,
-        },
-        body: formData,
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null)
-        console.log("Error response:", errorData)
-        // throw new Error(errorData?.message || "Failed to submit profile")
-      }
-
-      if (response.ok) {
-        toast({
-          title: "Profile submitted successfully",
-          description: "Your investor profile has been saved.",
-        })
-        router.push("/profile-page/investor")
-      }
-
-      // Navigate to dashboard
-    } catch (error) {
-      console.error("Error submitting profile:", error)
-      toast({
-        title: "Submission failed",
-        description: error instanceof Error ? error.message : "Failed to save your profile. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
   return (
-      <div className="max-w-4xl mx-auto py-12 px-4">
+      <div className="px-2 md:px-0 max-w-4xl mx-auto py-12">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-white">Investor Profile</h1>
-            <p className="text-gray-400">Tell us about your investment preferences and experience</p>
+            <h1 className="text-3xl font-bold text-white">Founder Profile</h1>
+            <p className="text-gray-400">Tell us about yourself and your experience in the Web3 space</p>
           </div>
 
           <div className="w-full">
@@ -521,20 +557,22 @@ export default function InvestorProfileSetupPage() {
 
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
-                <CardTitle className="text-xl text-white">Investor Information</CardTitle>
+                <CardTitle className="text-xl text-white">Founder Information</CardTitle>
                 <CardDescription className="text-gray-400">
-                  This information will help us match you with suitable projects
+                  This information will be visible to investors and the community
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    {/* Add banner image upload UI after the avatar section */}
+                    {/* Replace the existing avatar div with this updated version that includes banner: */}
                     <div className="flex flex-col items-center mb-6">
                       <div className="relative mb-4">
                         <Avatar className="h-24 w-24 border-2 border-gray-800">
                           <AvatarImage src={avatarSrc || "/placeholder.svg"} alt="Profile" />
                           <AvatarFallback className="bg-gray-800 text-gray-400">
-                            <User className="h-12 w-12" />
+                            <Building className="h-12 w-12" />
                           </AvatarFallback>
                         </Avatar>
                         <label
@@ -554,7 +592,6 @@ export default function InvestorProfileSetupPage() {
                       </div>
                       <p className="text-sm text-gray-400">Upload a professional profile picture<span className="text-red-500 text-sm">*</span></p>
 
-                      {/* banner Image */}
                       <div className="w-full mt-6">
                         <p className="text-sm text-gray-400 mb-2">Banner Image<span className="text-red-500 text-sm">*</span></p>
                         <div className="relative w-full h-32 bg-gray-800 rounded-lg overflow-hidden mb-2">
@@ -609,7 +646,7 @@ export default function InvestorProfileSetupPage() {
                             <FormLabel className="text-white">Professional Title<span className="text-red-500 text-sm">*</span></FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="Angel Investor / VC Partner"
+                                placeholder="CEO & Founder"
                                 className="bg-gray-800 border-gray-700 text-white"
                                 {...field}
                               />
@@ -628,7 +665,7 @@ export default function InvestorProfileSetupPage() {
                           <FormLabel className="text-white">Bio<span className="text-red-500 text-sm">*</span></FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="Tell us about your investment philosophy and background..."
+                              placeholder="Tell us about your background, experience, and vision..."
                               className="bg-gray-800 border-gray-700 text-white min-h-[120px]"
                               {...field}
                             />
@@ -644,38 +681,10 @@ export default function InvestorProfileSetupPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
-                        name="investorType"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-white">Investor Type<span className="text-red-500 text-sm">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                                  <SelectValue placeholder="Select investor type" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                                <SelectItem value="individual">Individual Investor</SelectItem>
-                                <SelectItem value="angel">Angel Investor</SelectItem>
-                                <SelectItem value="vc">Venture Capital</SelectItem>
-                                <SelectItem value="dao">DAO</SelectItem>
-                                <SelectItem value="family office">Family Office</SelectItem>
-                                <SelectItem value="corporate">Corporate Investor</SelectItem>
-                                <SelectItem value="crypto">Crypto Fund</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
                         name="experience"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Web3 Investment Experience<span className="text-red-500 text-sm">*</span></FormLabel>
+                            <FormLabel className="text-white">Web3 Experience<span className="text-red-500 text-sm">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
@@ -689,6 +698,25 @@ export default function InvestorProfileSetupPage() {
                                 <SelectItem value="expert">Expert (5+ years)</SelectItem>
                               </SelectContent>
                             </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="skills"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Skills & Expertise<span className="text-red-500 text-sm">*</span></FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Blockchain, DeFi, Fundraising, Communication etc..."
+                                className="bg-gray-800 border-gray-700 text-white"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription className="text-gray-500">Separate skills with commas</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -720,130 +748,31 @@ export default function InvestorProfileSetupPage() {
                       )}
                     />
 
-                    <div className="space-y-6">
-                      <h3 className="text-lg font-medium text-white">Investment Preferences<span className="text-red-500 text-sm">*</span></h3>
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium text-white">Social & Web Presence<span className="text-red-500 text-sm">*</span></h3>
 
-                      <div className="space-y-8">
-                        <div className="space-y-4">
-                          <div className="flex justify-between">
-                            <FormLabel className="text-white">Investment Range (USDC)</FormLabel>
-                            <span className="text-gray-400 text-sm">
-                              {form.watch("minInvestment").toLocaleString()} -{" "}
-                              {form.watch("maxInvestment").toLocaleString()} USDC
-                            </span>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormField
-                              control={form.control}
-                              name="minInvestment"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel className="text-white">Minimum Investment<span className="text-red-500 text-sm">*</span></FormLabel>
-                                  <FormControl>
-                                    <div className="relative">
-                                      <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                      <Input
-                                        type="number"
-                                        min={100}
-                                        step={100}
-                                        className="bg-gray-800 border-gray-700 text-white pl-10"
-                                        value={field.value}
-                                        onChange={(e) => {
-                                          const value = e.target.value === "" ? 0 : Number(e.target.value)
-                                          field.onChange(value)
-
-                                          // If max is less than the new min, update max to match min
-                                          const maxValue = form.getValues("maxInvestment")
-                                          if (maxValue < value) {
-                                            form.setValue("maxInvestment", value)
-                                          }
-                                        }}
-                                      />
-                                    </div>
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={form.control}
-                              name="maxInvestment"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel className="text-white">Maximum Investment<span className="text-red-500 text-sm">*</span></FormLabel>
-                                  <FormControl>
-                                    <div className="relative">
-                                      <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                      <Input
-                                        type="number"
-                                        min={100}
-                                        step={100}
-                                        className="bg-gray-800 border-gray-700 text-white pl-10"
-                                        value={field.value}
-                                        onChange={(e) => {
-                                          const value = e.target.value === "" ? 0 : Number(e.target.value)
-                                          field.onChange(value)
-                                        }}
-                                      />
-                                    </div>
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </div>
-                        </div>
-
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField
                           control={form.control}
-                          name="interests"
-                          render={() => (
+                          name="website"
+                          render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white block mb-3">Investment Interests<span className="text-red-500 text-sm">*</span></FormLabel>
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                {interestOptions.map((option) => (
-                                  <FormField
-                                    key={option.id}
-                                    control={form.control}
-                                    name="interests"
-                                    render={({ field }) => {
-                                      return (
-                                        <FormItem
-                                          key={option.id}
-                                          className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-3 bg-gray-800/50"
-                                        >
-                                          <FormControl>
-                                            <Checkbox
-                                              checked={field.value?.includes(option.id)}
-                                              onCheckedChange={(checked) => {
-                                                return checked
-                                                  ? field.onChange([...field.value, option.id])
-                                                  : field.onChange(field.value?.filter((value) => value !== option.id))
-                                              }}
-                                            />
-                                          </FormControl>
-                                          <FormLabel className="text-white font-normal cursor-pointer">
-                                            {option.label}
-                                          </FormLabel>
-                                        </FormItem>
-                                      )
-                                    }}
+                              <FormLabel className="text-white">Website<span className="text-red-500 text-sm">*</span></FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                  <Input
+                                    placeholder="https://yourwebsite.com"
+                                    className="bg-gray-800 border-gray-700 text-white pl-10"
+                                    {...field}
                                   />
-                                ))}
-                              </div>
-                              <FormMessage className="mt-2" />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
                             </FormItem>
                           )}
                         />
-                      </div>
-                    </div>
 
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-white">Social Profiles<span className="text-red-500 text-sm">*</span></h3>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField
                           control={form.control}
                           name="twitter"
@@ -885,32 +814,35 @@ export default function InvestorProfileSetupPage() {
                             </FormItem>
                           )}
                         />
+
+                        <FormField
+                          control={form.control}
+                          name="github"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-white">GitHub<span className="text-red-500 text-sm">*</span></FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Github className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                  <Input
+                                    placeholder="github.com/username"
+                                    className="bg-gray-800 border-gray-700 text-white pl-10"
+                                    {...field}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </div>
-
-                    <FormField
-                      control={form.control}
-                      name="publicProfile"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-800 p-4 bg-gray-800/50">
-                          <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="text-white">Make my profile public</FormLabel>
-                            <FormDescription className="text-gray-500">
-                              Allow founders to see your profile and contact you about investment opportunities
-                            </FormDescription>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
 
                     <div className="flex justify-between pt-4">
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => router.push("/profile/setup")}
+                        onClick={() => router.push("/profile")}
                         className="border-gray-700 text-white"
                         disabled={isSubmitting || onboardingStatus === true}
                       >
@@ -922,8 +854,8 @@ export default function InvestorProfileSetupPage() {
                         className="bg-black hover:bg-gray-900 text-white border border-gray-800"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? "Submitting..." : "Complete Setup"}
-                        {!isSubmitting && <Check className="ml-2 h-4 w-4" />}
+                        {isSubmitting ? "Submitting..." : "Submit"}
+                        {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
                       </Button>
                     </div>
                   </form>

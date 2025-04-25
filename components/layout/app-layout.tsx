@@ -339,10 +339,7 @@ export function AppLayout({
                 <DropdownMenuSeparator className="bg-gray-800" />
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    handleProfileNavigation();
-                  }}
+                  onSelect={() => router.push('/profile-page/combined')}
                 >
                   <div className="flex items-center">
                     <Shield className="mr-2 h-4 w-4" />
@@ -728,41 +725,9 @@ export function AppLayout({
                           </h4>
                         </div>
                         <div className="grid gap-1 px-2">
-                          {role === "Investor" ? (
-                            <Link
-                              href="/profile-page/investor"
-                              className={cn(
-                                "flex items-center gap-3 px-3 py-3 text-sm rounded-md",
-                                isActive("/profile-page/investor")
-                                  ? "bg-gray-800 text-white"
-                                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
-                              )}
-                            >
-                              <Building className="h-5 w-5" />
-                              Investor Dashboard
-                            </Link>
-                          ) : role === "Founder" ? (
-                            <Link
-                              href="/profile-page/founder"
-                              className={cn(
-                                "flex items-center gap-3 px-3 py-3 text-sm rounded-md",
-                                isActive("/profile-page/founder")
-                                  ? "bg-gray-800 text-white"
-                                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
-                              )}
-                            >
-                              <Building className="h-5 w-5" />
-                              Founder Dashboard
-                            </Link>
-                          ) : (
-                            ""
-                          )}
                           <Button
                             className="bg-gray-800 flex items-center justify-start gap-3 px-3"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleProfileNavigation();
-                            }}
+                            onClick={() => router.push("/profile-page/combined")}
                           >
                             <CircleUserIcon />
                             Profile

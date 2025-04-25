@@ -292,7 +292,7 @@ export default function NetworkPage() {
   return (
     <div>
       {/* Coming Soon Overlay */}
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md overflow-x-auto">
+      {/* <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 backdrop-blur-md overflow-x-auto">
         <Card className="w-full max-w-md mx-4 border-purple-800/30 shadow-xl rounded-2xl relative overflow-hidden">
         
           <div
@@ -328,7 +328,7 @@ export default function NetworkPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       <div className="w-screen overflow-x-hidden container mx-auto py-8 space-y-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

@@ -7,7 +7,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <AppLayout>
+    <AppLayout className="">
         {children}
     </AppLayout>
   );

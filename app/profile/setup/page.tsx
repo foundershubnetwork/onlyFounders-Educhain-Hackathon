@@ -8,12 +8,16 @@ import { Progress } from "@/components/ui/progress"
 import { ArrowRight, Building, User, Wallet } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
+import { ConnectButton } from "@rainbow-me/rainbowkit"
+import { useAccount } from "wagmi"
+import axios from "axios"
 
 export default function ProfileSetupPage() {
   const router = useRouter()
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { user, isLoading } = useUser()
+  const { address, isConnected } = useAccount()
 
   useEffect(() => {
     toast({
@@ -69,6 +73,22 @@ export default function ProfileSetupPage() {
           user_id: user?.sub?.substring(14),
         },
       })
+
+    
+      const sendWallet = await axios.post(
+        "https://onlyfounders.azurewebsites.net/api/profile/add-walletAddress",
+        { walletAddress: address },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            user_id: userId,
+          },
+        }
+      );
+
+      if(sendWallet.status == 200) {
+        console.log("Wallet address sent successfully")
+      }
 
       const roleData = await getRole.json()
       // Navigate to the next page based on the first selected role (0th index)
@@ -187,14 +207,41 @@ export default function ProfileSetupPage() {
                 </div>
               </CardContent>
               <CardFooter>
+                <div className="mb-4 w-full flex flex-col items-center gap-4">
+                  <ConnectButton.Custom>
+                            {({ account, openConnectModal, openAccountModal, mounted }) => {
+                              const connected = mounted && account;
+                              return (
+                                <button
+                                  onClick={
+                                    connected ? openAccountModal : openConnectModal
+                                  }
+                                  className="flex items-center justify-center rounded-md w-full bg-gradient-to-r px-2 py-1.5 from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                                >
+                                  <Wallet className="mr-2 h-4 w-4" />
+                                  <span className="block md:hidden">
+                                    {connected
+                                      ? `${address?.slice(0, 6)}...${address?.slice(-4)}`
+                                      : "Connect"}
+                                  </span>
+                                  <span className="hidden md:block">
+                                    {connected
+                                      ? `${address?.slice(0, 6)}...${address?.slice(-4)}`
+                                      : "Connect Wallet"}
+                                  </span>
+                                </button>
+                              );
+                            }}
+                  </ConnectButton.Custom>
                 <Button
                   onClick={handleContinue}
-                  disabled={selectedTypes.length === 0 || isSubmitting}
+                  disabled={selectedTypes.length === 0 || isSubmitting || !isConnected}
                   className="w-full bg-black hover:bg-gray-900 text-white border border-gray-800"
                 >
                   {isSubmitting ? "Submitting..." : "Continue"}
                   {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
                 </Button>
+                </div>
               </CardFooter>
             </Card>
           </div>

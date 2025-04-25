@@ -30,6 +30,7 @@ const investorProfileSchema = z
       .max(300, { message: "Bio must be less than 300 characters" }),
     investorType: z.string().min(1, { message: "Please select your investor type" }),
     experience: z.string().min(1, { message: "Please select your experience level" }),
+    vcFirmName: z.string().min(1, { message: "Please enter your VC firm name" }),
     location: z.string().min(1, { message: "Please select your country" }),
     minInvestment: z.number().min(100, { message: "Minimum investment must be at least 100 USDC" }),
     maxInvestment: z.number().min(100, { message: "Maximum investment must be at least 100 USDC" }),
@@ -274,6 +275,7 @@ export default function InvestorProfileSetupPage({params, }: { params: { id: num
       bio: "",
       investorType: "",
       experience: "",
+      vcFirmName: "",
       location: "",
       minInvestment: 0,
       maxInvestment: 0,
@@ -395,6 +397,7 @@ export default function InvestorProfileSetupPage({params, }: { params: { id: num
           bio: data.bio || "",
           investorType: data.investorData?.investorType || "",
           experience: data.investorData?.investmentExperience || "",
+          vcFirmName: data.investorData?.vcFirmName || "",
           location: data.location || "",
           minInvestment: data.investorData?.minInvestment || 100,
           maxInvestment: data.investorData?.maxInvestment || 100,
@@ -443,6 +446,7 @@ export default function InvestorProfileSetupPage({params, }: { params: { id: num
       const investorData = {
         investorType: data.investorType,
         investmentExperience: data.experience,
+        vcFirmName: data.vcFirmName,
         minInvestment: data.minInvestment,
         maxInvestment: data.maxInvestment,
         investmentInterest: data.interests,
@@ -724,6 +728,26 @@ export default function InvestorProfileSetupPage({params, }: { params: { id: num
                     </div>
 
                     <FormField
+                          control={form.control}
+                          name="vcFirmName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-white">VC Firm Name<span className="text-red-500 text-sm">*</span></FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Input
+                                    placeholder="VC Firm Name"
+                                    className="bg-gray-800 border-gray-700 text-white"
+                                    {...field}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                    <FormField
                       control={form.control}
                       name="location"
                       render={({ field }) => (
@@ -916,7 +940,7 @@ export default function InvestorProfileSetupPage({params, }: { params: { id: num
                       </div>
                     </div>
 
-                    <FormField
+                    {/* <FormField
                       control={form.control}
                       name="publicProfile"
                       render={({ field }) => (
@@ -932,7 +956,7 @@ export default function InvestorProfileSetupPage({params, }: { params: { id: num
                           </div>
                         </FormItem>
                       )}
-                    />
+                    /> */}
 
                     <div className="flex justify-between pt-4">
                       <Button

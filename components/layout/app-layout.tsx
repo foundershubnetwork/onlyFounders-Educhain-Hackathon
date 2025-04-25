@@ -42,7 +42,7 @@ import {
 
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
+import { useAccount } from "wagmi"
 import axios from "axios";
 import { useToast } from "../ui/use-toast";
 import {
@@ -412,12 +412,12 @@ export function AppLayout({
                 <Wallet className="mr-2 h-4 w-4" />
                 <span className="block md:hidden">
                   {connected
-                    ? "Connected"
+                    ? `${address?.slice(0, 6)}...${address?.slice(-4)}`
                     : "Connect"}
                 </span>
                 <span className="hidden md:block">
                   {connected
-                    ? "Wallet Connected"
+                    ? `${address?.slice(0, 6)}...${address?.slice(-4)}`
                     : "Connect Wallet"}
                 </span>
               </button>
@@ -756,7 +756,7 @@ export function AppLayout({
                               >
                                 <Wallet className="mr-2 h-4 w-4" />
                                 {connected
-                                  ? "Wallet Connected"
+                                  ? `${address?.slice(0, 6)}...${address?.slice(-4)}`
                                   : "Connect Wallet"}
                               </Button>
                             );

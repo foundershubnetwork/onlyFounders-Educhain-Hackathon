@@ -29,6 +29,7 @@ const founderProfileSchema = z.object({
     .max(300, { message: "Bio must be less than 300 characters" }),
   experience: z.string().min(1, { message: "Please select your experience level" }),
   skills: z.string().min(2, { message: "Skills are required" }),
+  companyName: z.string().min(2, { message: "Company name is required" }),
   location: z.string().min(1, { message: "Please select your country" }),
   website: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
   twitter: z.string().optional().or(z.literal("")),
@@ -64,6 +65,7 @@ export default function FounderProfileSetupPage({params, }: { params: { id: numb
       bio: "",
       experience: "",
       skills: "",
+      companyName: "",
       location: "",
       website: "",
       twitter: "",
@@ -342,6 +344,7 @@ export default function FounderProfileSetupPage({params, }: { params: { id: numb
           bio: data.bio || "",
           experience: data.founderData?.experienceLevel || "",
           skills: skillsString,
+          companyName: data.founderData?.companyName || "",
           location: data.location || "",
           website: data.founderData?.socialLinks?.website || "",
           twitter: data.founderData?.socialLinks?.Twitter || "",
@@ -422,6 +425,7 @@ export default function FounderProfileSetupPage({params, }: { params: { id: numb
       const founderData = {
         experienceLevel: data.experience,
         skills: skillsArray,
+        companyName: data.companyName,
         socialLinks: {
           Twitter: data.twitter,
           github: data.github,
@@ -722,6 +726,27 @@ export default function FounderProfileSetupPage({params, }: { params: { id: numb
                         )}
                       />
                     </div>
+
+                    <FormField
+                          control={form.control}
+                          name="companyName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-white">Company Name<span className="text-red-500 text-sm">*</span></FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                  <Input
+                                    placeholder="Your Company Name"
+                                    className="bg-gray-800 border-gray-700 text-white pl-10"
+                                    {...field}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
                     <FormField
                       control={form.control}

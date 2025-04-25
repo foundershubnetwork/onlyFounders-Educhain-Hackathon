@@ -1,147 +1,71 @@
-"use client";
+"use client"
 
-import type React from "react";
+import type React from "react"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Building,
-  Camera,
-  Facebook,
-  Globe,
-  Instagram,
-  Linkedin,
-  Twitter,
-} from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ArrowLeft, ArrowRight, Building, Camera, Facebook, Globe, Instagram, Linkedin, Twitter } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
+import { useUser } from "@auth0/nextjs-auth0/client"
+import { Check, ChevronDown } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 
 const serviceProviderProfileSchema = z.object({
-  fullName: z
-    .string()
-    .min(2, { message: "Name must be at least 2 characters" }),
+  fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
   title: z.string().min(2, { message: "Title is required" }),
   bio: z
     .string()
     .min(10, { message: "Bio must be at least 10 characters" })
     .max(300, { message: "Bio must be less than 300 characters" }),
-  experience: z
-    .string()
-    .min(1, { message: "Please select your experience level" }),
+  experience: z.string().min(1, { message: "Please select your experience level" }),
   location: z.string().min(1, { message: "Please select your country" }),
   businessName: z.string().min(2, { message: "Business name is required" }),
-  nameOfServiceProvider: z
-    .string()
-    .min(2, { message: "Service provider name is required" }),
+  nameOfServiceProvider: z.string().min(2, { message: "Service provider name is required" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
-  category: z.string().min(1, { message: "Please select a category" }),
-  serviceDescription: z
-    .string()
-    .min(10, { message: "Service description must be at least 10 characters" }),
+  category: z.array(z.string()).min(1, { message: "Please select at least one category" }),
+  otherCategory: z.string().optional(),
+  serviceDescription: z.string().min(10, { message: "Service description must be at least 10 characters" }),
   pricingModel: z.string().min(1, { message: "Please select a pricing model" }),
-  websiteUrl: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-  companyTwitter: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-  companyLinkedin: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-  companyInstagram: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-  companyFacebook: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-  personalTwitter: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-  personalLinkedin: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-  personalInstagram: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-  personalFacebook: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-});
+  websiteUrl: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  companyTwitter: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  companyLinkedin: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  companyInstagram: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  companyFacebook: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  personalTwitter: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  personalLinkedin: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  personalInstagram: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+  personalFacebook: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
+})
 
-type ServiceProviderProfileValues = z.infer<
-  typeof serviceProviderProfileSchema
->;
+type ServiceProviderProfileValues = z.infer<typeof serviceProviderProfileSchema>
 
 interface UserRole {
-  role: string[];
+  role: string[]
 }
 
-export default function ServiceProviderProfileSetupPage({params, }: { params: { id: number }; }) {
-  const router = useRouter();
-  const [avatarSrc, setAvatarSrc] = useState<string>(
-    "/placeholder.svg?height=100&width=100"
-  );
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user, isLoading } = useUser();
-  const [onboardingStatus, setOnboardingStatus] = useState<boolean>();
-    const [userRole, setUserRole] = useState<string[]>([])
+export default function ServiceProviderProfileSetupPage({ params }: { params: { id: number } }) {
+  const router = useRouter()
+  const [avatarSrc, setAvatarSrc] = useState<string>("/placeholder.svg?height=100&width=100")
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { user, isLoading } = useUser()
+  const [onboardingStatus, setOnboardingStatus] = useState<boolean>()
+  const [userRole, setUserRole] = useState<string[]>([])
   // Add state for banner image
-  const [bannerSrc, setBannerSrc] = useState<string>(
-    "/placeholder.svg?height=300&width=1000"
-  );
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerSrc, setBannerSrc] = useState<string>("/placeholder.svg?height=300&width=1000")
+  const [bannerFile, setBannerFile] = useState<File | null>(null)
 
   const form = useForm<ServiceProviderProfileValues>({
     resolver: zodResolver(serviceProviderProfileSchema),
@@ -154,7 +78,8 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
       businessName: "",
       nameOfServiceProvider: "",
       email: "",
-      category: "",
+      category: [],
+      otherCategory: "",
       serviceDescription: "",
       pricingModel: "",
       websiteUrl: "",
@@ -167,7 +92,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
       personalInstagram: "",
       personalFacebook: "",
     },
-  });
+  })
 
   const countries = [
     "Afghanistan",
@@ -365,7 +290,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
     "Yemen",
     "Zambia",
     "Zimbabwe",
-  ];
+  ]
 
   const categories = [
     "Development",
@@ -380,7 +305,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
     "Smart Contract Audit",
     "Tokenomics",
     "Other",
-  ];
+  ]
 
   const pricingModels = [
     "Hourly",
@@ -391,43 +316,36 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
     "Success Fee",
     "Hybrid",
     "Custom",
-  ];
+  ]
 
   // Add useEffect to fetch service provider data
   useEffect(() => {
     const fetchServiceProviderData = async () => {
       try {
-        if (!user || isLoading) return; // Wait until user is fully loaded
-        const userId = user?.sub?.substring(14);
+        if (!user || isLoading) return // Wait until user is fully loaded
+        const userId = user?.sub?.substring(14)
 
-        const response = await fetch(
-          "https://onlyfounders.azurewebsites.net/api/profile/get-profile",
-          {
-            method: "GET",
-            headers: {
-              user_id: userId,
-            },
-          }
-        );
+        const response = await fetch("https://onlyfounders.azurewebsites.net/api/profile/get-profile", {
+          method: "GET",
+          headers: {
+            user_id: userId,
+          },
+        })
 
         if (!response.ok) {
-          console.error(
-            "Response Error:",
-            response.status,
-            await response.text()
-          );
+          console.error("Response Error:", response.status, await response.text())
         }
 
-        const data = await response.json();
+        const data = await response.json()
 
         // Set avatar image if available
         if (data.profilePic && data.profilePic.file_url) {
-          setAvatarSrc(data.profilePic.file_url);
+          setAvatarSrc(data.profilePic.file_url)
         }
 
         // Set banner image if available
         if (data.bannerImage.file_url) {
-          setBannerSrc(data.bannerImage.file_url);
+          setBannerSrc(data.bannerImage.file_url)
         }
 
         // Update form with fetched data
@@ -438,102 +356,97 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
           experience: data.serviceProviderData?.experience || "",
           location: data.location || "",
           businessName: data.serviceProviderData?.businessName || "",
-          nameOfServiceProvider:
-            data.serviceProviderData?.nameOfServiceProvider || "",
+          nameOfServiceProvider: data.serviceProviderData?.nameOfServiceProvider || "",
           email: data.serviceProviderData?.email || data.email || "",
-          category: data.serviceProviderData?.category || "",
-          serviceDescription:
-            data.serviceProviderData?.serviceDescription || "",
+          category: Array.isArray(data.serviceProviderData?.category)
+            ? data.serviceProviderData?.category.filter((cat) => categories.map((c) => c.toLowerCase()).includes(cat))
+            : data.serviceProviderData?.category
+              ? [data.serviceProviderData?.category]
+              : [],
+          otherCategory: Array.isArray(data.serviceProviderData?.category)
+            ? data.serviceProviderData?.category.find((cat) => !categories.map((c) => c.toLowerCase()).includes(cat)) ||
+              ""
+            : "",
+          serviceDescription: data.serviceProviderData?.serviceDescription || "",
           pricingModel: data.serviceProviderData?.pricingModel || "",
           websiteUrl: data.serviceProviderData?.websiteUrl || "",
-          companyTwitter:
-            data.serviceProviderData?.companySocialLinks?.Twitter || "",
-          companyLinkedin:
-            data.serviceProviderData?.companySocialLinks?.LinkedIn || "",
-          companyInstagram:
-            data.serviceProviderData?.companySocialLinks?.Instagram || "",
-          companyFacebook:
-            data.serviceProviderData?.companySocialLinks?.Facebook || "",
-          personalTwitter:
-            data.serviceProviderData?.personalSocialLinks?.Twitter || "",
-          personalLinkedin:
-            data.serviceProviderData?.personalSocialLinks?.LinkedIn || "",
-          personalInstagram:
-            data.serviceProviderData?.personalSocialLinks?.Instagram || "",
-          personalFacebook:
-            data.serviceProviderData?.personalSocialLinks?.Facebook || "",
-        });
+          companyTwitter: data.serviceProviderData?.companySocialLinks?.Twitter || "",
+          companyLinkedin: data.serviceProviderData?.companySocialLinks?.LinkedIn || "",
+          companyInstagram: data.serviceProviderData?.companySocialLinks?.Instagram || "",
+          companyFacebook: data.serviceProviderData?.companySocialLinks?.Facebook || "",
+          personalTwitter: data.serviceProviderData?.personalSocialLinks?.Twitter || "",
+          personalLinkedin: data.serviceProviderData?.personalSocialLinks?.LinkedIn || "",
+          personalInstagram: data.serviceProviderData?.personalSocialLinks?.Instagram || "",
+          personalFacebook: data.serviceProviderData?.personalSocialLinks?.Facebook || "",
+        })
       } catch (error) {
-        console.log("Error fetching service provider data:", error);
+        console.log("Error fetching service provider data:", error)
       }
-    };
+    }
 
     if (user && !isLoading) {
-      fetchServiceProviderData();
+      fetchServiceProviderData()
     }
-  }, [user, isLoading, form, router]);
+  }, [user, isLoading, form, router])
 
   useEffect(() => {
     const getOnboardingStatus = async () => {
       try {
-        const response = await fetch(
-          "https://ofstaging.azurewebsites.net/api/profile/get-onboarding-status",
-          {
-            method: "GET",
-            headers: {
-              user_id: user?.sub?.substring(14),
-            },
-          }
-        );
+        const response = await fetch("https://ofstaging.azurewebsites.net/api/profile/get-onboarding-status", {
+          method: "GET",
+          headers: {
+            user_id: user?.sub?.substring(14),
+          },
+        })
 
         // if (!response.ok) {
         //   throw new Error("Failed to fetch onboarding status");
         // }
 
-        const data = await response.json();
-        setOnboardingStatus(data.status);
+        const data = await response.json()
+        setOnboardingStatus(data.status)
         const rolesArray = Array.isArray(data.role) ? data.role : [data.role]
         setUserRole(rolesArray)
       } catch (error) {
-        console.error("Error fetching onboarding status:", error);
+        console.error("Error fetching onboarding status:", error)
         toast({
           title: "Failed to fetch onboarding status",
           description: "Please try again later.",
           variant: "destructive",
-        });
+        })
       }
-    };
+    }
 
     if (user) {
-      getOnboardingStatus();
+      getOnboardingStatus()
     }
-  }, [user]);
+  }, [user])
 
   async function onSubmit(data: ServiceProviderProfileValues) {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
-      if (!user || isLoading) return; // Wait until user is fully loaded
+      if (!user || isLoading) return // Wait until user is fully loaded
       // Get user_id from wherever it's stored in your application
-      const userId = user?.sub?.substring(14);
+      const userId = user?.sub?.substring(14)
 
       // Create FormData object
-      const formData = new FormData();
+      const formData = new FormData()
 
       // Add profile data
-      formData.append("professionalTitle", data.title);
-      formData.append("location", data.location);
-      formData.append("bio", data.bio);
-      formData.append("username", data.fullName);
+      formData.append("professionalTitle", data.title)
+      formData.append("location", data.location)
+      formData.append("bio", data.bio)
+      formData.append("username", data.fullName)
 
       // Add profile picture if available
       if (avatarFile) {
-        formData.append("profile_pic_file", avatarFile);
+        formData.append("profile_pic_file", avatarFile)
       }
 
       // Add banner image if available
       if (bannerFile) {
-        formData.append("bannerImage", bannerFile);
+        formData.append("bannerImage", bannerFile)
       }
 
       // Create company social links object
@@ -542,7 +455,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
         LinkedIn: data.companyLinkedin,
         Instagram: data.companyInstagram,
         Facebook: data.companyFacebook,
-      };
+      }
 
       // Create personal social links object
       const personalSocialLinks = {
@@ -550,136 +463,123 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
         LinkedIn: data.personalLinkedin,
         Instagram: data.personalInstagram,
         Facebook: data.personalFacebook,
-      };
+      }
 
-      // Create service provider data object
       const serviceProviderData = {
         businessName: data.businessName,
         email: data.email,
         nameOfServiceProvider: data.nameOfServiceProvider,
-        category: data.category,
+        category: data.category.includes("other")
+          ? [...data.category.filter((cat) => cat !== "other"), data.otherCategory]
+          : data.category,
         serviceDescription: data.serviceDescription,
         pricingModel: data.pricingModel,
         websiteUrl: data.websiteUrl,
         companySocialLinks: companySocialLinks,
         personalSocialLinks: personalSocialLinks,
         experience: data.experience,
-      };
+      }
 
       // Append serviceProviderData as JSON string
-      formData.append(
-        "serviceProviderData",
-        JSON.stringify(serviceProviderData)
-      );
+      formData.append("serviceProviderData", JSON.stringify(serviceProviderData))
 
       // Make API call
-      const response = await fetch(
-        "https://ofstaging.azurewebsites.net/api/profile/submit-personal-details",
-        {
-          method: "POST",
-          headers: {
-            user_id: userId,
-          },
-          body: formData,
-        }
-      );
+      const response = await fetch("https://ofstaging.azurewebsites.net/api/profile/submit-personal-details", {
+        method: "POST",
+        headers: {
+          user_id: userId,
+        },
+        body: formData,
+      })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        console.log(errorData);
+        const errorData = await response.json().catch(() => null)
+        console.log(errorData)
         // throw new Error(errorData?.message || "Failed to submit profile")
       }
 
       if (response.status === 201) {
-
-        const roleCount = Number(params.id)+1;
+        console.log(serviceProviderData)
+        const roleCount = Number(params.id) + 1
         console.log("Current Index is:", roleCount)
 
-        if(roleCount < userRole.length) {
+        if (roleCount < userRole.length) {
           const nextRole = userRole[roleCount]
 
           if (nextRole === "Founder") {
             toast({
               title: "Profile submitted successfully",
               description: "Your service provider profile has been saved.",
-            });
-            router.push(`/profile/setup/founder/${roleCount}`);
+            })
+            router.push(`/profile/setup/founder/${roleCount}`)
           } else if (nextRole === "Investor") {
             toast({
               title: "Profile submitted successfully",
               description: "Your service provider profile has been saved.",
-            });
-            router.push(`/profile/setup/investor/${roleCount}`);
-          } 
-        }
-        else {
+            })
+            router.push(`/profile/setup/investor/${roleCount}`)
+          }
+        } else {
           toast({
             title: "Profile submitted successfully",
             description: "Your service provider profile has been saved.",
-          });
-          router.push("/profile-page/combined");
+          })
+          router.push("/profile-page/combined")
         }
       }
     } catch (error) {
-      console.error("Error submitting profile:", error);
+      console.error("Error submitting profile:", error)
       toast({
         title: "Submission failed",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Failed to save your profile. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to save your profile. Please try again.",
         variant: "destructive",
-      });
+      })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
       // Save file for upload
-      setAvatarFile(file);
+      setAvatarFile(file)
 
       // Preview image
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onload = (e) => {
         if (e.target?.result) {
-          setAvatarSrc(e.target.result as string);
+          setAvatarSrc(e.target.result as string)
         }
-      };
-      reader.readAsDataURL(file);
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   // Add handleBannerChange function
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
       // Save file for upload
-      setBannerFile(file);
+      setBannerFile(file)
 
       // Preview image
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onload = (e) => {
         if (e.target?.result) {
-          setBannerSrc(e.target.result as string);
+          setBannerSrc(e.target.result as string)
         }
-      };
-      reader.readAsDataURL(file);
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
       <div className="space-y-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-white">
-            Service Provider Profile
-          </h1>
-          <p className="text-gray-400">
-            Tell us about your services and expertise in the Web3 space
-          </p>
+          <h1 className="text-3xl font-bold text-white">Service Provider Profile</h1>
+          <p className="text-gray-400">Tell us about your services and expertise in the Web3 space</p>
         </div>
 
         <div className="w-full">
@@ -697,27 +597,18 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
 
           <Card className="bg-gray-900 border-gray-800">
             <CardHeader>
-              <CardTitle className="text-xl text-white">
-                Service Provider Information
-              </CardTitle>
+              <CardTitle className="text-xl text-white">Service Provider Information</CardTitle>
               <CardDescription className="text-gray-400">
-                This information will be visible to potential clients in the
-                community
+                This information will be visible to potential clients in the community
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-6"
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <div className="flex flex-col items-center mb-6">
                     <div className="relative mb-4">
                       <Avatar className="h-24 w-24 border-2 border-gray-800">
-                        <AvatarImage
-                          src={avatarSrc || "/placeholder.svg"}
-                          alt="Profile"
-                        />
+                        <AvatarImage src={avatarSrc || "/placeholder.svg"} alt="Profile" />
                         <AvatarFallback className="bg-gray-800 text-gray-400">
                           <Building className="h-12 w-12" />
                         </AvatarFallback>
@@ -769,16 +660,12 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
                           onChange={handleBannerChange}
                         />
                       </div>
-                      <p className="text-xs text-gray-500">
-                        Recommended size: 1000x300 pixels
-                      </p>
+                      <p className="text-xs text-gray-500">Recommended size: 1000x300 pixels</p>
                     </div>
                   </div>
 
                   <div className="space-y-6">
-                    <h3 className="text-lg font-medium text-white">
-                      Personal Information
-                    </h3>
+                    <h3 className="text-lg font-medium text-white">Personal Information</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
@@ -856,10 +743,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
                             Location
                             <span className="text-red-500 text-sm">*</span>
                           </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                                 <SelectValue placeholder="Select your country" />
@@ -887,10 +771,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
                             Experience
                             <span className="text-red-500 text-sm">*</span>
                           </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                                 <SelectValue placeholder="Select your experience level" />
@@ -910,9 +791,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
                   </div>
 
                   <div className="space-y-6">
-                    <h3 className="text-lg font-medium text-white">
-                      Business Information
-                    </h3>
+                    <h3 className="text-lg font-medium text-white">Business Information</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
@@ -988,27 +867,91 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
                               Service Category
                               <span className="text-red-500 text-sm">*</span>
                             </FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                                  <SelectValue placeholder="Select service category" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                                {categories.map((category) => (
-                                  <SelectItem
-                                    key={category}
-                                    value={category.toLowerCase()}
-                                  >
-                                    {category}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
+                            <div className="space-y-4">
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant="outline"
+                                      role="combobox"
+                                      className="w-full justify-between bg-gray-800 border-gray-700 text-white"
+                                    >
+                                      {field.value.length > 0
+                                        ? `${field.value.length} categories selected`
+                                        : "Select service categories"}
+                                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0 bg-gray-900 border-gray-800 text-white">
+                                  <Command className="bg-gray-900">
+                                    <CommandInput
+                                      placeholder="Search categories..."
+                                      className="h-9 bg-gray-900 text-white"
+                                    />
+                                    <CommandList>
+                                      <CommandEmpty>No category found.</CommandEmpty>
+                                      <CommandGroup className="max-h-[200px] overflow-auto">
+                                        {categories.map((category) => {
+                                          const value = category.toLowerCase()
+                                          const isSelected = field.value.includes(value)
+                                          return (
+                                            <CommandItem
+                                              key={category}
+                                              value={value}
+                                              onSelect={() => {
+                                                if (isSelected) {
+                                                  // If already selected, remove it
+                                                  const updatedValue = field.value.filter(
+                                                    (item: string) => item !== value,
+                                                  )
+                                                  field.onChange(updatedValue)
+                                                } else {
+                                                  // If not selected, add it
+                                                  field.onChange([...field.value, value])
+                                                }
+                                              }}
+                                              className="cursor-pointer"
+                                            >
+                                              <div className="flex items-center gap-2">
+                                                <div
+                                                  className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
+                                                    isSelected ? "bg-gray-700 border-gray-600" : "border-gray-700"
+                                                  }`}
+                                                >
+                                                  {isSelected && <Check className="h-3 w-3" />}
+                                                </div>
+                                                <span>{category}</span>
+                                              </div>
+                                            </CommandItem>
+                                          )
+                                        })}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+
+                              {field.value.includes("other") && (
+                                <FormField
+                                  control={form.control}
+                                  name="otherCategory"
+                                  render={({ field: otherField }) => (
+                                    <FormItem>
+                                      <FormControl>
+                                        <Input
+                                          placeholder="Specify other category"
+                                          className="bg-gray-800 border-gray-700 text-white"
+                                          {...otherField}
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              )}
+                              <FormMessage />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -1045,10 +988,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
                               Pricing Model
                               <span className="text-red-500 text-sm">*</span>
                             </FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                                   <SelectValue placeholder="Select pricing model" />
@@ -1056,10 +996,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
                               </FormControl>
                               <SelectContent className="bg-gray-900 border-gray-800 text-white">
                                 {pricingModels.map((model) => (
-                                  <SelectItem
-                                    key={model}
-                                    value={model.toLowerCase()}
-                                  >
+                                  <SelectItem key={model} value={model.toLowerCase()}>
                                     {model}
                                   </SelectItem>
                                 ))}
@@ -1097,9 +1034,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
                   </div>
 
                   <div className="space-y-6">
-                    <h3 className="text-lg font-medium text-white">
-                      Company Social Media
-                    </h3>
+                    <h3 className="text-lg font-medium text-white">Company Social Media</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
@@ -1200,9 +1135,7 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
                   </div>
 
                   <div className="space-y-6">
-                    <h3 className="text-lg font-medium text-white">
-                      Personal Social Media
-                    </h3>
+                    <h3 className="text-lg font-medium text-white">Personal Social Media</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
@@ -1329,5 +1262,5 @@ export default function ServiceProviderProfileSetupPage({params, }: { params: { 
         </div>
       </div>
     </div>
-  );
+  )
 }

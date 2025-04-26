@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { AppLayout } from "@/components/layout/app-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -37,11 +36,13 @@ import {
   Bell,
   Rocket,
   DollarSign,
+  Building2,
 } from "lucide-react";
 
 import { useUser } from "@auth0/nextjs-auth0/client";
 import axios from "axios";
 import {useToast} from '../../hooks/use-toast'
+import { useRouter } from "next/navigation";
 
 interface FounderData {
   _id: string;
@@ -56,6 +57,7 @@ interface FounderData {
   bio: string;
   founderData?: {
     skills: string[];
+    companyName: string;
   };
   location: string;
   professionalTitle: string;
@@ -69,18 +71,71 @@ interface FounderData {
   startup_id: string | null;
 }
 
-interface InvestorData {}
+interface InvestorData {
+  _id: string;
+  user_id: string;
+  role: string | string[];
+  status: string;
+  bannerImage?: {
+    file_name: string;
+    file_url: string;
+    _id: string;
+  };
+  bio: string;
+  location: string;
+  professionalTitle: string;
+  profilePic?: {
+    file_name: string;
+    file_url: string;
+    _id: string;
+  };
+  username: string;
+  investorData?: {
+    investmentInterest: string[];
+  };
+  email: string;
+  startup_id: string | null;
+}
 
-interface ServiceProviderData {}
+interface ServiceProviderData {
+  _id: string;
+  user_id: string;
+  role: string | string[];
+  status: string;
+  bannerImage?: {
+    file_name: string;
+    file_url: string;
+    _id: string;
+  };
+  bio: string;
+  location: string;
+  professionalTitle: string;
+  profilePic?: {
+    file_name: string;
+    file_url: string;
+    _id: string;
+  };
+  serviceProviderData?: {
+    category: string[];
+  };
+  username: string;
+  email: string;
+  startup_id: string | null;
+}
 
 export default function NetworkPage() {
   const [activeTab, setActiveTab] = useState("founders");
   const [founderData, setFounderData] = useState<FounderData[]>([]);
   const [investorData, setInvestorData] = useState<InvestorData[]>([]);
-  const [serviceProviderData, setServiceProviderData] = useState<ServiceProviderData[]>([]);
+  const [ServiceProviderData, setServiceProviderData] = useState<ServiceProviderData[]>([]);
+  const [selectedFounderCategory, setSelectedFounderCategory] = useState<string>("");
+  const [selectedInvestorCategory, setSelectedInvestorCategory] = useState<string>("");
+  const [selectedServiceProviderCategory, setSelectedServiceProviderCategory] = useState<string>("");
   const { user, isLoading } = useUser();
   const {toast} = useToast();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter()
+
 
   // Mock data for members
   const members = [
@@ -331,9 +386,11 @@ export default function NetworkPage() {
 
   const userId = user?.sub?.substring(14);
 
+  //founder data API
   useEffect(() => {
     const fetchFounderData = async () => {
       try {
+        setLoading(true);
         if (!user || isLoading) return;
         console.log("Calling API now...");
         const response = await axios.get(
@@ -357,17 +414,99 @@ export default function NetworkPage() {
     };
     fetchFounderData();
   }, [user]);
-  
-  if (loading || !user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading Founders ...</p>
-        </div>
-      </div>
-    );
-  }
+
+  //investor data API
+  useEffect(() => {
+    const fetchInvestorData = async () => {
+      try {
+        setLoading(true);
+        if (!user || isLoading) return;
+        console.log("Calling API now...");
+        const response = await axios.get(
+          "https://ofStaging.azurewebsites.net/api/network/list-profile-by-role/Investor",
+          {
+            headers: {
+              user_id: userId,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          const data = await response.data;
+          console.log("Investor data:", data.profiles);
+          setInvestorData(data.profiles);
+        }
+      } catch (error) {
+        console.error("Error fetching investor data:", error);
+      }
+      setLoading(false);
+    };
+
+    if (activeTab === "investors") {
+      fetchInvestorData();
+    }
+  }, [activeTab]);
+
+  //service provider data API
+  useEffect(() => {
+    const fetchServiceProviderData = async () => {
+      try {
+        setLoading(true);
+        if (!user || isLoading) return;
+        const response = await axios.get(
+          "https://ofStaging.azurewebsites.net/api/network/list-profile-by-role/ServiceProvider",
+          {
+            headers: {
+              user_id: userId,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          const data = await response.data;
+          setServiceProviderData(data.profiles);
+        }
+      } catch (error) {
+        console.error("Error fetching ServiceProvider data:", error);
+      }
+      setLoading(false);
+    };
+
+    if (activeTab === "serviceProviders") {
+      fetchServiceProviderData();
+    }
+  }, [activeTab]);
+
+
+  //filter founders based on selected category
+  const filteredFounders = 
+  selectedFounderCategory.toLowerCase() === "all" || selectedFounderCategory.trim() === ""
+    ? founderData
+    : founderData.filter(card => 
+        card.founderData?.skills.some(skill => 
+          skill.toLowerCase() === selectedFounderCategory.toLowerCase()
+        )
+  );
+
+  //filter investors based on selected category
+  const filteredInvestors = 
+  selectedInvestorCategory.toLowerCase() === "all" || selectedInvestorCategory.trim() === ""
+    ? investorData 
+    : investorData.filter(card => 
+        card.investorData?.investmentInterest.some(interest => 
+            interest.toLowerCase() === selectedInvestorCategory.toLowerCase()
+    )
+  );
+
+  //filter service providers based on selected category
+  const filteredServiceProviders = 
+  selectedServiceProviderCategory.toLowerCase() === "all" || selectedServiceProviderCategory.trim() === ""
+    ? ServiceProviderData 
+    : ServiceProviderData.filter(card => 
+        card.serviceProviderData?.category.some(category => 
+            category.toLowerCase() === selectedServiceProviderCategory.toLowerCase()
+    )
+  );
 
   return (
     <div>
@@ -451,6 +590,7 @@ export default function NetworkPage() {
             </TabsTrigger>
           </TabsList>
 
+
           <TabsContent value="founders" className="space-y-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
@@ -460,22 +600,166 @@ export default function NetworkPage() {
                   className="pl-9 bg-gray-900 border-gray-700 text-white"
                 />
               </div>
-              <Select defaultValue="all">
+              <Select value={selectedFounderCategory} onValueChange={(value) => setSelectedFounderCategory(value)}>
                 <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700 text-white">
                   <Filter className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Filter by" />
+                  <SelectValue placeholder="Filter By..." />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                  <SelectItem value="all">All Members</SelectItem>
-                  <SelectItem value="founders">Founders</SelectItem>
-                  <SelectItem value="investors">Investors</SelectItem>
-                  <SelectItem value="developers">Developers</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="DePIN">DePIN</SelectItem>
+                  <SelectItem value="DeFi">DeFi</SelectItem>
+                  <SelectItem value="RWA">RWA</SelectItem>
+                  <SelectItem value="Metaverse">Metaverse</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {founderData.map((member) => (
+              {!user ? (
+                  <div className="items-center justify-center flex flex-col space-y-4">
+                    <p className="text-center text-lg text-gray-400">Please login to view profiles.</p>
+                    <Button 
+                      onClick={() => router.push('/api/auth/login')}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                      Login
+                    </Button>
+                  </div>
+              ): 
+              loading? (
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                  <p className="text-gray-400">Loading Data ...</p>
+                </div>
+              ):
+              (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredFounders.map((member) => (
+                <Card
+                key={member._id}
+                className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors flex flex-col justify-between"
+              >
+                <div className="flex-1 flex flex-col">
+                  <CardHeader className="pb-0">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-16 w-16 border-2 border-gray-800">
+                          <AvatarImage src={member?.profilePic?.file_url} />
+                          <AvatarFallback>
+                            {member.username
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="flex items-center">
+                            <CardTitle className="text-lg text-white">
+                              {member.username}
+                            </CardTitle>
+                             {member.status === "verified" ? (
+                               <Badge className="ml-2 bg-green-900/30 text-green-400 border-green-800">
+                                 Verified
+                              </Badge>
+                             ): (
+                               <Badge className="ml-2 bg-amber-800/50 text-amber-300 border-amber-700">
+                                 Unverified
+                               </Badge>
+                             )}
+                          </div>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            <Badge
+                              variant="outline"
+                              className="bg-gray-800/50 text-gray-300 border-gray-700"
+                            >
+                              {member.role}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+ 
+                  <CardContent className="flex-1 flex flex-col justify-between pt-4 space-y-4">
+                    <div className="flex-1 space-y-4">
+                      <p className="text-sm text-gray-300 line-clamp-4 min-h-[5rem]">
+                        {member.bio || "No bio available."}
+                      </p>
+              
+                      <div className="flex flex-wrap gap-2">
+                        {member.founderData?.skills?.map((skill, index) => (
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="bg-gray-800/50 text-gray-300 border-gray-700"
+                          >
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+              
+                    {/* Bottom Button */}
+                    <div className="pt-4 flex flex-col gap-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center text-sm text-gray-400">
+                          <Building2 className="h-4 w-4 mr-1" />
+                          {member.founderData?.companyName || "N/A"}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-400">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          {member.location || "Unknown"}
+                        </div>
+                      </div>
+                      <Button 
+                      onClick={() => 
+                        {user ? router.push(`/network-profile/founder/${member.user_id}`) 
+                          : toast({title: "Login Required", 
+                            description: "Please login to view profiles.", 
+                            variant: "destructive"})}}
+                       className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                        View Profile
+                      </Button>
+                    </div>
+                  </CardContent>
+                </div>
+              </Card>
+              ))}
+               </div>
+               )}
+          </TabsContent>
+
+          <TabsContent value="investors" className="space-y-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                <Input
+                  placeholder="Search investors..."
+                  className="pl-9 bg-gray-900 border-gray-700 text-white"
+                />
+              </div>
+              <Select value={selectedInvestorCategory} onValueChange={(value) => setSelectedInvestorCategory(value)}> 
+                <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700 text-white">
+                  <Filter className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder="Filter By..." />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-900 border-gray-800 text-white">
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="DeFi">DeFi</SelectItem>
+                  <SelectItem value="NFT">NFT</SelectItem>
+                  <SelectItem value="DAO">DAO</SelectItem>
+                  <SelectItem value="Metaverse">Metaverse</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {loading? (
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p className="text-gray-400">Loading Data ...</p>
+              </div>
+            ):(
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredInvestors.map((member) => (
                <Card
                key={member._id}
                className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors flex flex-col justify-between"
@@ -498,11 +782,15 @@ export default function NetworkPage() {
                            <CardTitle className="text-lg text-white">
                              {member.username}
                            </CardTitle>
-                           {member && (
-                             <Badge className="ml-2 bg-amber-900/30 text-amber-400 border-amber-800">
-                               Unverified
+                            {member.status === "verified" ? (
+                              <Badge className="ml-2 bg-green-900/30 text-green-400 border-green-800">
+                                Verified
                              </Badge>
-                           )}
+                            ): (
+                              <Badge className="ml-2 bg-amber-800/50 text-amber-300 border-amber-700">
+                                Unverified
+                              </Badge>
+                            )}
                          </div>
                          <div className="flex flex-wrap gap-2 mt-1">
                            <Badge
@@ -524,13 +812,13 @@ export default function NetworkPage() {
                      </p>
              
                      <div className="flex flex-wrap gap-2">
-                       {member.founderData?.skills?.map((skill, index) => (
+                       {member.investorData?.investmentInterest?.map((interest, index) => (
                          <Badge
                            key={index}
                            variant="outline"
                            className="bg-gray-800/50 text-gray-300 border-gray-700"
                          >
-                           {skill}
+                           {interest}
                          </Badge>
                        ))}
                      </div>
@@ -544,10 +832,11 @@ export default function NetworkPage() {
                    {/* Bottom Button */}
                    <div className="pt-4">
                      <Button 
-                     onClick={() => toast(
-                      {description: "Founder Profile coming soon!",
-                      title: "Message",}
-                     )}
+                    onClick={() => 
+                      {user ? router.push(`/network-profile/investor/${member.user_id}`) 
+                        : toast({title: "Login Required", 
+                          description: "Please login to view profiles.", 
+                          variant: "destructive"})}}
                       className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                        View Profile
                      </Button>
@@ -558,42 +847,7 @@ export default function NetworkPage() {
              
               ))}
             </div>
-          </TabsContent>
-
-          <TabsContent value="investors" className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-                <Input
-                  placeholder="Search investors..."
-                  className="pl-9 bg-gray-900 border-gray-700 text-white"
-                />
-              </div>
-              <Select defaultValue="all">
-                <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700 text-white">
-                  <Filter className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Filter by" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                  <SelectItem value="all">All Investors</SelectItem>
-                  <SelectItem value="angel">Angel Investors</SelectItem>
-                  <SelectItem value="vc">Venture Capitalists</SelectItem>
-                  <SelectItem value="institutional">Institutional</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card
-                  className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors"
-                >
-                  <CardContent className="p-6">
-                    {/* Investor content goes here */}
-                    Investor Profile Coming Soon!
-                  </CardContent>
-                </Card>
-
-            </div>
+            )}
           </TabsContent>  
 
           <TabsContent value="serviceProviders" className="space-y-6">
@@ -605,30 +859,126 @@ export default function NetworkPage() {
                   className="pl-9 bg-gray-900 border-gray-700 text-white"
                 />
               </div>
-              <Select defaultValue="all">
+              <Select value={selectedServiceProviderCategory}>
                 <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700 text-white">
                   <Filter className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Filter by" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-900 border-gray-800 text-white">
-                  <SelectItem value="all">All Service Providers</SelectItem>
-                  <SelectItem value="legal">Legal Services</SelectItem>
-                  <SelectItem value="marketing">Marketing Services</SelectItem>
-                  <SelectItem value="development">Development Services</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="legal">Legal</SelectItem>
+                  <SelectItem value="marketing">Marketing</SelectItem>
+                  <SelectItem value="development">Development</SelectItem>
+                  <SelectItem value="design">Design</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card
-                  className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors"
-                >
-                  <CardContent className="p-6">
-                    {/* Service Provider content goes here */}
-                    Service Provider Profile Coming Soon!
-                  </CardContent>
-                </Card>
+            {loading? (
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p className="text-gray-400">Loading Data ...</p>
+              </div>
+            ):(
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredServiceProviders.map((member) => (
+               <Card
+               key={member._id}
+               className="bg-gray-900 border-gray-800 hover:border-blue-600 transition-colors flex flex-col justify-between"
+             >
+               <div className="flex-1 flex flex-col">
+                 <CardHeader className="pb-0">
+                   <div className="flex items-start justify-between">
+                     <div className="flex items-center gap-4">
+                       <Avatar className="h-16 w-16 border-2 border-gray-800">
+                         <AvatarImage src={member?.profilePic?.file_url} />
+                         <AvatarFallback>
+                           {member.username
+                             .split(" ")
+                             .map((n) => n[0])
+                             .join("")}
+                         </AvatarFallback>
+                       </Avatar>
+                       <div>
+                         <div className="flex items-center">
+                           <CardTitle className="text-lg text-white">
+                             {member.username}
+                           </CardTitle>
+                            {member.status === "verified" ? (
+                              <Badge className="ml-2 bg-green-900/30 text-green-400 border-green-800">
+                                Verified
+                             </Badge>
+                            ): (
+                              <Badge className="ml-2 bg-amber-800/50 text-amber-300 border-amber-700">
+                                Unverified
+                              </Badge>
+                            )}
+                         </div>
+                         <div className="flex flex-wrap gap-2 mt-1">
+                           <Badge
+                             variant="outline"
+                             className="bg-gray-800/50 text-gray-300 border-gray-700"
+                           >
+                             {member.role}
+                           </Badge>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 </CardHeader>
+
+                 <CardContent className="flex-1 flex flex-col justify-between pt-4 space-y-4">
+                   <div className="flex-1 space-y-4">
+                     <p className="text-sm text-gray-300 line-clamp-4 min-h-[5rem]">
+                       {member.bio || "No bio available."}
+                     </p>
+             
+                     <div className="flex flex-wrap gap-2">
+                        {Array.isArray(member.serviceProviderData?.category) ? (
+                          member.serviceProviderData?.category.map((category, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="bg-gray-800/50 text-gray-300 border-gray-700"
+                            >
+                              {category}
+                            </Badge>
+                          ))
+                        ) : member.serviceProviderData?.category ? (
+                          <Badge
+                            variant="outline"
+                            className="bg-gray-800/50 text-gray-300 border-gray-700"
+                          >
+                            {member.serviceProviderData.category}
+                          </Badge>
+                        ) : null}
+                    </div>
+
+             
+                     <div className="flex items-center text-sm text-gray-400">
+                       <MapPin className="h-4 w-4 mr-1" />
+                       {member.location || "Unknown"}
+                     </div>
+                   </div>
+             
+                   {/* Bottom Button */}
+                   <div className="pt-4">
+                     <Button 
+                     onClick={() => 
+                        {user ? router.push(`/network-profile/serviceProvider/${member.user_id}`) 
+                          : toast({title: "Login Required", 
+                            description: "Please login to view profiles.", 
+                            variant: "destructive"})}}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                       View Profile
+                     </Button>
+                   </div>
+                 </CardContent>
+               </div>
+             </Card>
+              ))}
             </div>
+            )}
           </TabsContent>
 
           <TabsContent value="events" className="space-y-6">

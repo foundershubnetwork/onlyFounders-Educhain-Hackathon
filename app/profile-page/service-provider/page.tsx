@@ -658,17 +658,22 @@ export default function ServiceProviderProfilePage() {
 
               <div className="flex items-center gap-2 text-gray-300">
                 <Globe className="h-4 w-4 flex-shrink-0" />
-                {isEditing ? (
-                  <Input
-                    value={editedProfile?.serviceProviderData?.category || ""}
-                    onChange={(e) =>
-                      handleBusinessInfoChange("companyWebsite", e.target.value)
-                    }
-                    className="text-gray-300 bg-[#1e1a3c] border-none"
-                  />
-                ) : (
-                  <span>{profile.serviceProviderData?.category}</span>
-                )}
+                {Array.isArray(profile.serviceProviderData?.category) ? (
+                    profile.serviceProviderData?.category.map(
+                      (category, index) => (
+                        <span
+                          key={index}
+                        >
+                          {category}
+                        </span>
+                      )
+                    )
+                  ) : profile.serviceProviderData?.category ? (
+                    <span
+                    >
+                      {profile.serviceProviderData.category}
+                    </span>
+                  ) : null}
               </div>
             </div>
           </div>

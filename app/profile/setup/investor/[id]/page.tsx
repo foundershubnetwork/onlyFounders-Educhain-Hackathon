@@ -35,8 +35,8 @@ const investorProfileSchema = z
     minInvestment: z.number().min(100, { message: "Minimum investment must be at least 100 USDC" }),
     maxInvestment: z.number().min(100, { message: "Maximum investment must be at least 100 USDC" }),
     interests: z.array(z.string()).min(1, { message: "Please select at least one interest" }),
-    twitter: z.string().optional().or(z.literal("")),
-    linkedin: z.string().optional().or(z.literal("")),
+    twitter: z.string().min(1, { message: "Twitter is required" }),
+    linkedin: z.string().min(1, { message: "LinkedIn is required" }),
     publicProfile: z.boolean().default(true),
   })
   .refine((data) => data.maxInvestment >= data.minInvestment, {

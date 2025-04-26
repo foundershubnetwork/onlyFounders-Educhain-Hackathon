@@ -894,7 +894,7 @@ export default function ProjectDetailPage({params, }: { params: { id: string }; 
               {" "}
               Founder:
               <a
-                href={`/public-profile/${project.id}`}
+                href={`/public-profile/founder/${project.id}`}
                 className="text-blue-600"
               >
                 {" "}

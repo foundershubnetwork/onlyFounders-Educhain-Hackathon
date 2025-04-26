@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { ArrowRight, Building, User, Wallet } from "lucide-react"
+import { ArrowRight, Building, CheckCircle, User, Wallet } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
@@ -161,7 +161,14 @@ export default function ProfileSetupPage() {
                     <Building className="h-6 w-6 text-blue-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-white">I'm a Founder</h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-medium text-white">I'm a Founder</h3>
+                      {selectedTypes.includes("Founder")? (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                      ): (
+                        <div className="bg-gray-600 rounded-full h-5 w-5" />
+                      )}
+                    </div>
                     <p className="text-gray-400 text-sm mt-1">
                       Raise funds for your Web3 project, connect with investors, and grow your startup
                     </p>
@@ -180,7 +187,14 @@ export default function ProfileSetupPage() {
                     <Wallet className="h-6 w-6 text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-white">I'm an Investor</h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-medium text-white">I'm an Investor</h3>
+                      {selectedTypes.includes("Investor")? (
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                        ): (
+                          <div className="bg-gray-600 rounded-full h-5 w-5" />
+                        )}
+                    </div>
                     <p className="text-gray-400 text-sm mt-1">
                       Discover promising Web3 projects, invest in blockchain startups, and track your portfolio
                     </p>
@@ -199,14 +213,22 @@ export default function ProfileSetupPage() {
                     <User className="h-6 w-6 text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-white">Service Provider</h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-medium text-white">I'm a Service Provider</h3>
+                      {selectedTypes.includes("ServiceProvider")? (
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          ): (
+                            <div className="bg-gray-600 rounded-full h-5 w-5" />
+                          )}
+                    </div>
                     <p className="text-gray-400 text-sm mt-1">
                       Connect with Startups, Mentor, Scale, Support and Build.
                     </p>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex flex-col items-start">
+                <CardDescription className="text-lg text-gray-400 mb-2">Connect Your Wallet</CardDescription>
                 <div className="mb-4 w-full flex flex-col items-center gap-4">
                   <ConnectButton.Custom>
                             {({ account, openConnectModal, openAccountModal, mounted }) => {
@@ -234,8 +256,13 @@ export default function ProfileSetupPage() {
                             }}
                   </ConnectButton.Custom>
                 <Button
-                  onClick={handleContinue}
-                  disabled={selectedTypes.length === 0 || isSubmitting || !isConnected}
+                  onClick={() => 
+                    {isConnected? handleContinue() : toast({
+                      title: "Wallet not connected",
+                      description: "Please connect your wallet to continue.",
+                      variant: "destructive",
+                    })}}
+                  disabled={selectedTypes.length === 0 || isSubmitting}
                   className="w-full bg-black hover:bg-gray-900 text-white border border-gray-800"
                 >
                   {isSubmitting ? "Submitting..." : "Continue"}

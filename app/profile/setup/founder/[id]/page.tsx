@@ -32,9 +32,9 @@ const founderProfileSchema = z.object({
   companyName: z.string().min(2, { message: "Company name is required" }),
   location: z.string().min(1, { message: "Please select your country" }),
   website: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
-  twitter: z.string().optional().or(z.literal("")),
-  linkedin: z.string().optional().or(z.literal("")),
-  github: z.string().optional().or(z.literal("")),
+  twitter: z.string().min(1, { message: "Twitter is reqiured" }),
+  linkedin: z.string().min(1, { message: "LinkedIn is required" }),
+  github: z.string().min(1, { message: "Github is required" }),
 })
 
 type FounderProfileValues = z.infer<typeof founderProfileSchema>

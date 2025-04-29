@@ -10,27 +10,28 @@ import AuthTracking from "./MIXPanel/AuthTracking";
 import AuthProvider from "../components/AuthProvider"; // Use AuthProvider instead of UserProvider
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
-import OCConnectWrapper from '../components/OCConnectWrapper';
+import OCConnectWrapper from "../components/OCConnectWrapper";
 
 const opts = {
-  clientId: '<Does_Not_Matter_For_Sandbox_mode>',    
-  redirectUri: 'http://localhost:3000/', // Adjust this URL
-  referralCode: 'ONLYFOUNDERS', // Assign partner code
+  clientId: "90083ac5-8ae6-4912-8884-641a62c4880c",
+  redirectUri: "https://www.onlyfounders.xyz/", // Adjust this URL
+  referralCode: "ONLYFOUNDERS", // Assign partner code
 };
 
 const inter = Inter({ subsets: ["latin"] });
-
 
 //social Preview settings
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.onlyfounders.xyz"),
   title: "OnlyFounders - Web3 Fundraising Platform",
   icons: {
-    icon: 'https://f3ai.blob.core.windows.net/frontend-picture-storage/favicon.svg', // or relative: '/favicon.ico'
+    icon: "https://f3ai.blob.core.windows.net/frontend-picture-storage/favicon.svg", // or relative: '/favicon.ico'
   },
-  description: "AI-powered Web3 fundraising platform connecting innovative blockchain projects with global investors",
+  description:
+    "AI-powered Web3 fundraising platform connecting innovative blockchain projects with global investors",
   openGraph: {
-    title: "Startup capital reimagined: transparent, trustless, and for the 99%.",
+    title:
+      "Startup capital reimagined: transparent, trustless, and for the 99%.",
     description: "Founders-first.",
     images: [
       {
@@ -48,7 +49,6 @@ export const metadata: Metadata = {
   },
 };
 
-
 export default function RootLayout({
   children,
 }: {
@@ -57,7 +57,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="icon" href="https://f3ai.blob.core.windows.net/frontend-picture-storage/favicon.svg" />
+        <link
+          rel="icon"
+          href="https://f3ai.blob.core.windows.net/frontend-picture-storage/favicon.svg"
+        />
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-R97GNL407V"
@@ -75,9 +78,9 @@ export default function RootLayout({
         <AuthProvider>
           <AuthTracking /> {/* Tracking user login */}
           <Providers>
-          <OCConnectWrapper opts={opts} sandboxMode={true}>
-          {children}
-        </OCConnectWrapper>
+            <OCConnectWrapper opts={opts} sandboxMode={false}>
+              {children}
+            </OCConnectWrapper>
             <Analytics />
             <SpeedInsights />
             <Toaster />

@@ -8,8 +8,8 @@
 <p float="left">
  <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questpage.PNG" alt="questPage" width="450" height="200">
   <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questRules.PNG" alt="questRules" width="450" height="200">
- To attempt quests user can navigate to quest section where they get cards containing quests sorted acc to category - basic , intermediate , advanced
 </p>
+ To attempt quests user can navigate to quest section where they get cards containing quests sorted acc to category - basic , intermediate , advanced
 <p float="left">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questattempt.PNG" alt="questAttempt" width="450" height="200">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/mintNft.PNG" alt="mintNFT" width="450" height="200">

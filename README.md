@@ -5,15 +5,25 @@
 # [User walkthrough document ](https://www.notion.so/foundershub/OnlyFounders-User-walkthrough-Documentations-1e4f8b9deb7980f19e6ccada2e18cfa0?pvs=4) - Read our full User walthrough documentation here.
 
 ## Glimpse of quest section
-<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questpage.PNG" alt="questPage" width="400" height="200">
-<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questRules.PNG" alt="questRules" width="400" height="200">
+<p float="left">
+ <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questpage.PNG" alt="questPage" width="400" height="200">
+  <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questRules.PNG" alt="questRules" width="400" height="200">
+</p>
+<p float="left">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questattempt.PNG" alt="questAttempt" width="400" height="200">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/mintNft.PNG" alt="mintNFT" width="400" height="200">
+</p>
+<p float="left">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/connectwallet.PNG" alt="connectwallet" width="400" height="200">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/rainbowkit.PNG" alt="rainbowkit" width="400" height="200">
+</p>
+<p float="left">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/metamask connect wallet.PNG" alt="metamask" width="400" height="200">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/nftmintedsuccessfully.PNG" alt="nftmint" width="400" height="200">
+</p>
+<p float="center">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/explorer.PNG" alt="explorer" width="400" height="200">
+</p>
 
 ## Ecosystem Impact and Integration.
 

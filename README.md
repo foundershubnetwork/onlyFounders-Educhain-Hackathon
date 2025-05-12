@@ -10,24 +10,26 @@
   <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questRules.PNG" alt="questRules" width="450" height="200">
 </p>
 Users can browse the Quests section to view categorized quest cards—Basic, Intermediate, and Advanced—and start any quest directly from there.
- <br>
+<br><br>
 <p float="left">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questattempt.PNG" alt="questAttempt" width="450" height="200">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/mintNft.PNG" alt="mintNFT" width="450" height="200">
 </p>
 Users earn 4 points for each correct answer and lose 1 point for incorrect answers. Scoring above 50% in a quest makes them eligible to mint an NFT as a reward.
-<br>
+<br><br>
 <p float="left">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/connectwallet.PNG" alt="connectwallet" width="450" height="200">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/rainbowkit.PNG" alt="rainbowkit" width="450" height="200">
 </p>
 To mint the NFT, users must connect their wallet directly on the platform.
-<br>
+<br><br>
+
 <p float="left">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/metamask connect wallet.PNG" alt="metamask" width="450" height="200">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/nftmintedsuccessfully.PNG" alt="nftmint" width="450" height="200">
 </p>
 Simply connect your wallet, sign the transaction, and mint your NFT instantly.
+<br><br>
 <p float="centre">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/explorer.PNG" alt="explorer" width="450" height="200">
 </p>

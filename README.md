@@ -6,8 +6,8 @@
 
 ## Glimpse of quest section
 <p float="left">
- <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questpage.PNG" alt="questPage" width="400" height="200">
-  <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questRules.PNG" alt="questRules" width="400" height="200">
+ <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questpage.PNG" alt="questPage" width="300" height="200">
+  <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questRules.PNG" alt="questRules" width="300" height="200">
 </p>
 <p float="left">
 <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questattempt.PNG" alt="questAttempt" width="400" height="200">

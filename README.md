@@ -8,21 +8,22 @@
 <p float="left">
  <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questpage.PNG" alt="questPage" width="450" height="200">
   <img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questRules.PNG" alt="questRules" width="450" height="200">
+ To attempt quests user can navigate to quest section where they get cards containing quests sorted acc to category - basic , intermediate , advanced
 </p>
 <p float="left">
-<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questattempt.PNG" alt="questAttempt" width="400" height="200">
-<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/mintNft.PNG" alt="mintNFT" width="400" height="200">
+<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/questattempt.PNG" alt="questAttempt" width="450" height="200">
+<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/mintNft.PNG" alt="mintNFT" width="450" height="200">
 </p>
 <p float="left">
-<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/connectwallet.PNG" alt="connectwallet" width="400" height="200">
-<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/rainbowkit.PNG" alt="rainbowkit" width="400" height="200">
+<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/connectwallet.PNG" alt="connectwallet" width="450" height="200">
+<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/rainbowkit.PNG" alt="rainbowkit" width="450" height="200">
 </p>
 <p float="left">
-<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/metamask connect wallet.PNG" alt="metamask" width="400" height="200">
-<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/nftmintedsuccessfully.PNG" alt="nftmint" width="400" height="200">
+<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/metamask connect wallet.PNG" alt="metamask" width="450" height="200">
+<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/nftmintedsuccessfully.PNG" alt="nftmint" width="450" height="200">
 </p>
-<p float="center">
-<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/explorer.PNG" alt="explorer" width="400" height="200">
+<p float="centre">
+<img src="https://f3ai.blob.core.windows.net/frontend-picture-storage/explorer.PNG" alt="explorer" width="450" height="200">
 </p>
 
 ## Ecosystem Impact and Integration.
